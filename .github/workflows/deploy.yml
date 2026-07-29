@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. Superseded runs are cancelled rather than queued, so a
+# rapid series of pushes doesn't publish an older build after a newer one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test -- --watch=false
+
+      # base-href is derived from the repo name rather than hard-coded, so a
+      # rename can't silently break every asset path on the deployed site.
+      - name: Build
+        run: npx ng build --base-href "/${{ github.event.repository.name }}/"
+
+      # Pages has no server-side rewrites, so a deep link like /movie/550 would
+      # 404. Serving index.html as the 404 page lets the Angular router take
+      # over and resolve the URL client-side.
+      - name: Add SPA fallback
+        run: cp dist/noviflix/browser/index.html dist/noviflix/browser/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/noviflix/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,12 @@
+name = "noviflix-tmdb"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Origins permitted to use the proxy. Without this it would be an open relay for
+# the token, so keep it tight — only the deployed site and local dev.
+[vars]
+ALLOWED_ORIGINS = "https://vitorcamargo.github.io,http://localhost:4200"
+
+# TMDB_ACCESS_TOKEN is a secret, not a var. Set it with:
+#   npx wrangler secret put TMDB_ACCESS_TOKEN
+# Never put it in this file — wrangler.toml is committed.

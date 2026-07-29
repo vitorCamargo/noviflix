@@ -15,8 +15,14 @@ npm run build      # production bundle into dist/
 npm test           # Vitest unit tests
 ```
 
-A TMDB credential already sits in `src/environments/environment.ts`. Nothing calls
-the API yet.
+TMDB calls route through a Cloudflare Worker that holds the token server-side, so
+no credential lives in this repo. Point `src/environments/environment.ts` at your
+deployed Worker URL — see [DEPLOY.md](./DEPLOY.md). Nothing calls the API yet.
+
+## Deployment
+
+GitHub Pages, published by `.github/workflows/deploy.yml` on every push to
+`master`. Full setup and troubleshooting in [DEPLOY.md](./DEPLOY.md).
 
 ## What exists
 
