@@ -1,0 +1,41 @@
+@mixin container {
+  width: 100%;
+  max-width: var(--nv-max-width);
+  margin-inline: auto;
+  padding-inline: var(--nv-gutter);
+}
+
+@mixin focus-ring($offset: 3px) {
+  &:focus-visible {
+    outline: 2px solid var(--nv-accent);
+    outline-offset: $offset;
+    border-radius: var(--nv-radius-sm);
+  }
+}
+
+@mixin clamp-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+@mixin kicker {
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--nv-tracking-wide);
+  text-transform: uppercase;
+  color: var(--nv-accent);
+}

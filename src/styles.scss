@@ -1,0 +1,166 @@
+@use './styles/tokens';
+@use './styles/mixins' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--nv-bg);
+  color: var(--nv-text);
+  font-family: var(--nv-font);
+  font-size: var(--nv-text-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/** Locks scroll while the details pop-up is open. */
+body.nv-modal-open {
+  overflow: hidden;
+}
+
+// ---------------------------------------------------------------------------
+// Content track
+//
+// Mobile scrolls vertically like any page. From $bp-horizontal up, the track
+// becomes a horizontal rail and HorizontalScroll maps vertical wheel input onto
+// it. These rules are global rather than in app.scss because they must reach
+// routed components, which sit outside App's view encapsulation.
+//
+// The directive detects which mode is active from the resulting overflow, so
+// this media query is the only place the breakpoint is defined.
+// ---------------------------------------------------------------------------
+
+.nv-track {
+  inline-size: 100%;
+}
+
+@media (min-width: 901px) {
+  html,
+  body {
+    overflow: hidden;
+  }
+
+  .shell {
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+  }
+
+  .nv-track {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    @include hide-scrollbar;
+
+    /* The directive eases scrollLeft itself; CSS smoothing on top of that
+       fights it and produces a rubbery lag. */
+    scroll-behavior: auto;
+
+    /* A focusable scroll container gets a ring on click without this. */
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--nv-accent);
+      outline-offset: -2px;
+    }
+  }
+
+  /* Routed page hosts: full height, sized to their content along the track. */
+  .nv-track > *:not(router-outlet) {
+    block-size: 100%;
+    flex: 0 0 auto;
+    min-inline-size: 100vw;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: var(--nv-tracking-tight);
+  line-height: 1.15;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:where(a, button, input, [tabindex]) {
+  @include focus-ring;
+}
+
+::selection {
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+}
+
+// No scroll chrome anywhere — every surface reads as uninterrupted. Scrolling
+// itself is untouched: wheel, trackpad, touch and keyboard all still work.
+html,
+body,
+* {
+  @include hide-scrollbar;
+}
+
+@keyframes nv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes nv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

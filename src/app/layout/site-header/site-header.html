@@ -1,0 +1,27 @@
+<header class="hdr" [class.is-scrolled]="scrolled()">
+  <div class="hdr__inner">
+    <a class="brand" routerLink="/" [attr.aria-label]="i18n.t('app.name')">
+      <img class="brand__mark" src="logo-mark.svg" alt="" aria-hidden="true" />
+      <img class="brand__word" src="logo-wordmark.svg" [alt]="i18n.t('app.name')" />
+    </a>
+
+    <nav class="nav" [attr.aria-label]="i18n.t('nav.home')">
+      <a
+        class="nav__link"
+        routerLink="/"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >{{ i18n.t('nav.home') }}</a
+      >
+      <a class="nav__link" routerLink="/collections" routerLinkActive="is-active">{{
+        i18n.t('nav.collections')
+      }}</a>
+
+      <nv-about-popover />
+    </nav>
+
+    <div class="hdr__tools">
+      <nv-language-switcher />
+    </div>
+  </div>
+</header>

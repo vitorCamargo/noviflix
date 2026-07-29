@@ -1,0 +1,103 @@
+// ---------------------------------------------------------------------------
+// Noviflix design tokens
+//
+// The whole visual identity funnels through these custom properties, so the
+// cruuunchify-inspired pass only has to touch this file plus _mixins.scss.
+// Accent is Novibet-leaning cyan (#33c5cf).
+// ---------------------------------------------------------------------------
+
+:root {
+  // Brand ------------------------------------------------------------------
+  --nv-accent: #33c5cf;
+  --nv-accent-strong: #5ce0e9;
+  --nv-accent-dim: #1c8a92;
+  --nv-accent-ink: #04191b; // text placed on top of an accent fill
+  --nv-accent-soft: rgba(51, 197, 207, 0.14);
+  --nv-accent-line: rgba(51, 197, 207, 0.32);
+  --nv-accent-glow: rgba(51, 197, 207, 0.45);
+
+  // Surfaces ---------------------------------------------------------------
+  --nv-bg: #000000;
+  --nv-bg-raised: #0a0c0d;
+  --nv-surface: #101416;
+  --nv-surface-2: #171d20;
+  --nv-surface-3: #1f272a;
+  --nv-overlay: rgba(0, 0, 0, 0.78);
+
+  // Overlays ---------------------------------------------------------------
+  // Panels sit slightly lighter than the page so they read as lifted without
+  // needing a hard border.
+  --nv-panel: #17191a;
+  --nv-panel-2: #1f2223;
+  --nv-panel-tile: #232729;
+  /* Dismiss actions stay red so they read apart from the cyan accent. */
+  --nv-close: #ff3b5c;
+  --nv-close-soft: rgba(255, 59, 92, 0.14);
+
+  // Text -------------------------------------------------------------------
+  --nv-text: #f2f6f7;
+  --nv-text-muted: #9aa8ac;
+  --nv-text-faint: #647175;
+
+  // Lines ------------------------------------------------------------------
+  --nv-border: rgba(255, 255, 255, 0.09);
+  --nv-border-strong: rgba(255, 255, 255, 0.18);
+
+  // Feedback ---------------------------------------------------------------
+  --nv-danger: #ff5c72;
+  --nv-warning: #ffc861;
+  --nv-success: #4ade80;
+
+  // Typography -------------------------------------------------------------
+  --nv-font: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', roboto, sans-serif;
+  --nv-font-display: 'Inter', 'Helvetica Neue', sans-serif;
+
+  --nv-text-xs: 0.75rem;
+  --nv-text-sm: 0.875rem;
+  --nv-text-base: 1rem;
+  --nv-text-lg: 1.125rem;
+  --nv-text-xl: 1.375rem;
+  --nv-text-2xl: 1.75rem;
+  --nv-text-3xl: 2.25rem;
+  --nv-text-4xl: clamp(2.25rem, 5vw, 4rem);
+
+  --nv-tracking-tight: -0.02em;
+  --nv-tracking-wide: 0.08em;
+
+  // Spacing ----------------------------------------------------------------
+  --nv-space-1: 0.25rem;
+  --nv-space-2: 0.5rem;
+  --nv-space-3: 0.75rem;
+  --nv-space-4: 1rem;
+  --nv-space-5: 1.5rem;
+  --nv-space-6: 2rem;
+  --nv-space-7: 3rem;
+  --nv-space-8: 4rem;
+
+  --nv-gutter: clamp(1rem, 4vw, 3.5rem);
+  --nv-max-width: 1440px;
+  --nv-header-height: 68px;
+
+  // Shape ------------------------------------------------------------------
+  --nv-radius-sm: 6px;
+  --nv-radius: 12px;
+  --nv-radius-lg: 20px;
+  --nv-radius-pill: 999px;
+
+  // Depth ------------------------------------------------------------------
+  --nv-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --nv-shadow-pop: 0 32px 80px rgba(0, 0, 0, 0.7);
+  --nv-shadow-accent: 0 0 0 1px var(--nv-accent-line),
+    0 8px 32px var(--nv-accent-glow);
+
+  // Motion -----------------------------------------------------------------
+  --nv-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --nv-fast: 140ms;
+  --nv-normal: 240ms;
+  --nv-slow: 420ms;
+
+  // Layering ---------------------------------------------------------------
+  --nv-z-header: 100;
+  --nv-z-modal: 200;
+}
