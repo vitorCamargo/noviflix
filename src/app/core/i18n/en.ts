@@ -10,6 +10,22 @@ export const en = {
   'page.home.body': 'Search and featured movies land here.',
   'page.home.demoModal': 'Open the details pop-up',
 
+  // Headline is split so the accent word can be styled separately, and so
+  // translators can reorder it — the emphasis doesn't fall last in every
+  // language.
+  'home.headlineLead': 'Discover how',
+  'home.headlineTailBefore': 'you',
+  'home.headlineAccent': 'watch.',
+  'home.subhead': 'Explore what is in cinemas now and build your own collections.',
+  'home.searchSlot': 'Search goes here',
+  'home.featuredCast': 'Featured cast',
+  'home.popularity': 'Popularity',
+  'home.votes': '{count} votes',
+  'home.tier.blazing': 'Blazing hot',
+  'home.tier.lowkey': 'Lowkey',
+  'home.tier.wellKnown': 'Well Known',
+  'home.tier.trending': 'Trending',
+
   'page.search.title': 'Search results',
   'page.search.body': 'Results for the current query land here.',
 
@@ -43,6 +59,8 @@ export const en = {
   'about.comingSoon': 'Coming soon',
   'about.madeWith': 'Made with Angular',
   'about.version': 'version {version}',
+
+  'scroll.hint': 'Swipe or scroll to navigate',
 
   'common.close': 'Close',
   'common.openFull': 'Open full page',

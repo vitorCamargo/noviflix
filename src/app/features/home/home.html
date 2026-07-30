@@ -1,0 +1,192 @@
+<nv-page-grid [minColumns]="minColumns">
+  <!-- Headline. Dots sit behind it, bleeding left off the text block. -->
+  <div class="caption" [style.gridArea]="area('caption')">
+    <div class="caption__dots">
+      <nv-dot-field [columns]="4" [rows]="5" />
+    </div>
+
+    <h1 class="caption__title">
+      <span class="caption__line">{{ i18n.t('home.headlineLead') }}</span>
+      <span class="caption__line">
+        {{ i18n.t('home.headlineTailBefore') }}
+        <em class="caption__accent">{{ i18n.t('home.headlineAccent') }}</em>
+      </span>
+    </h1>
+
+    <p class="caption__body">{{ i18n.t('home.subhead') }}</p>
+  </div>
+
+  <!-- Placeholder for search. Sized and placed so the real control drops in. -->
+  <div class="action" [style.gridArea]="area('action')">
+    <div class="action__slot">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.4-3.4" />
+      </svg>
+      <span>{{ i18n.t('home.searchSlot') }}</span>
+    </div>
+  </div>
+
+  <!-- Camera badge, floating above the card stack, with its dot trail. -->
+  <div class="badge" [style.gridArea]="area('badge')">
+    <span class="badge__dot">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="2" y="6" width="13" height="12" rx="2.5" />
+        <path d="m15 11 6-3.2v8.4L15 13z" />
+      </svg>
+    </span>
+
+    @for (dot of trail; track $index) {
+      <span
+        class="badge__trail"
+        aria-hidden="true"
+        [style.translate]="dot.x + 'px ' + dot.y + 'px'"
+        [style.width.px]="dot.size"
+        [style.height.px]="dot.size"
+        [style.opacity]="dot.opacity"
+      ></span>
+    }
+  </div>
+
+  <!-- Hero: backdrop, title, genre tags. -->
+  <div class="hero" [style.gridArea]="area('hero')">
+    <nv-drum-card [flat]="true" [interactive]="true">
+      @if (backdrop(); as src) {
+        <img class="hero__img" [src]="src" [alt]="active()?.title ?? ''" />
+      }
+      <div class="hero__scrim"></div>
+
+      <div class="hero__text">
+        <h2 class="hero__title">{{ active()?.title }}</h2>
+        @if (genres().length) {
+          <ul class="tags">
+            @for (genre of genres(); track genre) {
+              <li class="tag">{{ genre }}</li>
+            }
+            @if (extraGenres(); as extra) {
+              <li class="tag tag--more">+{{ extra }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </nv-drum-card>
+  </div>
+
+  <!-- Poster with featured cast underneath. Half-drum nudge interlocks it
+       with the hero rather than sitting flush against it. -->
+  <div
+    class="poster"
+    [style.gridArea]="area('poster')"
+    [style.translate]="posterNudge"
+  >
+    <nv-drum-card>
+      @if (poster(); as src) {
+        <img class="poster__img" [src]="src" [alt]="active()?.title ?? ''" />
+      }
+      <div class="poster__meta">
+        <p class="poster__label">{{ i18n.t('home.featuredCast') }}</p>
+        @if (cast().length) {
+          <p class="poster__names">
+            @for (person of cast(); track person.id) {
+              <span>{{ person.name }}</span>
+            }
+          </p>
+        } @else {
+          <p class="poster__names poster__names--empty">—</p>
+        }
+      </div>
+    </nv-drum-card>
+  </div>
+
+  <!-- Popularity. One drum tall, so label and tier only — no room for tags. -->
+  <div class="stats" [style.gridArea]="area('stats')">
+    <nv-drum-card>
+      <div class="stats__body">
+        <span class="stats__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+          </svg>
+        </span>
+        <div class="stats__text">
+          <p class="stats__label">{{ i18n.t('home.popularity') }}</p>
+          <p class="stats__value">{{ tierLabel() }}</p>
+        </div>
+      </div>
+    </nv-drum-card>
+  </div>
+
+  <!--
+    Avatar strip. Hovering anywhere in here pauses the countdown, so a movie
+    can be studied without it sliding away mid-read.
+  -->
+  <div
+    class="carousel"
+    [style.gridArea]="area('carousel')"
+    [style.translate]="carouselNudge"
+    (pointerenter)="pause()"
+    (pointerleave)="resume()"
+    (focusin)="pause()"
+    (focusout)="resume()"
+  >
+    <button
+      type="button"
+      class="carousel__nav carousel__nav--prev"
+      [attr.aria-label]="i18n.t('common.back')"
+      (click)="prev()"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+    </button>
+
+    <ul class="carousel__list">
+      @for (item of strip(); track item.index) {
+        <li class="carousel__slot">
+          <button
+            type="button"
+            class="carousel__item"
+            [class.is-active]="item.isActive"
+            [attr.aria-label]="item.movie.title"
+            [attr.aria-current]="item.isActive"
+            (click)="select(item.index)"
+          >
+            @if (avatarUrl(item.movie); as src) {
+              <img [src]="src" [alt]="" />
+            }
+          </button>
+
+          @if (item.isActive) {
+            <!--
+              Countdown ring. Sits outside the button so the avatar can stay
+              circular and clipped while the stroke draws around it.
+            -->
+            <svg class="carousel__ring" viewBox="0 0 100 100" aria-hidden="true">
+              <circle
+                class="carousel__ring-track"
+                [attr.cx]="50"
+                [attr.cy]="50"
+                [attr.r]="ringRadius"
+              />
+              <circle
+                class="carousel__ring-fill"
+                [attr.cx]="50"
+                [attr.cy]="50"
+                [attr.r]="ringRadius"
+                [attr.stroke-dasharray]="ringCircumference"
+                [attr.stroke-dashoffset]="ringDashOffset()"
+              />
+            </svg>
+          }
+        </li>
+      }
+    </ul>
+
+    <button
+      type="button"
+      class="carousel__nav carousel__nav--next"
+      [attr.aria-label]="i18n.t('common.forward')"
+      (click)="next()"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+    </button>
+  </div>
+</nv-page-grid>

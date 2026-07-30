@@ -77,7 +77,7 @@
 
   --nv-gutter: clamp(1rem, 4vw, 3.5rem);
   --nv-max-width: 1440px;
-  --nv-header-height: 68px;
+  --nv-header-height: var(--nv-grid-cell);
 
   // Shape ------------------------------------------------------------------
   --nv-radius-sm: 6px;

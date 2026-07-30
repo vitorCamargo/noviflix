@@ -12,6 +12,19 @@ export const ptBR: Dictionary = {
   'page.home.body': 'A busca e os filmes em destaque entram aqui.',
   'page.home.demoModal': 'Abrir o pop-up de detalhes',
 
+  'home.headlineLead': 'Descubra como',
+  'home.headlineTailBefore': 'você',
+  'home.headlineAccent': 'assiste.',
+  'home.subhead': 'Veja o que está em cartaz e monte suas próprias coleções.',
+  'home.searchSlot': 'A busca entra aqui',
+  'home.featuredCast': 'Elenco em destaque',
+  'home.popularity': 'Popularidade',
+  'home.votes': '{count} votos',
+  'home.tier.blazing': 'Recém-chegado',
+  'home.tier.lowkey': 'Discreto',
+  'home.tier.wellKnown': 'Conhecido',
+  'home.tier.trending': 'Em alta',
+
   'page.search.title': 'Resultados da busca',
   'page.search.body': 'Os resultados da busca atual entram aqui.',
 
@@ -45,6 +58,8 @@ export const ptBR: Dictionary = {
   'about.comingSoon': 'Em breve',
   'about.madeWith': 'Feito com Angular',
   'about.version': 'versão {version}',
+
+  'scroll.hint': 'Arraste ou role para navegar',
 
   'common.close': 'Fechar',
   'common.openFull': 'Abrir página completa',

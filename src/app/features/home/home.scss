@@ -1,0 +1,466 @@
+// Every block here is placed by grid-area from home-layout.ts, so nothing sets
+// its own size — the drums decide. Rules below are purely what goes *inside*.
+
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+// ---------------------------------------------------------------- headline
+
+/*
+ * `isolation` makes this a stacking context so the dots can sit behind the text
+ * while the block as a whole still paints above the pad field. Without it a
+ * negative z-index would escape and land under the pads, hiding the dots.
+ */
+.caption {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--nv-space-4);
+  padding-inline-end: var(--nv-space-5);
+  pointer-events: none;
+}
+
+/*
+ * A 4x5 matrix to the left of the headline, echoing the drum lattice. Sized by
+ * its own content, so only the anchor point is set here — pinning both axes
+ * would stretch the pitch.
+ */
+.caption__dots {
+  position: absolute;
+  /* Raised 1.5 drums above where it used to sit. */
+  inset-block-start: calc(4% - var(--nv-grid-cell) * 1.5);
+  /*
+   * Measured from the caption's right edge, so a larger value moves the matrix
+   * left. 1.5 drums puts its right edge that far in from the caption's left —
+   * one drum further right than before.
+   */
+  inset-inline-end: calc(100% - var(--nv-grid-cell) * 1.5);
+  z-index: 0;
+}
+
+.caption__title,
+.caption__body {
+  position: relative;
+  z-index: 1;
+}
+
+.caption__title {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(2.6rem, 5.2vw, 4.6rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.caption__accent {
+  font-style: normal;
+  color: var(--nv-accent);
+}
+
+.caption__body {
+  margin: 0;
+  max-inline-size: 34ch;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-lg);
+  line-height: 1.65;
+}
+
+// ------------------------------------------------------------ search slot
+
+.action {
+  display: flex;
+  align-items: center;
+}
+
+/*
+ * Dashed because it's a reservation, not a control — it should read as
+ * unfinished rather than as a disabled button.
+ */
+.action__slot {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  inline-size: 100%;
+  block-size: calc(var(--nv-grid-cell) - var(--nv-space-3));
+  padding-inline: var(--nv-space-5);
+  border: 1px dashed var(--nv-accent-line);
+  border-radius: var(--nv-grid-radius);
+  background: var(--nv-accent-soft);
+  color: var(--nv-accent);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+
+  svg {
+    inline-size: 17px;
+    block-size: 17px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+  }
+}
+
+// ------------------------------------------------------------ camera badge
+
+/* The trail spills well outside this one drum, so nothing may clip it. */
+.badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+
+.badge__dot {
+  display: grid;
+  place-items: center;
+  inline-size: 46px;
+  block-size: 46px;
+  border-radius: 50%;
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+
+  svg {
+    inline-size: 23px;
+    block-size: 23px;
+    fill: none;
+    stroke: currentColor;
+    /* Heavier than the other icons — the badge is a focal point, not a hint. */
+    stroke-width: 2.4;
+    stroke-linejoin: round;
+  }
+}
+
+/*
+ * Centred on the badge, then pushed out along its arm with `translate`. Using
+ * the standalone property rather than `transform` keeps the offset independent
+ * of the centring, so neither has to account for the other.
+ */
+.badge__trail {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--nv-accent);
+  pointer-events: none;
+}
+
+// -------------------------------------------------------------------- hero
+
+.hero {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.hero__img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 4%,
+    rgba(0, 0, 0, 0.25) 48%,
+    rgba(0, 0, 0, 0.05)
+  );
+}
+
+.hero__text {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-3);
+  padding: var(--nv-space-5);
+}
+
+.hero__title {
+  font-size: clamp(1.75rem, 2.6vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+// ------------------------------------------------------------------ poster
+
+.poster {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.poster__img {
+  inline-size: 100%;
+  /* Leaves room for the meta strip without the card growing off the lattice. */
+  block-size: calc(100% - var(--nv-grid-cell));
+  object-fit: cover;
+}
+
+.poster__meta {
+  block-size: var(--nv-grid-cell);
+  padding: var(--nv-space-2) var(--nv-space-4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.poster__label {
+  margin: 0;
+  font-size: var(--nv-text-xs);
+  color: var(--nv-text-faint);
+}
+
+.poster__names {
+  margin: 0;
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  span:not(:last-child)::after {
+    content: ', ';
+    font-weight: 400;
+    color: var(--nv-text-faint);
+  }
+}
+
+.poster__names--empty {
+  color: var(--nv-text-faint);
+}
+
+// ------------------------------------------------------------------- stats
+
+.stats {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.stats__body {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  block-size: 100%;
+  padding-inline: var(--nv-space-4);
+}
+
+.stats__text {
+  min-inline-size: 0;
+}
+
+.stats__icon {
+  flex: none;
+  color: var(--nv-accent);
+
+  svg {
+    inline-size: 22px;
+    block-size: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+}
+
+.stats__label {
+  margin: 0;
+  font-size: var(--nv-text-xs);
+  color: var(--nv-text-faint);
+}
+
+.stats__value {
+  margin: 0;
+  font-size: var(--nv-text-base);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// -------------------------------------------------------------------- tags
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nv-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags--tight {
+  gap: var(--nv-space-1);
+}
+
+.tag {
+  padding: 3px var(--nv-space-3);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  font-size: var(--nv-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag--accent {
+  background: var(--nv-accent-soft);
+  color: var(--nv-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Quieter than a real genre — it's a count, not a label. */
+.tag--more {
+  color: var(--nv-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+// ---------------------------------------------------------------- carousel
+
+/* Two drums tall, so the strip sits clear of the card above it. */
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+ * Pinned to lattice intersections rather than flowed with the avatars: their
+ * centres land where four drums meet, which ties them to the grid the same way
+ * the cards are. Offsets are from the carousel's own top-left, which is itself
+ * on a drum corner.
+ */
+.carousel__nav {
+  position: absolute;
+  translate: -50% 0%;
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border: 1px solid var(--nv-border);
+  border-radius: 50%;
+  /* Darker than the pads, so the button reads as a hole punched in the grid. */
+  background: var(--nv-grid-pad);
+  color: var(--nv-text-muted);
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 16px;
+    block-size: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* No accent here — the accent is reserved for the countdown ring, so it
+     reads as progress rather than as generic emphasis. */
+  &:hover {
+    border-color: var(--nv-border-strong);
+    color: var(--nv-text);
+  }
+}
+
+.carousel__nav--prev {
+  inset-inline-start: calc(var(--nv-grid-cell) * 2);
+}
+
+.carousel__nav--next {
+  inset-inline-start: calc(var(--nv-grid-cell) * 6);
+}
+
+.carousel__list {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carousel__slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.carousel__item {
+  display: block;
+  inline-size: 46px;
+  block-size: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nv-surface-2);
+  overflow: hidden;
+  opacity: 0.6;
+  transition:
+    opacity var(--nv-fast) var(--nv-ease),
+    inline-size var(--nv-normal) var(--nv-ease),
+    block-size var(--nv-normal) var(--nv-ease);
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.is-active {
+    inline-size: 52px;
+    block-size: 52px;
+    opacity: 1;
+  }
+}
+
+/*
+ * Countdown ring. Overlaid rather than a border on the avatar, so the stroke
+ * can be a partial arc — a border can only ever be a full circle.
+ *
+ * Two circles at the same radius: a faint full track, and the accent arc drawn
+ * over it. The track means the ring still reads as a complete shape at zero
+ * progress instead of the avatar losing its outline entirely.
+ */
+.carousel__ring {
+  position: absolute;
+  inline-size: 64px;
+  block-size: 64px;
+  pointer-events: none;
+  /* SVG draws from 3 o'clock; rotate so the arc starts at the top. */
+  transform: rotate(-90deg);
+
+  circle {
+    fill: none;
+    stroke-width: 2.5;
+  }
+}
+
+.carousel__ring-track {
+  stroke: var(--nv-border-strong);
+}
+
+.carousel__ring-fill {
+  stroke: var(--nv-accent);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px var(--nv-accent-glow));
+}

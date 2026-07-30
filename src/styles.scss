@@ -79,22 +79,28 @@ body.nv-modal-open {
        fights it and produces a rubbery lag. */
     scroll-behavior: auto;
 
-    /* A focusable scroll container gets a ring on click without this. */
-    &:focus {
-      outline: none;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--nv-accent);
-      outline-offset: -2px;
-    }
   }
 
-  /* Routed page hosts: full height, sized to their content along the track. */
+  /*
+   * Focus indicator for the track, relocated to the hint. The hint isn't a
+   * sibling of the track — it sits outside the shell — so this reaches it from
+   * the root rather than with a combinator.
+   */
+  body:has(.nv-track:focus-visible) nv-scroll-hint .hint {
+    color: var(--nv-text);
+  }
+
+  /*
+   * Routed page hosts: full height, at least as wide as the track.
+   *
+   * `100%` of the flex container rather than `100vw` — the two differ whenever
+   * the viewport unit includes space the track doesn't have, and being a hair
+   * too wide is exactly what makes the track scrollable with nothing to reveal.
+   */
   .nv-track > *:not(router-outlet) {
     block-size: 100%;
     flex: 0 0 auto;
-    min-inline-size: 100vw;
+    min-inline-size: 100%;
   }
 }
 
@@ -123,8 +129,20 @@ button {
   cursor: pointer;
 }
 
-:where(a, button, input, [tabindex]) {
+/*
+ * The content track is excluded deliberately. It carries tabindex so keyboard
+ * users can scroll it, but it fills the viewport — a focus ring on it draws an
+ * accent border around the whole page, which is what kept appearing. Its focus
+ * indicator is relocated to the scroll hint instead, which is visible and in a
+ * sensible place.
+ */
+:where(a, button, input, select, textarea, [tabindex]:not(.nv-track)) {
   @include focus-ring;
+}
+
+.nv-track:focus,
+.nv-track:focus-visible {
+  outline: none;
 }
 
 ::selection {

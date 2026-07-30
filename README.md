@@ -150,6 +150,32 @@ total pads so a huge viewport can't stall layout.
 Everything is fine-pointer and `min-width: 576px` only — the same query gates
 `cursor: none`, so touch and small screens keep the system pointer.
 
+### Page grid
+
+`PageGrid` lays a page on the drum lattice. Content is projected in and places
+itself with `grid-area`; the pads are a complete field behind it.
+
+The rule that matters: **content covers pads, it never replaces them.** An
+earlier version subtracted placed areas from the pad count and let auto-placement
+fill the remainder — which punched visible holes in the lattice wherever a block
+was transparent, like behind the headline. The pad layer now spans every track
+and re-declares the same lattice inside itself, so pads still align with the
+cells content occupies.
+
+No z-index is involved. The pad layer is the first child, so every later sibling
+paints over it in DOM order.
+
+`DrumCard` enforces the two rules that make a card belong to the grid rather than
+sit on it: the box is a whole number of cells, and the corner radius matches the
+pads' so the rounding reads as continuing the lattice. Its hover border is an
+inset `box-shadow` rather than a real border — a border would change the box size
+and knock the card off the lattice.
+
+Row counts vary with viewport height because cells are a fixed 64px, so a layout
+that pinned content to absolute rows would slide around on resize. `home-layout.ts`
+defines a 10-row composition block and `centreOffset` centres it in whatever rows
+exist.
+
 ### Overlay primitives
 
 Two reusable shells, both built from the design reference:

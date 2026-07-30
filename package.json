@@ -4,9 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run check:styles && ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "npm run check:styles && ng test",
+    "check:styles": "node scripts/check-inline-styles.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.8",

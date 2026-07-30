@@ -1,3 +1,5 @@
+// Shell is header + content. Pads live inside each page's grid, not here.
+
 .shell {
   position: relative;
   z-index: var(--nv-z-content);
@@ -9,4 +11,24 @@
 .shell__main {
   flex: 1;
   min-block-size: 0;
+}
+
+// On desktop the header floats over the grid rather than taking a row out of
+// the flow, so the page lattice starts at the very top of the viewport and the
+// pads run behind the nav — as in the reference.
+@media (min-width: 901px) {
+  .shell {
+    block-size: 100dvh;
+  }
+
+  nv-site-header {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: var(--nv-z-header);
+  }
+
+  .shell__main {
+    block-size: 100%;
+  }
 }

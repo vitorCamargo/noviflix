@@ -1,5 +1,9 @@
+<!--
+  Glow sits at the very bottom. The drum pads now live inside each page's grid
+  (see PageGrid), so the glow shows through the seams of whatever page is on
+  screen and travels with it as the track scrolls.
+-->
 <nv-mouse-glow />
-<nv-grid-backdrop />
 
 <div class="shell">
   <nv-site-header />
@@ -9,7 +13,9 @@
   </main>
 </div>
 
+<!-- Details pop-up renders above the shell, driven by the `modal` outlet. -->
 <router-outlet name="modal" />
 
+<nv-scroll-hint />
 <nv-scroll-overlay />
 <nv-cursor />
