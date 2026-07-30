@@ -97,7 +97,28 @@
   --nv-normal: 240ms;
   --nv-slow: 420ms;
 
+  // Grid backdrop ----------------------------------------------------------
+  // The grid is a field of opaque pads separated by 1px seams. The seam colour
+  // is whatever sits behind them, so the "lines" are really gaps, and the glow
+  // layered underneath shines through only where those gaps are.
+  --nv-grid-cell: 64px;
+  --nv-grid-gap: 1px;
+  --nv-grid-radius: 8px;
+  --nv-grid-seam: #14171a;
+  --nv-grid-pad: var(--nv-bg-raised);
+  --nv-glow-size: 30vh;
+
   // Layering ---------------------------------------------------------------
+  // Bottom to top. The glow deliberately sits *below* the pads: it's visible
+  // only through the seams, which is what makes the grid light up near the
+  // pointer instead of a blob floating over the UI.
+  --nv-z-glow: 5;
+  --nv-z-grid: 10;
+  --nv-z-content: 20;
   --nv-z-header: 100;
   --nv-z-modal: 200;
+  /* Swallows pointer events mid-scroll so hover states don't flicker. */
+  --nv-z-scroll-overlay: 800;
+  /* Above everything — the pointer must never be occluded. */
+  --nv-z-cursor: 900;
 }

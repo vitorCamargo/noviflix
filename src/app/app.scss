@@ -1,4 +1,6 @@
 .shell {
+  position: relative;
+  z-index: var(--nv-z-content);
   display: flex;
   flex-direction: column;
   min-block-size: 100dvh;

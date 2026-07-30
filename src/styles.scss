@@ -19,7 +19,7 @@ body {
 
 body {
   margin: 0;
-  background: var(--nv-bg);
+  background: var(--nv-grid-seam);
   color: var(--nv-text);
   font-family: var(--nv-font);
   font-size: var(--nv-text-base);
@@ -28,9 +28,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/** Locks scroll while the details pop-up is open. */
 body.nv-modal-open {
   overflow: hidden;
+}
+
+@media (pointer: fine) and (min-width: 576px) {
+  body,
+  body * {
+    cursor: none;
+  }
 }
 
 // ---------------------------------------------------------------------------

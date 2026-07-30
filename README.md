@@ -109,6 +109,47 @@ scroll metrics, so the specs define them explicitly.
 The track carries `tabindex="0"`: a scrollable region has to be keyboard-reachable
 to be operable with arrow keys (WCAG 2.1.1).
 
+### Grid backdrop, glow and cursor
+
+Ported from [vitorCamargo/v-spotifood](https://github.com/vitorCamargo/v-spotifood)
+(MIT), which is where this structure comes from. Cell size is 64px rather than
+that project's viewport-derived `10vh`.
+
+**The grid is real DOM, not a background image.** `GridBackdrop` renders a field
+of opaque rounded pads with a `1px` margin on two sides. Nothing draws a line —
+the seams *are* the gaps, and the darker `--nv-grid-seam` behind shows through
+them.
+
+That detail carries the whole effect, because of what it enables next.
+
+**The glow sits underneath the pads.** `MouseGlow` is a radial gradient following
+the pointer at `--nv-z-glow: 5`, below the pads at `10`. Opaque pads occlude it
+everywhere except the seams, so it reads as the grid *lighting up* around the
+cursor. The pads mask the glow into grid shape for free — no per-pad work, no
+hit-testing, no reacting to pointer position at all.
+
+Layer order matters here, so it's a documented scale in `_tokens.scss`:
+glow `5` → pads `10` → content `20` → header `100` → modal `200` →
+scroll overlay `800` → cursor `900`.
+
+**The cursor trails via a CSS transition,** not an animation loop. Both dot and
+ring get the same transform on every `mousemove`; the ring carries
+`transition: transform .8s cubic-bezier(.05,.8,.4,1)` and the browser eases it.
+Cheaper than a rAF lerp and it stays smooth under main-thread load. Pressing the
+mouse swells the dot. Transforms are written straight to the elements rather than
+through bindings — this fires constantly and shouldn't drive change detection.
+
+**`ScrollOverlay`** blocks pointer events for 66ms after each scroll event.
+Without it, content sliding under a stationary cursor fires hover states on
+everything that passes beneath, which reads as flicker.
+
+Grid dimensions come from `computeGrid`, exported and unit tested: rounds up to
+over-fill rather than leave a bare strip, holds a minimum column count, and caps
+total pads so a huge viewport can't stall layout.
+
+Everything is fine-pointer and `min-width: 576px` only — the same query gates
+`cursor: none`, so touch and small screens keep the system pointer.
+
 ### Overlay primitives
 
 Two reusable shells, both built from the design reference:
