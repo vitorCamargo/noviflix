@@ -6,6 +6,7 @@ import type {
   MovieDetails,
   MovieSummary,
   Paginated,
+  Video,
 } from '../models/tmdb.models';
 
 type ImageSize =
@@ -46,6 +47,19 @@ export class TmdbService {
     return this.get<MovieDetails>(`/movie/${id}`, {
       append_to_response: 'credits',
     });
+  }
+
+  /**
+   * Clips attached to a movie — trailers, teasers, featurettes.
+   *
+   * Separate from `movie()` rather than appended to it: this is only needed when
+   * someone actually asks to watch something, and folding it into the detail
+   * call would fetch a video list for every card the carousel passes through.
+   */
+  videos(id: number | string): Observable<Video[]> {
+    return this.get<{ results: Video[] }>(`/movie/${id}/videos`).pipe(
+      map((res) => res.results ?? []),
+    );
   }
 
   private get<T>(path: string, params: Record<string, string | number | boolean> = {}) {

@@ -1,4 +1,4 @@
-<nv-page-grid [minColumns]="minColumns">
+<nv-page-grid [minColumns]="minColumns()">
   <!-- Headline. Dots sit behind it, bleeding left off the text block. -->
   <div class="caption" [style.gridArea]="area('caption')">
     <div class="caption__dots">
@@ -48,12 +48,30 @@
     }
   </div>
 
-  <!-- Hero: backdrop, title, genre tags. -->
-  <div class="hero" [style.gridArea]="area('hero')">
+  <!--
+    Hero: backdrop, trailer, title, genre tags.
+
+    Hover is tracked on this wrapper rather than on the trailer itself, so moving
+    the pointer onto the title doesn't count as leaving the card.
+  -->
+  <div
+    class="hero"
+    [class.is-playing]="trailerPlaying()"
+    [style.gridArea]="area('hero')"
+    (pointerenter)="onHeroEnter($event)"
+    (pointerleave)="onHeroLeave()"
+  >
     <nv-drum-card [flat]="true" [interactive]="true">
       @if (backdrop(); as src) {
         <img class="hero__img" [src]="src" [alt]="active()?.title ?? ''" />
       }
+
+      <nv-hero-trailer
+        [movieId]="active()?.id ?? null"
+        [hovered]="heroHovered()"
+        (stateChange)="onTrailerState($event)"
+      />
+
       <div class="hero__scrim"></div>
 
       <div class="hero__text">
@@ -77,7 +95,7 @@
   <div
     class="poster"
     [style.gridArea]="area('poster')"
-    [style.translate]="posterNudge"
+    [style.translate]="posterNudge()"
   >
     <nv-drum-card>
       @if (poster(); as src) {
@@ -102,12 +120,8 @@
   <div class="stats" [style.gridArea]="area('stats')">
     <nv-drum-card>
       <div class="stats__body">
-        <span class="stats__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="8" />
-            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
-          </svg>
-        </span>
+        <nv-popularity-badge [tier]="tier()" />
+
         <div class="stats__text">
           <p class="stats__label">{{ i18n.t('home.popularity') }}</p>
           <p class="stats__value">{{ tierLabel() }}</p>
@@ -123,7 +137,7 @@
   <div
     class="carousel"
     [style.gridArea]="area('carousel')"
-    [style.translate]="carouselNudge"
+    [style.translate]="carouselNudge()"
     (pointerenter)="pause()"
     (pointerleave)="resume()"
     (focusin)="pause()"

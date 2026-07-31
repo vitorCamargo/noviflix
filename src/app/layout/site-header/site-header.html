@@ -1,27 +1,39 @@
-<header class="hdr" [class.is-scrolled]="scrolled()">
-  <div class="hdr__inner">
-    <a class="brand" routerLink="/" [attr.aria-label]="i18n.t('app.name')">
-      <img class="brand__mark" src="logo-mark.svg" alt="" aria-hidden="true" />
-      <img class="brand__word" src="logo-wordmark.svg" [alt]="i18n.t('app.name')" />
+<header class="hdr">
+  <nav class="hdr__row" [attr.aria-label]="i18n.t('app.name')">
+    <!--
+      Mark only, no wordmark. Doubles as the home link.
+
+      Inlined rather than an <img>: currentColor inside a referenced SVG resolves
+      against that file's own document, not this one, so an external asset can't
+      be tinted from here.
+    -->
+    <a class="hdr__logo" routerLink="/" [attr.aria-label]="i18n.t('nav.home')">
+      <svg viewBox="0 0 26 26" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M25.2117 10.1891L23.4198 24.8979C23.3683 25.3321 23.035 25.6158 22.5594 25.6158H15.2324C14.7569 25.6158 14.5142 25.3765 14.5142 24.9965V24.8979L16.3184 9.9523C16.414 9.3799 16.5047 8.8125 16.5047 8.2426C16.5047 7.3865 16.414 6.8585 16.1272 6.4786C15.7497 5.958 15.0878 5.7681 14.1857 5.7681C12.9086 5.7681 11.2049 6.0049 11.2049 6.0049L8.886 24.8979C8.83942 25.3321 8.5134 25.6158 8.0403 25.6158H0.703526C0.235326 25.6158 0 25.3765 0 24.9965V24.8979L2.60329 3.6686C2.78959 1.9564 4.54473 1.4803 7.56965 0.905499C9.93271 0.426799 13.2395 0 16.2228 0C19.4413 0 21.9981 0.3356 23.6527 1.6209C24.8783 2.5239 25.5868 3.9523 25.5868 6.1875C25.5868 7.4802 25.3441 8.9062 25.2117 10.1891Z"
+        />
+      </svg>
     </a>
 
-    <nav class="nav" [attr.aria-label]="i18n.t('nav.home')">
-      <a
-        class="nav__link"
-        routerLink="/"
-        routerLinkActive="is-active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        >{{ i18n.t('nav.home') }}</a
-      >
-      <a class="nav__link" routerLink="/collections" routerLinkActive="is-active">{{
-        i18n.t('nav.collections')
-      }}</a>
+    <a
+      class="hdr__item"
+      routerLink="/collections"
+      routerLinkActive="is-active"
+    >
+      <!-- Film strip: body, frame divisions, and perforations either side. -->
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="2" y="4" width="20" height="16" rx="2.5" />
+        <path d="M7 4v16M17 4v16" />
+        <path d="M2 9h5M2 15h5M17 9h5M17 15h5" />
+      </svg>
+      <span>{{ i18n.t('nav.collections') }}</span>
+    </a>
 
-      <nv-about-popover />
-    </nav>
+    <nv-about-popover class="hdr__item hdr__item--popover" />
 
-    <div class="hdr__tools">
-      <nv-language-switcher />
-    </div>
-  </div>
+    <!-- A full drum of air sets the selector apart from the nav proper. -->
+    <nv-language-switcher class="hdr__lang" />
+  </nav>
 </header>

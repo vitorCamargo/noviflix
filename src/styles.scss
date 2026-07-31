@@ -55,6 +55,21 @@ body.nv-modal-open {
   inline-size: 100%;
 }
 
+/*
+ * Stacked mode scrolls one way only.
+ *
+ * Measured at a 390px viewport, the document reported a 430px scroll width — so
+ * something was sticking out far enough to let the whole page slide sideways,
+ * which is what made every card look wrongly inset on one side while devtools
+ * showed them at full width. `clip` rather than `hidden` so this stays a
+ * non-scrolling clip and does not turn the root into a scroll container.
+ */
+@media (max-width: 900px) {
+  html {
+    overflow-x: clip;
+  }
+}
+
 @media (min-width: 901px) {
   html,
   body {
@@ -164,6 +179,37 @@ body,
   }
   to {
     opacity: 1;
+  }
+}
+
+/*
+ * Panel reveal: the box unmasks downward from its top edge while drifting into
+ * place. Animating clip-path rather than height means the content inside never
+ * reflows — it is simply uncovered, so text doesn't reposition mid-animation.
+ *
+ * Corner radius is passed in so the mask follows the panel's own rounding
+ * instead of squaring off its corners as it opens.
+ */
+@keyframes nv-mask-open {
+  from {
+    clip-path: inset(0 0 100% 0 round var(--nv-mask-radius, 20px));
+    transform: translateY(-6px);
+  }
+  to {
+    clip-path: inset(0 round var(--nv-mask-radius, 20px));
+    transform: translateY(0);
+  }
+}
+
+/* Content rising into place behind the unmasking panel. */
+@keyframes nv-swipe-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

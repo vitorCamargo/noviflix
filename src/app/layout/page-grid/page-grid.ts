@@ -161,6 +161,74 @@ export function offsetArea(area: DrumArea, offset: number): DrumArea {
       border-radius: var(--nv-grid-radius);
       margin: 0 var(--nv-grid-gap) var(--nv-grid-gap) 0;
     }
+
+    /*
+     * Mobile: the lattice stops being a layout device and becomes a backdrop.
+     * The grid collapses to two plain columns — most blocks span both and read
+     * as a single column, but a page can pair two blocks side by side by taking
+     * one column each. Placement comes from the page's own stylesheet here, so
+     * pages must drop their drum grid-area bindings at this width.
+     *
+     * Pads are pinned to the viewport, which also covers the strip behind the
+     * header: on desktop the header floats over the grid, but in flow the grid
+     * began below it and left that band bare.
+     */
+    @media (max-width: 900px) {
+      .pg {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: none;
+        grid-auto-rows: auto;
+        align-content: start;
+        column-gap: var(--nv-space-4);
+        /*
+         * One gutter for the whole page, so every block fills the width it is
+         * given rather than carrying its own margin. Blocks spanning both columns
+         * are therefore exactly the content width.
+         */
+        padding-inline: var(--nv-space-5);
+        inline-size: 100%;
+        block-size: auto;
+        min-block-size: 100dvh;
+        /*
+         * Nothing may stick out sideways here. The track is not a scroll rail at
+         * this width, so horizontal overflow cannot be scrolled to — it just
+         * shifts the page and clips content against the viewport edge.
+         */
+        overflow-x: clip;
+      }
+
+      /*
+       * No stacking context here, and no z-index on the pads.
+       *
+       * Both are tempting, and both break DrumCard: its corner glow relies on a
+       * negative z-index escaping the card to land *beneath* this pad layer, so
+       * the only light that survives is what leaks through the seams. Isolating
+       * the grid traps that glow above the pads and it becomes a halo drawn on
+       * top of the card. Content stays above the pads because pinning makes them
+       * positioned, and every card is positioned too but later in the DOM — any
+       * block that is *not* positioned has to say so for itself.
+       *
+       * Exactly the viewport, with the drums stretched to fill it rather than the
+       * field overhanging.
+       *
+       * The desktop trick of drawing an extra column and letting it hang over the
+       * edge does not work here: this box is the viewport's size, so overhang is
+       * real overflow that shifts the page sideways. Auto-fit with a minmax floor
+       * lays as many whole drums as fit and then shares the remainder between
+       * them, so a viewport that is not a round number of cells gets pads a
+       * fraction of a pixel wider instead of a bare strip down the edge.
+       */
+      .pg__pads {
+        position: fixed;
+        inset: 0;
+        inline-size: auto;
+        block-size: auto;
+        grid-template-columns: repeat(auto-fit, minmax(var(--nv-grid-cell), 1fr));
+        grid-template-rows: repeat(auto-fit, minmax(var(--nv-grid-cell), 1fr));
+        grid-auto-rows: var(--nv-grid-cell);
+        overflow: clip;
+      }
+    }
   `,
 })
 export class PageGrid {

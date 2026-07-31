@@ -64,34 +64,42 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
     }
 
     svg {
-      inline-size: 16px;
-      block-size: 16px;
+      inline-size: 18px;
+      block-size: 18px;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.8;
+      stroke-width: 1.7;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
+    /* Same plain white treatment as the rest of the header. */
     .lang__trigger {
       display: inline-flex;
       align-items: center;
       gap: var(--nv-space-2);
+      /* Constant padding so opening the menu doesn't nudge the row. */
       padding: var(--nv-space-2) var(--nv-space-3);
-      border: 1px solid var(--nv-border);
+      border: 0;
       border-radius: var(--nv-radius-pill);
-      background: var(--nv-surface);
-      color: var(--nv-text-muted);
+      background: transparent;
+      color: var(--nv-text);
       font-size: var(--nv-text-sm);
       font-weight: 600;
+      white-space: nowrap;
+      /* Same long panel curve as the About trigger, so the header is uniform. */
       transition:
-        border-color var(--nv-fast) var(--nv-ease),
-        color var(--nv-fast) var(--nv-ease);
+        color var(--nv-dur-swipe) var(--nv-ease-panel),
+        background var(--nv-dur-swipe) var(--nv-ease-panel);
 
-      &:hover,
+      &:hover {
+        color: var(--nv-text-muted);
+      }
+
+      /* Open: tinted accent pill, matching the selected nav item. */
       &[aria-expanded='true'] {
+        background: var(--nv-accent-soft);
         color: var(--nv-accent);
-        border-color: var(--nv-accent-line);
       }
     }
 
@@ -114,11 +122,18 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
       margin: 0;
       padding: var(--nv-space-1);
       list-style: none;
-      background: var(--nv-surface-2);
-      border: 1px solid var(--nv-border);
+      background: var(--nv-panel);
+      /* Borderless, like the popover panel — the shadow does the lifting. */
       border-radius: var(--nv-radius);
       box-shadow: var(--nv-shadow-pop);
-      animation: nv-rise var(--nv-fast) var(--nv-ease);
+      /* Unmasks like the About panel; the radius follows this menu's own. */
+      --nv-mask-radius: var(--nv-radius);
+      animation: nv-mask-open var(--nv-dur-mask) var(--nv-ease-panel) both;
+    }
+
+    .lang__menu li {
+      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel)
+        var(--nv-delay-swipe) both;
     }
 
     .lang__option {

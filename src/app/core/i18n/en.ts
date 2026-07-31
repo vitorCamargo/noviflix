@@ -19,12 +19,23 @@ export const en = {
   'home.subhead': 'Explore what is in cinemas now and build your own collections.',
   'home.searchSlot': 'Search goes here',
   'home.featuredCast': 'Featured cast',
+  'trailer.play': 'Play trailer',
+  'trailer.pause': 'Stop trailer',
+  'trailer.loading': 'Loading trailer',
+
   'home.popularity': 'Popularity',
-  'home.votes': '{count} votes',
+  // Newest release in the set — recency, not volume.
   'home.tier.blazing': 'Blazing hot',
-  'home.tier.lowkey': 'Lowkey',
-  'home.tier.wellKnown': 'Well Known',
+  // Commands most of the batch's attention.
   'home.tier.trending': 'Trending',
+  // Strong score with enough votes to trust it.
+  'home.tier.acclaimed': 'Acclaimed',
+  // Well liked but hasn't broken through.
+  'home.tier.hiddenGem': 'Hidden gem',
+  'home.tier.wellKnown': 'Well known',
+  // Plenty of votes, low score — people disagree.
+  'home.tier.divisive': 'Divisive',
+  'home.tier.lowkey': 'Lowkey',
 
   'page.search.title': 'Search results',
   'page.search.body': 'Results for the current query land here.',

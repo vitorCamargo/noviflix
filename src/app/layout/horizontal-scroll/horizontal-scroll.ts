@@ -60,6 +60,21 @@ export function clampOffset(offset: number, scrollWidth: number, clientWidth: nu
 }
 
 /**
+ * Whether the track is currently a horizontal scroll container.
+ *
+ * `scrollWidth > clientWidth` alone is not enough to decide this. It reports
+ * overflowing content even when `overflow-x` is `visible`, so in stacked mode a
+ * single wide descendant made the directive believe it was in charge: it then
+ * called `preventDefault()` on every wheel event and wrote to `scrollLeft`,
+ * which does nothing on a non-scrolling box. The result was a page that simply
+ * refused to scroll. The mode has to come from the computed overflow, which is
+ * what the breakpoint actually changes.
+ */
+export function isHorizontalTrack(overflowX: string): boolean {
+  return overflowX === 'auto' || overflowX === 'scroll';
+}
+
+/**
  * Pointer travel before a press counts as a drag rather than a click.
  *
  * Without a threshold, the tiny movement between mousedown and mouseup would
@@ -140,17 +155,25 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     }
   }
 
+  /** True only while the track is a scroll rail with somewhere to go. */
+  private canScroll(el: HTMLElement): boolean {
+    return (
+      isHorizontalTrack(getComputedStyle(el).overflowX) &&
+      el.scrollWidth > el.clientWidth + 1
+    );
+  }
+
   /** Publishes whether there is anything to navigate to, for the hint. */
   private measure(): void {
     const el = this.host.nativeElement;
-    this.trackState.overflowing.set(el.scrollWidth > el.clientWidth + 1);
+    this.trackState.overflowing.set(this.canScroll(el));
   }
 
   @HostListener('wheel', ['$event'])
   protected onWheel(event: WheelEvent): void {
     const el = this.host.nativeElement;
 
-    if (el.scrollWidth <= el.clientWidth + 1) return;
+    if (!this.canScroll(el)) return;
 
     if (findNestedVerticalScroller(event.target as Element | null, el, event.deltaY)) {
       return;
@@ -194,7 +217,7 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     if (event.button !== 0) return;
 
     const el = this.host.nativeElement;
-    if (el.scrollWidth <= el.clientWidth + 1) return;
+    if (!this.canScroll(el)) return;
 
     this.dragPointer = event.pointerId;
     this.dragLastX = event.clientX;

@@ -129,6 +129,28 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .card.is-active ~ .glow {
       opacity: 1;
     }
+
+    /*
+     * Stacked layouts drop both grid behaviours.
+     *
+     * The seam margin exists so a card's edge meets its neighbour the way two
+     * pads do; with cards stacked as standalone blocks there is no neighbour, and
+     * it just holds them a pixel off the edge they are meant to be flush with.
+     *
+     * The corner glow goes because it depends on light escaping through the pad
+     * seams behind the card. Below this width the pads are a fixed backdrop
+     * rather than the layer the card is set into, so there is nothing for the
+     * light to leak through and it reads as a halo instead.
+     */
+    @media (max-width: 900px) {
+      .card {
+        margin: 0;
+      }
+
+      .glow {
+        display: none;
+      }
+    }
   `,
 })
 export class DrumCard {

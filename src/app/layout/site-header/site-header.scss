@@ -1,114 +1,136 @@
-@use '../../../styles/mixins' as *;
-
 :host {
   display: block;
-  position: sticky;
-  inset-block-start: 0;
-  z-index: var(--nv-z-header);
 }
 
+/*
+ * Exactly one drum tall. No background: the pads run behind the bar, and
+ * anything opaque here would punch a hole in the lattice.
+ */
 .hdr {
-  background: transparent;
-  border-block-end: 1px solid transparent;
-  transition:
-    background var(--nv-normal) var(--nv-ease),
-    border-color var(--nv-normal) var(--nv-ease);
-
-  &.is-scrolled {
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(18px);
-    border-block-end-color: var(--nv-border);
-  }
+  block-size: var(--nv-grid-cell);
 }
 
-.hdr__inner {
-  @include container;
+/*
+ * Starts at the second column, so the first drum is left empty. The gap is
+ * modest because each item carries its own pill padding.
+ */
+.hdr__row {
   display: flex;
   align-items: center;
-  gap: var(--nv-space-6);
-  block-size: var(--nv-header-height);
+  gap: var(--nv-space-2);
+  block-size: 100%;
+  padding-inline-start: var(--nv-grid-cell);
 }
 
-.brand {
+.hdr__logo {
   display: inline-flex;
   align-items: center;
-  gap: var(--nv-space-3);
   flex: none;
+  margin-inline-end: var(--nv-space-3);
   color: var(--nv-text);
 
-  &:hover .brand__mark {
-    color: var(--nv-accent);
+  svg {
+    block-size: 22px;
+    inline-size: 22px;
+    fill: currentColor;
   }
 }
 
-.brand__mark {
-  block-size: 20px;
-  inline-size: auto;
-  color: var(--nv-accent);
-  transition: color var(--nv-fast) var(--nv-ease);
-}
-
-.brand__word {
-  block-size: 18px;
-  inline-size: auto;
-}
-
-.nav {
-  display: flex;
+.hdr__item {
+  display: inline-flex;
   align-items: center;
-  gap: var(--nv-space-5);
-  margin-inline-end: auto;
-}
-
-.nav__link {
-  position: relative;
+  gap: var(--nv-space-2);
+  flex: none;
+  /*
+   * The padding is always present, transparent at rest. Adding it only on the
+   * selected state would shift every neighbour sideways as you navigate.
+   */
+  padding: var(--nv-space-2) var(--nv-space-3);
+  border-radius: var(--nv-radius-pill);
+  color: var(--nv-text);
   font-size: var(--nv-text-sm);
   font-weight: 600;
-  color: var(--nv-text-muted);
-  transition: color var(--nv-fast) var(--nv-ease);
+  white-space: nowrap;
+  /* Matches the popover triggers, so the whole bar moves at one speed. */
+  transition:
+    color var(--nv-dur-swipe) var(--nv-ease-panel),
+    background var(--nv-dur-swipe) var(--nv-ease-panel);
 
-  &::after {
-    content: '';
-    position: absolute;
-    inset-block-end: -6px;
-    inset-inline: 0;
-    block-size: 2px;
-    border-radius: 2px;
-    background: var(--nv-accent);
-    transform: scaleX(0);
-    transition: transform var(--nv-normal) var(--nv-ease);
+  svg {
+    inline-size: 18px;
+    block-size: 18px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
+  /* Hover dims rather than colours — accent is reserved for the selected item. */
   &:hover {
-    color: var(--nv-text);
+    color: var(--nv-text-muted);
   }
 
+  /* Selected: tinted pill in accent, no border. */
   &.is-active {
+    background: var(--nv-accent-soft);
     color: var(--nv-accent);
   }
-
-  &.is-active::after {
-    transform: scaleX(1);
-  }
 }
 
-.hdr__tools {
-  display: flex;
+/*
+ * The popover renders its own trigger, so this only needs to sit in the row.
+ * Its internal padding is why the gap looks even against the plain link.
+ */
+.hdr__item--popover {
+  display: inline-flex;
   align-items: center;
-  gap: var(--nv-space-3);
-  flex: none;
 }
 
-@media (max-width: 640px) {
-  .hdr__inner {
+/* One drum of separation from the nav items. */
+.hdr__lang {
+  margin-inline-start: var(--nv-grid-cell);
+}
+
+@media (max-width: 900px) {
+  .hdr__row {
     gap: var(--nv-space-4);
+    padding-inline: var(--nv-space-4);
   }
 
-  .nav {
-    gap: var(--nv-space-4);
+  .hdr__lang {
+    margin-inline-start: auto;
+  }
+}
+
+/*
+ * Icon-only nav on small phones.
+ *
+ * This row cannot shrink: every item is flex: none and nowrap, so its width is
+ * the sum of its parts — measured at 434px with the mobile padding. Below that
+ * it pushed the document wider than the viewport, and since the page could then
+ * slide sideways, every block on the page looked wrongly inset on one side while
+ * actually being full width. Dropping the two nav labels takes the row to about
+ * 245px, which clears the narrowest phones in use.
+ *
+ * The labels are the right thing to give up: both items keep their icon, their
+ * accessible name, and their hit area, and the language selector keeps its code
+ * visible since that *is* its state.
+ */
+@media (max-width: 480px) {
+  .hdr__row {
+    gap: var(--nv-space-2);
+    padding-inline: var(--nv-space-3);
   }
 
-  .brand__word {
+  .hdr__item > span {
     display: none;
+  }
+
+  /* Reaches the label inside the popover, which encapsulation puts out of
+     selector range — see the property's definition there. */
+  .hdr__item--popover {
+    --nv-popover-label-display: none;
   }
 }

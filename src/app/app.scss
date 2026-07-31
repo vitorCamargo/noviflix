@@ -13,6 +13,17 @@
   min-block-size: 0;
 }
 
+/*
+ * Stacked above the track at every width. On mobile the pad layer is fixed to
+ * the viewport and lives inside the track, which comes later in the DOM — so
+ * without a z-index here the opaque pads painted straight over the header and
+ * it vanished entirely.
+ */
+nv-site-header {
+  position: relative;
+  z-index: var(--nv-z-header);
+}
+
 // On desktop the header floats over the grid rather than taking a row out of
 // the flow, so the page lattice starts at the very top of the viewport and the
 // pads run behind the nav — as in the reference.

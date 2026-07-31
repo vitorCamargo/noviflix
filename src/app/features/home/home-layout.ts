@@ -14,8 +14,22 @@ import {
  */
 export const HOME_CONTENT_ROWS = 10;
 
-/** Columns the composition needs before the grid starts widening past it. */
-export const HOME_MIN_COLUMNS = 22;
+/**
+ * Below this width the composition shifts to its compact columns.
+ *
+ * The headline scales with viewport width, so as the window narrows the text
+ * shrinks while the hero stays pinned to the same column — opening a growing
+ * dead gap between them. Pulling the whole stack left closes it, rather than
+ * letting the type shrink into an increasingly empty column.
+ */
+export const HOME_COMPACT_MAX = 1240;
+
+/**
+ * At or below this width the composition is abandoned for a plain vertical
+ * stack. There aren't enough columns left for overlap to read as anything but
+ * collision, so blocks flow in reading order instead.
+ */
+export const HOME_STACK_MAX = 900;
 
 const BASE = {
   /** Headline block. */
@@ -63,18 +77,50 @@ export type HomeAreaKey = keyof typeof BASE;
 
 export type HomeAreas = Record<HomeAreaKey, DrumArea>;
 
+/** Columns the compact variant pulls the card stack left by. */
+const COMPACT_SHIFT = 2;
+
 /**
- * Shifts every area down so the composition sits centred vertically.
+ * Only the card stack moves when compact. The headline block keeps its column,
+ * because that is what anchors the page — sliding it to the edge as well would
+ * just move the gap rather than close it.
+ */
+const COMPACT_SHIFTS: readonly HomeAreaKey[] = [
+  'hero',
+  'poster',
+  'stats',
+  'badge',
+  'carousel',
+];
+
+function shiftColumns(area: DrumArea, by: number): DrumArea {
+  return { ...area, col: area.col - by, colEnd: area.colEnd - by };
+}
+
+/** Rightmost grid line the composition reaches, which is what the grid must fit. */
+export function homeMinColumns(compact = false): number {
+  const areas = homeAreas(HOME_CONTENT_ROWS, compact);
+  return Math.max(...Object.values(areas).map((area) => area.colEnd));
+}
+
+/**
+ * Shifts every area down so the composition sits centred vertically, and left
+ * when the viewport is too narrow to carry the full-width arrangement.
  *
  * Base rows start at 0 for blocks that sit above the hero, so the offset also
  * has to keep them on the grid — a row 0 placement would be invalid CSS.
  */
-export function homeAreas(rows: number): HomeAreas {
+export function homeAreas(rows: number, compact = false): HomeAreas {
   const offset = Math.max(1, centreOffset(rows, HOME_CONTENT_ROWS));
   const out = {} as HomeAreas;
 
   for (const key of Object.keys(BASE) as HomeAreaKey[]) {
-    out[key] = offsetArea(BASE[key], offset);
+    let area = offsetArea(BASE[key], offset);
+
+    if (compact && COMPACT_SHIFTS.includes(key)) {
+      area = shiftColumns(area, COMPACT_SHIFT);
+    }
+    out[key] = area;
   }
   return out;
 }

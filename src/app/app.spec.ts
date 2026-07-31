@@ -35,12 +35,31 @@ describe('App', () => {
     expect(track?.getAttribute('tabindex')).toBe('0');
   });
 
-  it('renders the wordmark in the header', async () => {
+  /**
+   * The mark is the only branding in the header, and it links home.
+   *
+   * Inline SVG rather than an image: an external SVG can't inherit colour from
+   * this document, so the mark could never be tinted white.
+   */
+  it('renders the mark in the header as the home link', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    const word = compiled.querySelector<HTMLImageElement>('.brand__word');
-    expect(word?.getAttribute('src')).toBe('logo-wordmark.svg');
-    expect(word?.alt).toBe('Noviflix');
+
+    const logo = compiled.querySelector<HTMLAnchorElement>('.hdr__logo');
+    expect(logo?.getAttribute('href')).toBe('/');
+    expect(logo?.querySelector('svg')).not.toBeNull();
+    expect(logo?.querySelector('img')).toBeNull();
+    expect(compiled.querySelector('.brand__word')).toBeNull();
+  });
+
+  it('lays the header out one drum tall, starting at the second column', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Structure only — the drum values themselves live in the stylesheet.
+    expect(compiled.querySelector('.hdr__row')).not.toBeNull();
+    expect(compiled.querySelector('.hdr__lang')).not.toBeNull();
   });
 });

@@ -10,6 +10,14 @@
 
   <main class="shell__main nv-track" nvHorizontalScroll>
     <router-outlet />
+
+    <!--
+      Inside the track, not beside it. The overlay swallows pointer events while
+      scrolling, and wheel events are pointer events: sitting outside the track
+      it became the wheel target and the track stopped receiving any. As a
+      descendant, wheel still bubbles up to the track while hover stays blocked.
+    -->
+    <nv-scroll-overlay />
   </main>
 </div>
 
@@ -17,5 +25,4 @@
 <router-outlet name="modal" />
 
 <nv-scroll-hint />
-<nv-scroll-overlay />
 <nv-cursor />

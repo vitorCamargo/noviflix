@@ -1,15 +1,13 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  HostListener,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { LanguageSwitcher } from '../../shared/language-switcher/language-switcher';
 import { AboutPopover } from '../about-popover/about-popover';
 
+/**
+ * One drum tall, sitting in the grid's first row and starting at its second
+ * column, so the whole bar lands on the lattice like everything else.
+ */
 @Component({
   selector: 'nv-site-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,11 +17,4 @@ import { AboutPopover } from '../about-popover/about-popover';
 })
 export class SiteHeader {
   protected readonly i18n = inject(I18nService);
-
-  protected readonly scrolled = signal(false);
-
-  @HostListener('window:scroll')
-  protected onScroll(): void {
-    this.scrolled.set(window.scrollY > 12);
-  }
 }

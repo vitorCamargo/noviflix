@@ -48,6 +48,18 @@
   --nv-warning: #ffc861;
   --nv-success: #4ade80;
 
+  // Popularity tiers -------------------------------------------------------
+  // Each status gets its own hue so the badge is legible at a glance, before
+  // the label is read. Deliberately outside the brand palette: these describe
+  // the film, not the product.
+  --nv-tier-blazing: #ff6b3d;
+  --nv-tier-trending: #f2f6f7;
+  --nv-tier-acclaimed: #ff5c8a;
+  --nv-tier-gem: #a78bfa;
+  --nv-tier-known: #ffc861;
+  --nv-tier-divisive: #ffa94d;
+  --nv-tier-lowkey: #33c5cf;
+
   // Typography -------------------------------------------------------------
   --nv-font: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont,
     'Segoe UI', roboto, sans-serif;
@@ -97,6 +109,20 @@
   --nv-normal: 240ms;
   --nv-slow: 420ms;
 
+  /*
+   * Panel motion, matching the reference's curve and timings.
+   *
+   * A long, heavily decelerated ease: fast off the mark, then a slow settle.
+   * That's what makes a half-second reveal feel unhurried rather than sluggish.
+   */
+  --nv-ease-panel: cubic-bezier(0.2, 0.6, 0.35, 1);
+  /* Panel unmasking. */
+  --nv-dur-mask: 500ms;
+  /* Content rising inside the panel. */
+  --nv-dur-swipe: 700ms;
+  /* Content waits for the mask to be underway before it rises. */
+  --nv-delay-swipe: 200ms;
+
   // Grid backdrop ----------------------------------------------------------
   // The grid is a field of opaque pads separated by 1px seams. The seam colour
   // is whatever sits behind them, so the "lines" are really gaps, and the glow
@@ -107,6 +133,19 @@
   --nv-grid-seam: #14171a;
   --nv-grid-pad: var(--nv-bg-raised);
   --nv-glow-size: 30vh;
+
+  /*
+   * How far the trailer embed is scaled past the card it fills.
+   *
+   * YouTube offers no parameter to hide the video title or the control bar —
+   * `modestbranding` no longer does anything, and `controls=0` leaves the title
+   * overlay behind. Overscanning pushes those bands, which live at the very top
+   * and bottom of the frame, outside the visible area.
+   *
+   * The cost is real: roughly this much of the picture is cropped off each edge.
+   * Lower it if trailers start losing their subject, raise it if chrome peeks in.
+   */
+  --nv-trailer-overscan: 1.42;
 
   // Layering ---------------------------------------------------------------
   // Bottom to top. The glow deliberately sits *below* the pads: it's visible

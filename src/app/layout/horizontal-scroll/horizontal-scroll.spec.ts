@@ -1,8 +1,27 @@
 import {
   clampOffset,
   findNestedVerticalScroller,
+  isHorizontalTrack,
   resolveWheelDelta,
 } from './horizontal-scroll';
+
+describe('isHorizontalTrack', () => {
+  it('accepts the overflow values that make a scroll rail', () => {
+    expect(isHorizontalTrack('auto')).toBe(true);
+    expect(isHorizontalTrack('scroll')).toBe(true);
+  });
+
+  /**
+   * The stacked-mode bug: content can overflow a `visible` box, so measuring
+   * scrollWidth alone had the directive claiming a track it could not move,
+   * swallowing the wheel and leaving the page stuck.
+   */
+  it('rejects a box that merely has content sticking out of it', () => {
+    expect(isHorizontalTrack('visible')).toBe(false);
+    expect(isHorizontalTrack('clip')).toBe(false);
+    expect(isHorizontalTrack('hidden')).toBe(false);
+  });
+});
 
 describe('clampOffset', () => {
   it('keeps offsets inside the scrollable range', () => {

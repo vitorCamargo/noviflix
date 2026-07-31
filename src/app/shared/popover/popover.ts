@@ -50,39 +50,60 @@ import {
       position: relative;
     }
 
+    /*
+     * Plain white text, matching the other nav items — no pill or border. The
+     * trigger only needs to read as a peer of its neighbours; the panel arriving
+     * is what signals it was pressed.
+     */
     .pv__trigger {
       display: inline-flex;
       align-items: center;
       gap: var(--nv-space-2);
-      padding: var(--nv-space-2) var(--nv-space-4);
-      border: 1px solid transparent;
+      /* Padding is always present so opening the panel doesn't shift the row. */
+      padding: var(--nv-space-2) var(--nv-space-3);
+      border: 0;
       border-radius: var(--nv-radius-pill);
       background: transparent;
-      color: var(--nv-text-muted);
+      color: var(--nv-text);
       font-size: var(--nv-text-sm);
       font-weight: 600;
+      white-space: nowrap;
+      /*
+       * Long and heavily decelerated, matching the panel's curve, so the pill
+       * and the panel feel like one gesture rather than two separate effects.
+       */
       transition:
-        color var(--nv-fast) var(--nv-ease),
-        border-color var(--nv-fast) var(--nv-ease),
-        background var(--nv-fast) var(--nv-ease);
+        color var(--nv-dur-swipe) var(--nv-ease-panel),
+        background var(--nv-dur-swipe) var(--nv-ease-panel);
 
       &:hover {
-        color: var(--nv-text);
+        color: var(--nv-text-muted);
       }
     }
 
+    /*
+     * Hideable from outside the component.
+     *
+     * A custom property crosses the encapsulation boundary where a descendant
+     * selector cannot, so a caller can drop the label to an icon-only trigger
+     * without this component knowing anything about the context.
+     */
+    .pv__label {
+      display: var(--nv-popover-label-display, inline);
+    }
+
+    /* Open: tinted accent pill, matching the selected nav item. */
     .is-open .pv__trigger {
-      color: var(--nv-accent);
-      border-color: var(--nv-accent-line);
       background: var(--nv-accent-soft);
+      color: var(--nv-accent);
     }
 
     .pv__icon {
       display: inline-flex;
 
       ::ng-deep svg {
-        inline-size: 16px;
-        block-size: 16px;
+        inline-size: 18px;
+        block-size: 18px;
         fill: none;
         stroke: currentColor;
         stroke-width: 1.8;
@@ -103,10 +124,25 @@ import {
       overscroll-behavior: contain;
       padding: var(--nv-space-6);
       background: var(--nv-panel);
-      border: 1px solid var(--nv-border);
       border-radius: var(--nv-radius-lg);
+      /* Borderless — the shadow alone lifts it off the grid. An outline here
+         competes with the lattice showing through behind it. */
       box-shadow: var(--nv-shadow-pop);
-      animation: nv-rise var(--nv-normal) var(--nv-ease);
+      --nv-mask-radius: var(--nv-radius-lg);
+      animation: nv-mask-open var(--nv-dur-mask) var(--nv-ease-panel) both;
+    }
+
+    /*
+     * Every block of panel content rises as the mask opens. Applied here rather
+     * than by each caller, via ::ng-deep, so any popover's content animates
+     * without the caller knowing about it.
+     *
+     * The delay lets the mask get underway first — content arriving at the same
+     * instant as the box reads as one flat fade instead of two layers.
+     */
+    ::ng-deep .pv__panel > * {
+      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel)
+        var(--nv-delay-swipe) both;
     }
 
     .pv__panel--end {
@@ -121,8 +157,6 @@ import {
       inline-size: 10px;
       block-size: 10px;
       background: var(--nv-panel);
-      border-inline-start: 1px solid var(--nv-border);
-      border-block-start: 1px solid var(--nv-border);
       transform: rotate(45deg);
     }
 

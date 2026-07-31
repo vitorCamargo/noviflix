@@ -24,11 +24,15 @@ import { DotField } from './dot-field/dot-field';
 import { badgeTrail } from './badge-trail';
 import {
   CAROUSEL_NUDGE,
-  HOME_MIN_COLUMNS,
+  HOME_COMPACT_MAX,
+  HOME_STACK_MAX,
   POSTER_NUDGE,
   homeAreas,
+  homeMinColumns,
 } from './home-layout';
-import { newestReleaseId, popularityTier, scoreLabel } from './popularity';
+import { HeroTrailer, type TrailerState } from './hero-trailer/hero-trailer';
+import { assignTiers, tierLabelKey, type PopularityTier } from './popularity';
+import { PopularityBadge } from './popularity-badge/popularity-badge';
 import {
   RING_CIRCUMFERENCE,
   RING_RADIUS,
@@ -45,7 +49,7 @@ const GENRE_LIMIT = 3;
 @Component({
   selector: 'nv-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageGrid, DrumCard, DotField],
+  imports: [PageGrid, DrumCard, DotField, PopularityBadge, HeroTrailer],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -58,10 +62,6 @@ export class Home implements OnDestroy {
 
   /** Static geometry — built once, never recomputed. */
   protected readonly trail = badgeTrail();
-  protected readonly posterNudge = POSTER_NUDGE;
-  protected readonly carouselNudge = CAROUSEL_NUDGE;
-
-  protected readonly minColumns = HOME_MIN_COLUMNS;
 
   /**
    * Row count is derived here rather than read back off the grid: the grid's
@@ -69,13 +69,41 @@ export class Home implements OnDestroy {
    * the child would be circular. Both sides compute it from the same viewport
    * and cell size, so they agree.
    */
-  private readonly viewportHeight = signal(readViewport().height);
+  private readonly viewport = signal(readViewport());
 
   protected readonly rows = computed(() =>
-    Math.max(1, Math.ceil(this.viewportHeight() / readCellSize())),
+    Math.max(1, Math.ceil(this.viewport().height / readCellSize())),
   );
 
-  protected readonly areas = computed(() => homeAreas(this.rows()));
+  /** Narrow enough that the full-width arrangement leaves a dead gap. */
+  protected readonly compact = computed(
+    () => this.viewport().width <= HOME_COMPACT_MAX,
+  );
+
+  /** Narrow enough to give up the composition for a vertical stack. */
+  protected readonly stacked = computed(
+    () => this.viewport().width <= HOME_STACK_MAX,
+  );
+
+  protected readonly areas = computed(() =>
+    homeAreas(this.rows(), this.compact()),
+  );
+
+  protected readonly minColumns = computed(() => homeMinColumns(this.compact()));
+
+  /*
+   * The half-drum nudges have to be cleared here rather than in the stylesheet.
+   * They are bound as inline styles, which outrank any rule in a media query, so
+   * a `translate: none` in the mobile block was silently losing — which is why
+   * the poster still overlapped the hero when stacked.
+   */
+  protected readonly posterNudge = computed(() =>
+    this.stacked() ? null : POSTER_NUDGE,
+  );
+
+  protected readonly carouselNudge = computed(() =>
+    this.stacked() ? null : CAROUSEL_NUDGE,
+  );
 
   protected resizeFrame: number | null = null;
 
@@ -84,12 +112,19 @@ export class Home implements OnDestroy {
     if (this.resizeFrame !== null) cancelAnimationFrame(this.resizeFrame);
     this.resizeFrame = requestAnimationFrame(() => {
       this.resizeFrame = null;
-      this.viewportHeight.set(readViewport().height);
+      this.viewport.set(readViewport());
     });
   }
 
+  /**
+   * Drum placement, or nothing at all when stacked.
+   *
+   * Returning null there matters: `grid-area` is bound inline, and an inline
+   * style outranks any rule in a media query — so leaving these in place would
+   * pin blocks to desktop drum coordinates inside the stacked two-column grid.
+   */
   protected readonly area = (key: keyof ReturnType<typeof homeAreas>) =>
-    toGridArea(this.areas()[key]);
+    this.stacked() ? null : toGridArea(this.areas()[key]);
 
   // ------------------------------------------------------------------- data
 
@@ -157,31 +192,19 @@ export class Home implements OnDestroy {
     () => this.details()?.credits?.cast?.slice(0, CAST_LIMIT) ?? [],
   );
 
-  /** Recomputed per batch, so "newest" means newest of what's on offer. */
-  private readonly newestId = computed(() => newestReleaseId(this.movies()));
+  /**
+   * Tiers are assigned per batch, not per movie: attention is measured against
+   * the other films on offer, so the set is the unit of comparison.
+   */
+  private readonly tiers = computed(() => assignTiers(this.movies()));
 
-  protected readonly tierLabel = computed(() => {
-    const movie = this.active();
-    const tier = popularityTier(
-      movie?.popularity,
-      movie != null && movie.id === this.newestId(),
-    );
-
-    const keys = {
-      blazing: 'home.tier.blazing',
-      lowkey: 'home.tier.lowkey',
-      wellKnown: 'home.tier.wellKnown',
-      trending: 'home.tier.trending',
-    } as const;
-    return this.i18n.t(keys[tier]);
+  protected readonly tier = computed<PopularityTier>(() => {
+    const id = this.active()?.id;
+    return (id != null ? this.tiers().get(id) : undefined) ?? 'lowkey';
   });
 
-  protected readonly score = computed(() =>
-    this.active() ? scoreLabel(this.active()!) : null,
-  );
-
-  protected readonly voteCount = computed(() =>
-    this.i18n.formatNumber(this.active()?.vote_count ?? 0),
+  protected readonly tierLabel = computed(() =>
+    this.i18n.t(tierLabelKey(this.tier())),
   );
 
   protected avatarUrl(movie: MovieSummary): string | null {
@@ -218,6 +241,40 @@ export class Home implements OnDestroy {
     });
   });
 
+  // ---------------------------------------------------------------- trailer
+
+  protected readonly heroHovered = signal(false);
+  private readonly trailerState = signal<TrailerState>('idle');
+
+  /** Loading counts as engaged: playback is imminent, so hold the carousel. */
+  private readonly trailerEngaged = computed(
+    () => this.trailerState() === 'loading' || this.trailerState() === 'playing',
+  );
+
+  /**
+   * Drives clearing the title and chips off the card while the trailer runs.
+   *
+   * Only once playback has actually begun — hiding them during `loading` would
+   * blank the card for the length of the fetch and read as a glitch.
+   */
+  protected readonly trailerPlaying = computed(
+    () => this.trailerState() === 'playing',
+  );
+
+  protected onHeroEnter(event: PointerEvent): void {
+    // Touch has no hover; there the button is the only way in.
+    if (event.pointerType !== 'mouse') return;
+    this.heroHovered.set(true);
+  }
+
+  protected onHeroLeave(): void {
+    this.heroHovered.set(false);
+  }
+
+  protected onTrailerState(state: TrailerState): void {
+    this.trailerState.set(state);
+  }
+
   // ------------------------------------------------------------ slide timer
 
   /** 0 → 1 across one slide's dwell time. Drives the ring around the avatar. */
@@ -241,8 +298,16 @@ export class Home implements OnDestroy {
     });
 
     effect(() => {
+      /*
+       * Held while a trailer is engaged as well as while the strip is hovered.
+       * Advancing the carousel out from under a playing trailer would discard
+       * something the viewer explicitly asked to watch.
+       */
       const canRun =
-        this.movies().length > 1 && !this.hovering() && !prefersReducedMotion();
+        this.movies().length > 1 &&
+        !this.hovering() &&
+        !this.trailerEngaged() &&
+        !prefersReducedMotion();
 
       if (canRun) {
         this.startTimer();

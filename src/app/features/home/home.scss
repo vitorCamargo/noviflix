@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as *;
+
 // Every block here is placed by grid-area from home-layout.ts, so nothing sets
 // its own size — the drums decide. Rules below are purely what goes *inside*.
 
@@ -166,26 +168,35 @@
   object-fit: cover;
 }
 
+/* Above the trailer, so the title stays readable once video is playing. */
 .hero__scrim {
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.92) 4%,
     rgba(0, 0, 0, 0.25) 48%,
     rgba(0, 0, 0, 0.05)
   );
+  pointer-events: none;
 }
 
+/*
+ * Kept clear of the cards that overlap the hero's right edge. The poster and
+ * popularity card cover roughly two drums there, so the text stops short of
+ * them and wraps rather than running underneath.
+ */
 .hero__text {
   position: absolute;
   inset-block-end: 0;
   inset-inline: 0;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   gap: var(--nv-space-3);
   padding: var(--nv-space-5);
+  padding-inline-end: calc(var(--nv-grid-cell) * 2);
 }
 
 .hero__title {
@@ -193,6 +204,9 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.05;
+  /* Two lines is the most the card can give a title without crowding the
+     chips below it; anything longer is cut rather than allowed to overflow. */
+  @include clamp-lines(2);
 }
 
 // ------------------------------------------------------------------ poster
@@ -262,18 +276,7 @@
   min-inline-size: 0;
 }
 
-.stats__icon {
-  flex: none;
-  color: var(--nv-accent);
-
-  svg {
-    inline-size: 22px;
-    block-size: 22px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-  }
-}
+/* The badge carries its own colour and motion per tier. */
 
 .stats__label {
   margin: 0;
@@ -463,4 +466,164 @@
   stroke: var(--nv-accent);
   stroke-linecap: round;
   filter: drop-shadow(0 0 6px var(--nv-accent-glow));
+}
+
+// ------------------------------------------------------------------- mobile
+
+/*
+ * The drum composition is abandoned below this width — there are not enough
+ * columns for cards to overlap meaningfully. Blocks stack in reading order:
+ * headline, search, hero, poster + cast, popularity, strip.
+ *
+ * `grid-area` is set inline on each block, but the parent switches to
+ * `display: block` at this width which makes those values inert. The half-drum
+ * `translate` nudges are inline too — those *cannot* be undone from here, since
+ * an inline style outranks any rule in a media query, so `Home` clears them at
+ * the binding instead.
+ *
+ * Every block is sized by its own content here rather than by drums, so the page
+ * is one column of cards with a single shared gutter and rhythm.
+ */
+@media (max-width: 900px) {
+  /*
+   * Full width by default. The grid is two columns so the poster and popularity
+   * can pair up below; everything else spans both and reads as one column.
+   * Gutters come from the grid's own padding, so nothing here sets a margin-inline.
+   */
+  .caption,
+  .action,
+  .hero,
+  .carousel {
+    grid-column: 1 / -1;
+    inline-size: auto;
+    block-size: auto;
+  }
+
+  /* Decorative companions to the composition; nothing to sit beside now. */
+  .badge,
+  .caption__dots {
+    display: none;
+  }
+
+  /* Gutter comes from the grid, so nothing here adds one of its own. */
+  .caption {
+    gap: var(--nv-space-3);
+    padding-block-start: var(--nv-space-6);
+    padding-inline: 0;
+  }
+
+  .caption__title {
+    /* Tracks the narrow column instead of the desktop viewport curve. */
+    font-size: clamp(2.6rem, 12vw, 3.6rem);
+  }
+
+  .caption__body {
+    font-size: var(--nv-text-base);
+  }
+
+  /*
+   * Positioned so it paints above the pinned pad layer.
+   *
+   * The cards get this for free — each wraps a positioned DrumCard — but a plain
+   * block does not, and positioned boxes paint after unpositioned ones. That is
+   * what put the search slot and the nav buttons behind the drums.
+   */
+  .action,
+  .action__slot,
+  .carousel__nav {
+    position: relative;
+  }
+
+  .action {
+    margin-block-start: var(--nv-space-5);
+  }
+
+  /* Matches the backdrop it crops, rather than a guessed pixel height. */
+  .hero {
+    aspect-ratio: 16 / 9;
+    margin-block-start: var(--nv-space-7);
+  }
+
+  .hero__text {
+    padding: var(--nv-space-4);
+  }
+
+  .hero__title {
+    font-size: var(--nv-text-2xl);
+  }
+
+  /*
+   * Playback clears the card on touch. The card is small here and the copy is
+   * repeated in the poster and popularity blocks below, so the trailer gets the
+   * whole frame. Faded rather than removed, so the layout does not jump when it
+   * comes back. Kept to this width on purpose: on desktop the hero is large
+   * enough that the title never competes with the video.
+   */
+  .hero.is-playing .hero__text {
+    opacity: 0;
+    transition: opacity var(--nv-normal) var(--nv-ease);
+  }
+
+  /*
+   * The pair. Poster takes the left column and keeps its drum proportions —
+   * 3 columns by 5 rows on the lattice, so 3/5 — which is why its height is not
+   * stated. Popularity takes the right column and stretches to match it.
+   */
+  .poster {
+    grid-column: 1;
+    aspect-ratio: 3 / 5;
+    inline-size: auto;
+    margin-block-start: var(--nv-space-5);
+  }
+
+  /*
+   * Half the poster's height, so the pair is deliberately uneven rather than
+   * looking like two cards that failed to match. The poster is 3 wide by 5 tall,
+   * so half of that at the same width is 3 by 2.5 — hence 6/5.
+   *
+   * `align-self` keeps it at the top of the row instead of stretching to fill
+   * the height the poster establishes.
+   */
+  .stats {
+    grid-column: 2;
+    align-self: start;
+    aspect-ratio: 6 / 5;
+    inline-size: auto;
+    block-size: auto;
+    margin-block-start: var(--nv-space-5);
+  }
+
+  /* A horizontal row inside one drum on desktop. With real height to spend, the
+     icon leads from above and the copy sits under it, both centred. */
+  .stats__body {
+    --nv-badge-size: 44px;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nv-space-3);
+    padding: var(--nv-space-4);
+    text-align: center;
+  }
+
+  .stats__value {
+    /* Room for two lines now that the copy is not competing with the icon. */
+    white-space: normal;
+    @include clamp-lines(2);
+  }
+
+  /*
+   * Nav buttons are pinned to lattice intersections on desktop; with no lattice
+   * to pin to, the strip becomes a plain centred row and they rejoin the flow.
+   */
+  .carousel {
+    position: static;
+    gap: var(--nv-space-4);
+    margin-block: var(--nv-space-6) var(--nv-space-7);
+  }
+
+  .carousel__nav {
+    translate: none;
+    inset: auto;
+  }
 }
