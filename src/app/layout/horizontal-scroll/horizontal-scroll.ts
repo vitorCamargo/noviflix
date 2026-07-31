@@ -5,6 +5,7 @@ import {
   HostListener,
   OnDestroy,
   inject,
+  signal,
 } from '@angular/core';
 import { TrackState } from './track-state';
 
@@ -93,6 +94,7 @@ export function exceedsDragThreshold(
   selector: '[nvHorizontalScroll]',
   host: {
     tabindex: '0',
+    '[class.is-dragging]': 'dragging()',
   },
 })
 export class HorizontalScroll implements AfterViewInit, OnDestroy {
@@ -107,6 +109,15 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
   private dragPointer: number | null = null;
   private dragLastX = 0;
   private dragTravel = 0;
+
+  /**
+   * True once a press has become a drag, which suppresses text selection.
+   *
+   * Selection can't be prevented on pointerdown — that would also stop the press
+   * focusing an input or reaching a control — so it is allowed to begin and then
+   * cancelled at the moment the gesture turns out to be a drag.
+   */
+  protected readonly dragging = signal(false);
 
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
@@ -240,6 +251,10 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     // card still reaches it.
     if (!el.hasPointerCapture(event.pointerId)) {
       el.setPointerCapture(event.pointerId);
+      this.dragging.set(true);
+      // Anything highlighted before the threshold was crossed is discarded, so a
+      // drag never leaves a trail of selected titles behind it.
+      window.getSelection?.()?.removeAllRanges();
     }
 
     this.stop();
@@ -261,6 +276,7 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
       el.releasePointerCapture(event.pointerId);
     }
     this.dragPointer = null;
+    this.dragging.set(false);
   }
 
   /**

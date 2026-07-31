@@ -16,16 +16,21 @@
     <p class="caption__body">{{ i18n.t('home.subhead') }}</p>
   </div>
 
-  <!-- Placeholder for search. Sized and placed so the real control drops in. -->
+  <!-- Search, in the slot the dashed placeholder was reserving. -->
   <div class="action" [style.gridArea]="area('action')">
-    <div class="action__slot">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.4-3.4" />
-      </svg>
-      <span>{{ i18n.t('home.searchSlot') }}</span>
-    </div>
+    <nv-search-field />
   </div>
+
+  @if (searching()) {
+    <!--
+      Results take the card stack's space. The featured blocks are removed rather
+      than hidden, so their images stop loading and the trailer's hover machinery
+      isn't sitting behind the grid waiting to fire.
+    -->
+    <div class="results" [style.gridArea]="resultsArea()">
+      <nv-search-results-grid [rows]="cardRows()" />
+    </div>
+  } @else {
 
   <!-- Camera badge, floating above the card stack, with its dot trail. -->
   <div class="badge" [style.gridArea]="area('badge')">
@@ -203,4 +208,6 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
     </button>
   </div>
+
+  }
 </nv-page-grid>

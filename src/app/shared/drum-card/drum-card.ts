@@ -65,8 +65,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       inline-size: 100%;
       /* Matches the pads so corners continue the lattice. */
       border-radius: var(--nv-grid-radius);
-      /* Same seam the pads leave, so gaps read as one system. */
-      margin: 0 var(--nv-grid-gap) var(--nv-grid-gap) 0;
+      /*
+       * Same seam the pads leave, so gaps read as one system. Overridable because
+       * a card is only ever a pixel short of its box to meet a neighbour — where
+       * a real gap already separates cards, as in the results grid, the seam is
+       * a pixel of nothing.
+       */
+      margin: 0 var(--nv-card-seam, var(--nv-grid-gap))
+        var(--nv-card-seam, var(--nv-grid-gap)) 0;
       background: var(--nv-panel);
       overflow: hidden;
       isolation: isolate;
@@ -86,8 +92,17 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
      * pads' backgrounds. The card itself stays opaque above, so the only light
      * that survives is what leaks through the seams around the corners.
      */
+    /*
+     * Colour comes from --nv-card-glow, read with a fallback rather than declared
+     * here: declaring it locally would shadow whatever an ancestor sets, and the
+     * point is that a caller can tint the light — the search field turns it red
+     * while the term is invalid.
+     */
     .glow {
       --reach: 104px;
+      --core: color-mix(in srgb, var(--nv-card-glow, #ffffff) 50%, transparent);
+      --halo: color-mix(in srgb, var(--nv-card-glow, #ffffff) 10%, transparent);
+
       position: absolute;
       inset: calc(var(--reach) * -1);
       z-index: -1;
@@ -97,27 +112,27 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       background:
         radial-gradient(
           circle var(--reach) at var(--reach) var(--reach),
-          hsla(0, 0%, 100%, 0.5),
-          hsla(0, 0%, 100%, 0.1) 25%,
-          hsla(0, 0%, 100%, 0) 70%
+          var(--core),
+          var(--halo) 25%,
+          transparent 70%
         ),
         radial-gradient(
           circle var(--reach) at calc(100% - var(--reach)) var(--reach),
-          hsla(0, 0%, 100%, 0.5),
-          hsla(0, 0%, 100%, 0.1) 25%,
-          hsla(0, 0%, 100%, 0) 70%
+          var(--core),
+          var(--halo) 25%,
+          transparent 70%
         ),
         radial-gradient(
           circle var(--reach) at var(--reach) calc(100% - var(--reach)),
-          hsla(0, 0%, 100%, 0.5),
-          hsla(0, 0%, 100%, 0.1) 25%,
-          hsla(0, 0%, 100%, 0) 70%
+          var(--core),
+          var(--halo) 25%,
+          transparent 70%
         ),
         radial-gradient(
           circle var(--reach) at calc(100% - var(--reach)) calc(100% - var(--reach)),
-          hsla(0, 0%, 100%, 0.5),
-          hsla(0, 0%, 100%, 0.1) 25%,
-          hsla(0, 0%, 100%, 0) 70%
+          var(--core),
+          var(--halo) 25%,
+          transparent 70%
         );
     }
 

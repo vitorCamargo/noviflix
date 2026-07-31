@@ -17,7 +17,26 @@ export const en = {
   'home.headlineTailBefore': 'you',
   'home.headlineAccent': 'watch.',
   'home.subhead': 'Explore what is in cinemas now and build your own collections.',
-  'home.searchSlot': 'Search goes here',
+  'search.placeholder': 'Search for a movie',
+  'search.label': 'Search for a movie',
+  'search.searching': 'Searching',
+  // Says what is wrong and what to do, rather than restating the rule.
+  'search.error.tooShort': 'Type at least {min} characters to search.',
+  'search.error.charset': 'Use letters and numbers only.',
+
+  'search.resultCount': '{count} results for “{query}”',
+  'search.retry': 'Try again',
+  'search.voteAverage': 'Average rating',
+  'search.unrated': 'Not rated',
+  'search.openDetails': 'Open details for {title}',
+  'search.openFull': 'Open {title} on its own page',
+  'search.emptyTitle': 'Nothing found for “{query}”',
+  'search.emptyBody':
+    'Check the spelling, or try a shorter phrase — a single distinctive word usually works better than a full title.',
+  'search.failed': 'Search unavailable',
+  'search.failedTitle': 'Could not reach the movie database',
+  'search.failedBody':
+    'The request did not go through. Your connection may be down, or the service may be busy — searching again usually resolves it.',
   'home.featuredCast': 'Featured cast',
   'trailer.play': 'Play trailer',
   'trailer.pause': 'Stop trailer',

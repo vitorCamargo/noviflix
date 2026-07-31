@@ -37,6 +37,22 @@ export class TmdbService {
   }
 
   /**
+   * Keyword search, returning the page envelope rather than just the results.
+   *
+   * The envelope is the point: `page` and `total_pages` are what pagination is
+   * built from, so unwrapping to a bare array here — as `nowPlaying` does, since
+   * nothing pages through it — would throw away the only numbers the caller
+   * needs.
+   */
+  search(query: string, page = 1): Observable<Paginated<MovieSummary>> {
+    return this.get<Paginated<MovieSummary>>('/search/movie', {
+      query,
+      page,
+      include_adult: false,
+    });
+  }
+
+  /**
    * Full record for one movie, with credits folded in.
    *
    * `append_to_response` keeps this to a single round trip — genres and cast

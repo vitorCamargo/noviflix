@@ -1,0 +1,215 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.mc {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+/*
+ * The artwork's frame. It clips the zoom, so the image can grow without the card
+ * growing with it — the card's edges have to stay on the lattice seams.
+ */
+.mc__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.mc__img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  /*
+   * Scaled from the centre on hover. `scale` rather than `transform` so it does
+   * not fight anything else that might want to translate the image, and a slow
+   * curve because a brisk zoom on a wall of posters is agitating.
+   */
+  transition: scale var(--nv-slow) var(--nv-ease-panel);
+}
+
+.mc__fallback {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 34px;
+    block-size: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+/*
+ * Vote average, hidden until the card is engaged.
+ *
+ * Held back rather than always shown because a score on every card at rest turns
+ * a grid of posters into a table of numbers; on hover it answers a question that
+ * has just been asked.
+ */
+.mc__score {
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-end: var(--nv-space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--nv-space-2);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  color: var(--nv-text);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  translate: 0 -4px;
+  transition:
+    opacity var(--nv-normal) var(--nv-ease),
+    translate var(--nv-normal) var(--nv-ease);
+  pointer-events: none;
+}
+
+.mc__score.is-empty {
+  color: var(--nv-text-faint);
+  font-weight: 600;
+}
+
+.mc__star {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: var(--nv-accent);
+}
+
+/* The meta strip. One drum tall, matching the poster card it borrows from. */
+.mc__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  padding-inline: var(--nv-space-4);
+  /* Room for the external-link button, which sits over this strip. */
+  padding-inline-end: calc(var(--nv-space-4) + 26px);
+}
+
+.mc__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-inline-size: 0;
+}
+
+.mc__title {
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  @include clamp-lines(2);
+}
+
+.mc__year {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Escape hatch to the full page, over the meta strip.
+ *
+ * Only revealed on hover, but it stays focusable at all times — hiding it from
+ * the keyboard would leave the full page unreachable for anyone not using a
+ * pointer, so it appears on focus as well.
+ */
+.mc__full {
+  position: absolute;
+  inset-block-end: calc((var(--nv-grid-cell) - 26px) / 2);
+  inset-inline-end: var(--nv-space-3);
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  border-radius: 50%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-muted);
+  opacity: 0;
+  transition:
+    opacity var(--nv-normal) var(--nv-ease),
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 14px;
+    block-size: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--nv-accent-soft);
+    color: var(--nv-accent);
+  }
+}
+
+/*
+ * Engaged state, driven from the host so hovering the artwork, the title or the
+ * button all count as the same gesture. Focus is included so keyboard users get
+ * the score and the button too.
+ */
+:host(:hover),
+:host(:focus-within) {
+  .mc__img {
+    scale: 1.07;
+  }
+
+  .mc__score,
+  .mc__full {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/*
+ * Where there is no hover, nothing can be revealed by it.
+ *
+ * Both the score and the link button are shown outright on touch. The score is the
+ * obvious one, but the button matters more: hidden until hover, it would be
+ * completely unreachable on a phone — the full-page route would exist with no way
+ * in.
+ */
+@media (hover: none), (max-width: 900px) {
+  .mc__score,
+  .mc__full {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* The zoom is the one effect here that reads as motion, so it goes. The score
+   and button still appear — they are information, not decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .mc__img {
+    transition: none;
+  }
+
+  :host(:hover) .mc__img,
+  :host(:focus-within) .mc__img {
+    scale: 1;
+  }
+}

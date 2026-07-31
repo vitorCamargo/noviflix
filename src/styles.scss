@@ -97,6 +97,19 @@ body.nv-modal-open {
   }
 
   /*
+   * Dragging the page must not highlight it.
+   *
+   * A press that turns into a drag is a scroll gesture, but the browser has
+   * already read it as the start of a text selection — so by the time the page
+   * moves, every title it passes over is highlighted. The class only lasts for the
+   * gesture, leaving selection available for ordinary clicks and double-clicks.
+   */
+  .nv-track.is-dragging,
+  .nv-track.is-dragging * {
+    user-select: none;
+  }
+
+  /*
    * Focus indicator for the track, relocated to the hint. The hint isn't a
    * sibling of the track — it sits outside the shell — so this reaches it from
    * the root rather than with a combinator.
@@ -163,6 +176,24 @@ button {
 ::selection {
   background: var(--nv-accent);
   color: var(--nv-accent-ink);
+}
+
+/*
+ * Available to assistive tech, absent from the page.
+ *
+ * `display: none` would hide it from screen readers too, which defeats the point;
+ * this keeps the text in the accessibility tree while giving it no visible box.
+ */
+.nv-sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 // No scroll chrome anywhere — every surface reads as uninterrupted. Scrolling

@@ -29,8 +29,17 @@ import {
   POSTER_NUDGE,
   homeAreas,
   homeMinColumns,
+  homeResultsArea,
+  homeResultsColumns,
 } from './home-layout';
+import { resultGridWidth, resultRowCount } from '../search/results-metrics';
+
+/** Drum rows the results grid gives up at the top, for the floating header. */
+const RESULTS_TOP_ROWS = 1;
 import { HeroTrailer, type TrailerState } from './hero-trailer/hero-trailer';
+import { SearchField } from './search-field/search-field';
+import { SearchResultsGrid } from '../search/search-results-grid/search-results-grid';
+import { SearchStore } from '../search/search-store';
 import { assignTiers, tierLabelKey, type PopularityTier } from './popularity';
 import { PopularityBadge } from './popularity-badge/popularity-badge';
 import {
@@ -49,13 +58,25 @@ const GENRE_LIMIT = 3;
 @Component({
   selector: 'nv-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageGrid, DrumCard, DotField, PopularityBadge, HeroTrailer],
+  imports: [
+    PageGrid,
+    DrumCard,
+    DotField,
+    PopularityBadge,
+    HeroTrailer,
+    SearchField,
+    SearchResultsGrid,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnDestroy {
   private readonly tmdb = inject(TmdbService);
+  private readonly search = inject(SearchStore);
   protected readonly i18n = inject(I18nService);
+
+  /** Results replace the featured composition while a search is running. */
+  protected readonly searching = this.search.active;
 
   protected readonly ringRadius = RING_RADIUS;
   protected readonly ringCircumference = RING_CIRCUMFERENCE;
@@ -89,7 +110,51 @@ export class Home implements OnDestroy {
     homeAreas(this.rows(), this.compact()),
   );
 
-  protected readonly minColumns = computed(() => homeMinColumns(this.compact()));
+  /**
+   * Card rows the results grid gets, from the height actually available.
+   *
+   * Computed here rather than in the grid because the page needs the same number
+   * to work out how wide it has to be — the grid flows in columns, so its width
+   * depends on how many cards each column holds.
+   */
+  protected readonly cardRows = computed(() =>
+    resultRowCount(this.rows() - RESULTS_TOP_ROWS),
+  );
+
+  /** Width of the results grid in drums, zero when it isn't showing. */
+  private readonly resultsWidth = computed(() =>
+    this.searching() && !this.stacked()
+      ? resultGridWidth(this.search.slotCount(), this.cardRows())
+      : 0,
+  );
+
+  /**
+   * The page spans whichever is wider: the featured composition, or the results.
+   *
+   * This is what makes the track scrollable. Without it the page stays viewport
+   * width, and since it clips horizontal overflow, every card past the first screen
+   * exists but cannot be reached.
+   */
+  protected readonly minColumns = computed(() =>
+    Math.max(
+      homeMinColumns(this.compact()),
+      this.resultsWidth()
+        ? homeResultsColumns(this.rows(), this.compact(), this.resultsWidth())
+        : 0,
+    ),
+  );
+
+  /**
+   * Full-height slot for the results grid, kept apart from `areas` because it is
+   * viewport-sized rather than part of the centred composition.
+   */
+  protected readonly resultsArea = computed(() =>
+    this.stacked()
+      ? null
+      : toGridArea(
+          homeResultsArea(this.rows(), this.compact(), this.resultsWidth()),
+        ),
+  );
 
   /*
    * The half-drum nudges have to be cleared here rather than in the stylesheet.
@@ -305,6 +370,9 @@ export class Home implements OnDestroy {
        */
       const canRun =
         this.movies().length > 1 &&
+        // Nothing to advance while the results are showing — the carousel it
+        // drives isn't on screen.
+        !this.searching() &&
         !this.hovering() &&
         !this.trailerEngaged() &&
         !prefersReducedMotion();

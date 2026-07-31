@@ -1,0 +1,196 @@
+/*
+ * Card footprint, in drums. Three across by five down is the poster card's shape,
+ * which this borrows so results sit on the same lattice as everything else.
+ */
+$card-cols: 3;
+$card-rows: 5;
+
+:host {
+  display: block;
+  block-size: 100%;
+  min-inline-size: 0;
+}
+
+.rg {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+/*
+ * Desktop flows in columns, not rows.
+ *
+ * The page scrolls sideways here, so results have to extend in the direction the
+ * page moves — a row-major grid would run off the bottom of a viewport that cannot
+ * scroll that way. Rows are fixed and columns are added as needed, which is what
+ * makes the grid readable as "keep going right".
+ *
+ * The row count comes in as `--rg-rows` rather than from `auto-fill`. The page
+ * needs the same number to size itself wide enough for every card to be reachable,
+ * so it is decided once, there, and handed down — auto-fill would be a second,
+ * independent answer to the same question.
+ */
+.rg__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--rg-rows, 2), calc(var(--nv-grid-cell) * #{$card-rows}));
+  grid-auto-columns: calc(var(--nv-grid-cell) * #{$card-cols});
+  gap: var(--nv-grid-cell);
+  /* A real gap separates the cards, so the lattice seam inside each one is a
+     pixel of nothing — see the property's definition in DrumCard. */
+  --nv-card-seam: 0px;
+  align-content: start;
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+.rg__skeleton {
+  border-radius: var(--nv-grid-radius);
+  background: var(--nv-panel);
+  animation: nv-rg-pulse 1.4s var(--nv-ease) infinite;
+}
+
+@keyframes nv-rg-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/*
+ * Occupies a card's slot rather than collapsing to nothing, so it is genuinely
+ * ahead of the last card in the scroll direction. A zero-width element between
+ * columns would already be on screen when the last card is.
+ */
+.rg__sentinel {
+  inline-size: calc(var(--nv-grid-cell) * #{$card-cols});
+  block-size: 100%;
+  pointer-events: none;
+}
+
+/*
+ * Empty and failed states. Sized to a few cards rather than the whole grid, so the
+ * message sits where the results would have started instead of floating in the
+ * middle of a large blank area.
+ */
+.rg__state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--nv-space-3);
+  inline-size: calc(var(--nv-grid-cell) * 6);
+  padding-inline-end: var(--nv-space-5);
+  block-size: calc(var(--nv-grid-cell) * #{$card-rows});
+}
+
+.rg__state-icon {
+  inline-size: 30px;
+  block-size: 30px;
+  fill: none;
+  stroke: var(--nv-text-faint);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.rg__state-title {
+  margin: 0;
+  font-size: var(--nv-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.rg__state-body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+.rg__retry {
+  padding: var(--nv-space-2) var(--nv-space-4);
+  border: 1px solid var(--nv-accent-line);
+  border-radius: var(--nv-radius-pill);
+  background: var(--nv-accent-soft);
+  color: var(--nv-accent);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+}
+
+.rg__tail-error {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  margin: 0;
+  padding-block: var(--nv-space-3);
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+}
+
+.rg__retry--inline {
+  padding: 2px var(--nv-space-3);
+}
+
+/*
+ * Mobile is an ordinary vertical page, so the grid turns row-major and grows
+ * downward. Cards keep the poster's proportion rather than a fixed height, since
+ * the column width is now whatever the viewport gives.
+ */
+@media (max-width: 900px) {
+  .rg {
+    block-size: auto;
+  }
+
+  /*
+   * Two across, so a card is half the width. The gap is tighter than on desktop
+   * because the columns are narrow and a drum between them would cost a card.
+   *
+   * This is the narrowest band's value; the three-column band below widens it.
+   * Written that way round rather than as a max-width override so the two rules
+   * meet exactly at 560px — complementary queries can't leave a fractional
+   * viewport width matching neither.
+   */
+  .rg__grid {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    gap: var(--nv-space-4);
+    block-size: auto;
+  }
+
+  .rg__grid > *:not(.rg__sentinel) {
+    aspect-ratio: #{$card-cols} / #{$card-rows};
+  }
+
+  /* Full width and short, so it crosses the viewport as the page scrolls down. */
+  .rg__sentinel {
+    grid-column: 1 / -1;
+    inline-size: auto;
+    block-size: 1px;
+  }
+
+  .rg__state {
+    inline-size: auto;
+    block-size: auto;
+    padding-block: var(--nv-space-6);
+    padding-inline-end: 0;
+  }
+}
+
+/*
+ * Larger phones and small tablets take a third column. Two cards across is
+ * generous at 400px and wasteful at 700, where a poster ends up wider than it
+ * needs to be to be read.
+ */
+@media (min-width: 560px) and (max-width: 900px) {
+  .rg__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* A drum's worth of air is affordable once there is width to spare. */
+    gap: var(--nv-space-5);
+  }
+}

@@ -1,0 +1,68 @@
+@let film = movie();
+
+<nv-drum-card [interactive]="true">
+  <!--
+    The whole card is the primary target, so it is a link rather than a clickable
+    div: it keeps keyboard focus, middle-click, and open-in-new-tab for free.
+  -->
+  <a
+    class="mc"
+    [routerLink]="modalLink()"
+    [attr.aria-label]="i18n.t('search.openDetails', { title: film.title })"
+  >
+    <span class="mc__art">
+      @if (poster(); as src) {
+        <img class="mc__img" [src]="src" [alt]="" loading="lazy" />
+      } @else {
+        <!-- Not every record has artwork, and an empty frame reads as broken. -->
+        <span class="mc__fallback" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" rx="2.5" />
+            <path d="M7 4v16M17 4v16" />
+          </svg>
+        </span>
+      }
+
+      <!-- Revealed on hover, over the artwork's darkened corner. -->
+      <span class="mc__score" [class.is-empty]="!score()">
+        @if (score(); as value) {
+          <svg class="mc__star" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+            />
+          </svg>
+          <span class="mc__score-value">{{ value }}</span>
+          <span class="nv-sr">{{ i18n.t('search.voteAverage') }}</span>
+        } @else {
+          <span class="mc__score-value">{{ i18n.t('search.unrated') }}</span>
+        }
+      </span>
+    </span>
+
+    <span class="mc__meta">
+      <span class="mc__text">
+        <span class="mc__title">{{ film.title }}</span>
+        @if (year(); as y) {
+          <span class="mc__year">{{ y }}</span>
+        }
+      </span>
+    </span>
+  </a>
+
+  <!--
+    Outside the card link, because a link cannot contain another link. Positioned
+    over the meta strip so it reads as belonging to the description.
+  -->
+  <a
+    class="mc__full"
+    [routerLink]="['/movie', film.id]"
+    [attr.aria-label]="i18n.t('search.openFull', { title: film.title })"
+    [attr.tabindex]="0"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14 4h6v6" />
+      <path d="M20 4l-8.5 8.5" />
+      <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+    </svg>
+  </a>
+</nv-drum-card>

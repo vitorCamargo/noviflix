@@ -1,0 +1,66 @@
+@let error = message();
+
+<!-- The invalid flag sits here rather than on the row: it also has to reach the
+     card's glow, and a custom property only inherits downward. -->
+<div class="sf" role="search" [class.is-invalid]="error">
+  <!--
+    A card, so the field is the same kind of surface as everything else on the
+    lattice: panel fill, matching radius, and the hero's corner glow — pinned on
+    while focused rather than on hover, since focus is what a field responds to.
+  -->
+  <!-- Pinned while invalid as well as while focused, so leaving the field does
+       not take the error's glow with it. -->
+  <nv-drum-card [active]="focused() || !!error">
+    <div class="sf__row">
+      <span class="sf__icon" [class.is-busy]="busy()">
+        @if (busy()) {
+          <svg class="sf__spinner" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="12" />
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.4-3.4" />
+          </svg>
+        }
+      </span>
+
+      <!--
+        The validator is attached here as an attribute, so the rules travel with
+        the input rather than with this component.
+      -->
+      <input
+        class="sf__input"
+        type="search"
+        autocomplete="off"
+        nvSearchTerm
+        [formControl]="term"
+        [placeholder]="i18n.t('search.placeholder')"
+        [attr.aria-label]="i18n.t('search.label')"
+        [attr.aria-invalid]="error ? 'true' : null"
+        [attr.aria-describedby]="error ? 'nv-search-error' : null"
+        (focus)="focused.set(true)"
+        (blur)="onBlur()"
+      />
+
+      <!-- Announces the wait to screen readers, which the icon swap alone
+           does not. -->
+      <span class="sf__status" role="status">
+        @if (busy()) {
+          {{ i18n.t('search.searching') }}
+        }
+      </span>
+    </div>
+  </nv-drum-card>
+
+  <!--
+    Taken out of the flow so a message can never change the field's height — the
+    box has to stay exactly one drum. role=alert announces it without pulling
+    focus away from the input being corrected.
+  -->
+  <p class="sf__error" id="nv-search-error" role="alert">
+    @if (error) {
+      {{ error }}
+    }
+  </p>
+</div>

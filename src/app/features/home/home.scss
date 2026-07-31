@@ -74,38 +74,10 @@
 
 // ------------------------------------------------------------ search slot
 
+/* Block, not flex: the field takes the whole drum rather than being centred
+   inside it, so its edges land on the seams like every other surface. */
 .action {
-  display: flex;
-  align-items: center;
-}
-
-/*
- * Dashed because it's a reservation, not a control — it should read as
- * unfinished rather than as a disabled button.
- */
-.action__slot {
-  display: flex;
-  align-items: center;
-  gap: var(--nv-space-3);
-  inline-size: 100%;
-  block-size: calc(var(--nv-grid-cell) - var(--nv-space-3));
-  padding-inline: var(--nv-space-5);
-  border: 1px dashed var(--nv-accent-line);
-  border-radius: var(--nv-grid-radius);
-  background: var(--nv-accent-soft);
-  color: var(--nv-accent);
-  font-size: var(--nv-text-sm);
-  font-weight: 600;
-
-  svg {
-    inline-size: 17px;
-    block-size: 17px;
-    flex: none;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-  }
+  display: block;
 }
 
 // ------------------------------------------------------------ camera badge
@@ -151,6 +123,18 @@
   border-radius: 50%;
   background: var(--nv-accent);
   pointer-events: none;
+}
+
+// ----------------------------------------------------------------- results
+
+/*
+ * Takes the card stack's place. min-inline-size: 0 so the grid inside can be
+ * wider than its area — the track scrolls to it rather than the grid being
+ * squeezed into the columns the area declares.
+ */
+.results {
+  min-inline-size: 0;
+  min-block-size: 0;
 }
 
 // -------------------------------------------------------------------- hero
@@ -493,10 +477,15 @@
   .caption,
   .action,
   .hero,
-  .carousel {
+  .carousel,
+  .results {
     grid-column: 1 / -1;
     inline-size: auto;
     block-size: auto;
+  }
+
+  .results {
+    padding-block-end: var(--nv-space-7);
   }
 
   /* Decorative companions to the composition; nothing to sit beside now. */
@@ -529,13 +518,17 @@
    * what put the search slot and the nav buttons behind the drums.
    */
   .action,
-  .action__slot,
   .carousel__nav {
     position: relative;
   }
 
+  /*
+   * The error message is taken out of the flow so it can never change the field's
+   * height, which means the space beneath the field has to be reserved here —
+   * otherwise a message lands on top of the first row of results.
+   */
   .action {
-    margin-block-start: var(--nv-space-5);
+    margin-block: var(--nv-space-5) var(--nv-space-6);
   }
 
   /* Matches the backdrop it crops, rather than a guessed pixel height. */

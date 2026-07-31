@@ -63,6 +63,15 @@ const BASE = {
   carousel: { row: 8, rowEnd: 9, col: 13, colEnd: 21 },
 } as const satisfies Record<string, DrumArea>;
 
+/** Blocks that make up the featured composition, hidden while showing results. */
+export const FEATURED_AREAS: readonly HomeAreaKey[] = [
+  'hero',
+  'poster',
+  'stats',
+  'badge',
+  'carousel',
+];
+
 /**
  * Half-drum shift applied to the poster on top of its grid placement.
  *
@@ -100,6 +109,56 @@ const COMPACT_SHIFTS: readonly HomeAreaKey[] = [
   'badge',
   'carousel',
 ];
+
+/** Column the results grid starts at — the same edge as the card stack. */
+const RESULTS_COL = BASE.hero.col;
+
+/**
+ * Area the results grid occupies: everything right of the headline, top to bottom.
+ *
+ * Not part of BASE because it isn't part of the centred composition. It takes the
+ * full height below the header rather than the composition's rows, and that height
+ * is the whole point — the grid derives its row count from the space available, so
+ * a taller window fits more rows and therefore reaches more films per column.
+ *
+ * The end column is a minimum, not a limit. The grid flows in columns and is as
+ * wide as there are results; the track scrolls to reach the rest.
+ */
+export function homeResultsArea(
+  rows: number,
+  compact = false,
+  widthDrums = 0,
+): DrumArea {
+  const shift = compact ? COMPACT_SHIFT : 0;
+  const col = RESULTS_COL - shift;
+  const fallbackEnd = Math.max(...Object.values(BASE).map((a) => a.colEnd)) - shift;
+
+  return {
+    // Row 2 clears the header, which floats over the first row.
+    row: 2,
+    rowEnd: Math.max(3, rows + 1),
+    col,
+    /*
+     * Wide enough to hold the grid, rather than letting it spill.
+     *
+     * The page clips horizontal overflow — it has to, or the pad field's one-drum
+     * overhang would make the track scrollable by a sliver with nothing to reveal.
+     * So a grid overflowing this area is a grid whose later cards cannot be
+     * reached. Declaring the real width is what makes the page grow and the track
+     * scroll to them.
+     */
+    colEnd: Math.max(fallbackEnd, col + widthDrums),
+  };
+}
+
+/** Drum columns the page must span to hold the results grid. */
+export function homeResultsColumns(
+  rows: number,
+  compact: boolean,
+  widthDrums: number,
+): number {
+  return homeResultsArea(rows, compact, widthDrums).colEnd;
+}
 
 function shiftColumns(area: DrumArea, by: number): DrumArea {
   return { ...area, col: area.col - by, colEnd: area.colEnd - by };
