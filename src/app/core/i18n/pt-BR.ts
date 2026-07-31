@@ -63,7 +63,6 @@ export const ptBR: Dictionary = {
   'movie.voteAverage': 'Nota média',
   'movie.unrated': 'Sem nota',
   'movie.openDetails': 'Abrir detalhes de {title}',
-  'movie.openFull': 'Abrir {title} em página própria',
   'search.emptyTitle': 'Nada encontrado para “{query}”',
   'search.emptyBody':
     'Confira a grafia ou tente algo mais curto — uma única palavra marcante costuma funcionar melhor que o título completo.',
@@ -99,6 +98,52 @@ export const ptBR: Dictionary = {
 
   'page.collectionDetails.title': 'Coleção',
   'page.collectionDetails.body': 'Os filmes de uma coleção entram aqui.',
+
+  // Coleções
+  'collections.count': '{count} filmes',
+  'collections.open': 'Abrir {name}',
+  'collections.new': 'Nova coleção',
+  'collections.newSub': 'Junte filmes que você quer manter por perto.',
+  'collections.emptyBody':
+    'Nada salvo ainda. Crie uma coleção e comece a preenchê-la.',
+  'collections.backToList': 'Coleções',
+  'collections.createTitle': 'Nova coleção',
+  'collections.createLead':
+    'Dê um nome e diga o que entra nela. Os dois são obrigatórios.',
+  'collections.fieldTitle': 'Título',
+  'collections.fieldTitlePlaceholder': 'Noites de sábado',
+  'collections.fieldDescription': 'Descrição',
+  'collections.fieldDescriptionPlaceholder': 'Para que serve esta coleção.',
+  'collections.createSubmit': 'Criar coleção',
+  'collections.cancel': 'Cancelar',
+  'collections.errorRequired': 'Campo obrigatório.',
+  'collections.errorTooLong': 'Use menos de {max} caracteres.',
+  'collections.missingTitle': 'Esta coleção não existe mais',
+  'collections.missingBody':
+    'Ela pode ter sido removida, ou o link pode ser de outro navegador — coleções ficam no dispositivo que as criou.',
+  'collections.emptyDetail':
+    'Nada aqui ainda. Busque filmes e adicione a partir dos resultados.',
+  'collections.removeMovie': 'Remover {title} desta coleção',
+
+  // Adicionar a uma coleção
+  'collections.select': 'Selecionar {title}',
+  'collections.selected': '{count} selecionados',
+  'collections.addSelected': 'Adicionar à coleção',
+  'collections.clearSelection': 'Limpar',
+  'collections.pickerTitle': 'Adicionar a uma coleção',
+  'collections.pickerLead': 'Escolha onde estes {count} filmes devem entrar.',
+  'collections.pickerEmpty':
+    'Nenhuma coleção ainda. Crie uma e eles vão para lá.',
+  'collections.find': 'Encontrar uma coleção',
+  'collections.noMatch': 'Nenhuma coleção corresponde a isso.',
+  'collections.createWithFilms':
+    'Dê um nome e os {count} filmes escolhidos entram direto nela.',
+  'collections.generatedName': 'Coleção',
+  'collections.generatedDescription': 'Começou com um filme que você gostou.',
+  'collections.createdWith': '{name} criada com {count} filmes.',
+  'collections.alreadyIn': '{count} já estão nela',
+  'collections.addedCount': '{count} adicionados a {name}.',
+  'collections.addedNone': 'Já estão em {name}.',
 
   'about.trigger': 'Sobre',
   'about.title': 'Sobre o app',

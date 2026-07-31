@@ -65,7 +65,6 @@ export const en = {
   'movie.voteAverage': 'Average rating',
   'movie.unrated': 'Not rated',
   'movie.openDetails': 'Open details for {title}',
-  'movie.openFull': 'Open {title} on its own page',
   'search.emptyTitle': 'Nothing found for “{query}”',
   'search.emptyBody':
     'Check the spelling, or try a shorter phrase — a single distinctive word usually works better than a full title.',
@@ -106,6 +105,54 @@ export const en = {
 
   'page.collectionDetails.title': 'Collection',
   'page.collectionDetails.body': 'The movies inside one collection land here.',
+
+  // Collections
+  'collections.count': '{count} films',
+  'collections.open': 'Open {name}',
+  'collections.new': 'New collection',
+  'collections.newSub': 'Group films you want to keep together.',
+  'collections.emptyBody': 'Nothing saved yet. Make a collection and start filling it.',
+  'collections.backToList': 'Collections',
+  'collections.createTitle': 'New collection',
+  'collections.createLead':
+    'Give it a name and say what belongs in it. Both are required.',
+  'collections.fieldTitle': 'Title',
+  'collections.fieldTitlePlaceholder': 'Saturday nights',
+  'collections.fieldDescription': 'Description',
+  'collections.fieldDescriptionPlaceholder': 'What this collection is for.',
+  'collections.createSubmit': 'Create collection',
+  'collections.cancel': 'Cancel',
+  'collections.errorRequired': 'This is required.',
+  'collections.errorTooLong': 'Keep this under {max} characters.',
+  'collections.missingTitle': 'This collection is gone',
+  'collections.missingBody':
+    'It may have been removed, or the link may belong to a different browser — collections are kept on the device that made them.',
+  'collections.emptyDetail':
+    'Nothing here yet. Search for films and add them from the results.',
+  'collections.removeMovie': 'Remove {title} from this collection',
+
+  // Adding to a collection
+  'collections.select': 'Select {title}',
+  'collections.selected': '{count} selected',
+  'collections.addSelected': 'Add to collection',
+  'collections.clearSelection': 'Clear',
+  'collections.pickerTitle': 'Add to a collection',
+  'collections.pickerLead': 'Choose where these {count} films should go.',
+  'collections.pickerEmpty': 'No collections yet. Make one and they will land there.',
+  'collections.find': 'Find a collection',
+  'collections.noMatch': 'No collection matches that.',
+  'collections.createWithFilms':
+    'Name it, and the {count} films you picked will go straight in.',
+  // Quick-create has no form to ask for these, so it invents them. Numbered past what exists, so
+  // several are still tellable apart in the list.
+  'collections.generatedName': 'Collection',
+  'collections.generatedDescription': 'Started from a film you liked.',
+  'collections.createdWith': 'Created {name} with {count} films.',
+  'collections.alreadyIn': '{count} already in',
+  'collections.addedCount': 'Added {count} to {name}.',
+  // Every chosen film was already there, so nothing changed — said plainly rather than
+  // reporting a success that did nothing.
+  'collections.addedNone': 'Already in {name}.',
 
   'about.trigger': 'About',
   'about.title': 'About the app',

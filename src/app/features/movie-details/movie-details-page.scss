@@ -232,7 +232,16 @@
    */
   .mp {
     grid-column: 1 / -1;
-    padding-block: var(--nv-space-5) var(--nv-space-7);
+    /* No top padding: the header already sits a row above, and adding more left a band of
+       nothing between the nav and the first thing on the page. */
+    padding-block: 0 var(--nv-space-7);
+  }
+
+  /* A drum tall exists to land the tile grid on a seam, which the stacked layout has no need of —
+     here it is just height between the nav and the content. */
+  .mp__back {
+    block-size: auto;
+    padding-block: var(--nv-space-3);
   }
 
   .mp__row,
@@ -278,12 +287,19 @@
     font-size: clamp(1.7rem, 7vw, 2.2rem);
   }
 
+  /*
+   * No rule under the tabs. The active tab's own underline already marks the row, and a full-width
+   * border on top of it read as two lines doing one job.
+   *
+   * The margin replaces what the border was incidentally providing: a little air before the panel,
+   * so the content does not start flush against the labels.
+   */
   .tabs {
     display: flex;
     align-items: center;
     gap: var(--nv-space-4);
     flex-wrap: wrap;
-    border-block-end: 1px solid var(--nv-border);
+    margin-block-end: var(--nv-space-4);
   }
 
   .tabs__btn {
@@ -308,11 +324,12 @@
   .tabs__btn.is-active {
     color: var(--nv-accent);
 
+    /* Sat on the border before; with that gone it sits on the label's own baseline edge. */
     &::after {
       content: '';
       position: absolute;
       inset-inline: 0;
-      inset-block-end: -1px;
+      inset-block-end: 0;
       block-size: 2px;
       background: var(--nv-accent);
     }

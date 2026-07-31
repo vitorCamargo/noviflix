@@ -12,6 +12,7 @@ import {
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { MovieCard } from '../movie-card/movie-card';
 import { SearchStore } from '../search-store';
+import { CollectionPickerService } from '../../collections/collection-picker.service';
 import { TAIL_SLOTS } from '../results-metrics';
 
 /**
@@ -44,6 +45,7 @@ const SKELETON_COUNT = 12;
 export class SearchResultsGrid implements OnDestroy {
   protected readonly i18n = inject(I18nService);
   private readonly store = inject(SearchStore);
+  private readonly picker = inject(CollectionPickerService);
 
   protected readonly results = this.store.results;
   protected readonly query = this.store.query;
@@ -121,4 +123,5 @@ export class SearchResultsGrid implements OnDestroy {
   protected retry(): void {
     this.store.retry();
   }
+
 }

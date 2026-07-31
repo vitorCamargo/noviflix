@@ -2,13 +2,18 @@
 
 <nv-drum-card [interactive]="true">
   <!--
-    The whole card is the primary target, so it is a link rather than a clickable
-    div: it keeps keyboard focus, middle-click, and open-in-new-tab for free.
+    The card itself toggles selection, which is what it is most often used for. A checkbox rather
+    than a button, because that is what it is: a thing with two states, announced as such. It was
+    a link to the details before, and the two swapped — opening a film now lives on the icon.
   -->
-  <a
+  <button
+    type="button"
     class="mc"
-    [routerLink]="modalLink()"
-    [attr.aria-label]="i18n.t('movie.openDetails', { title: film.title })"
+    role="checkbox"
+    [class.is-selected]="selected()"
+    [attr.aria-checked]="selected()"
+    [attr.aria-label]="i18n.t('collections.select', { title: film.title })"
+    (click)="toggleSelect($event)"
   >
     <span class="mc__art">
       @if (poster(); as src) {
@@ -23,7 +28,16 @@
         </span>
       }
 
-      <!-- Revealed on hover, over the artwork's darkened corner. -->
+      <!--
+        The tick is now only a mark, not a control — the card around it is the checkbox, so this
+        is hidden from assistive tech and takes no pointer events of its own.
+      -->
+      <span class="mc__pick" [class.is-on]="selected()" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 12.5l5 5 9-11" />
+        </svg>
+      </span>
+
       <span class="mc__score" [class.is-empty]="!score()">
         @if (score(); as value) {
           <svg class="mc__star" viewBox="0 0 24 24" aria-hidden="true">
@@ -47,17 +61,18 @@
         }
       </span>
     </span>
-  </a>
+  </button>
 
   <!--
-    Outside the card link, because a link cannot contain another link. Positioned
-    over the meta strip so it reads as belonging to the description.
+    Opens the details pop-up — the job the card body used to do. Still a link, so keyboard focus,
+    middle-click and open-in-new-tab keep working; it sits outside the card's control because one
+    interactive element cannot contain another.
   -->
   <a
     class="mc__full"
-    [routerLink]="['/movie', film.id]"
-    [attr.aria-label]="i18n.t('movie.openFull', { title: film.title })"
-    [attr.tabindex]="0"
+    [href]="modalHref()"
+    [attr.aria-label]="i18n.t('movie.openDetails', { title: film.title })"
+    (click)="openDetails($event)"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M14 4h6v6" />
@@ -65,4 +80,5 @@
       <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
     </svg>
   </a>
+
 </nv-drum-card>

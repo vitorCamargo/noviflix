@@ -6,11 +6,19 @@
   block-size: 100%;
 }
 
+/* A button now, so the element defaults have to be undone before it looks like a card again. */
 .mc {
   display: flex;
   flex-direction: column;
+  inline-size: 100%;
   block-size: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
 /*
@@ -92,8 +100,14 @@
   block-size: var(--nv-grid-cell);
   flex: none;
   padding-inline: var(--nv-space-4);
-  /* Room for the external-link button, which sits over this strip. */
-  padding-inline-end: calc(var(--nv-space-4) + 26px);
+  /*
+   * Room for one control, because only one sits here now.
+   *
+   * Reserving for two left barely a hundred pixels of a three-drum card for the title, and every
+   * name clamped mid-word. The add button moved up onto the artwork, where there is space, and the
+   * title got that width back.
+   */
+  padding-inline-end: calc(var(--nv-space-3) + 30px);
 }
 
 .mc__text {
@@ -117,11 +131,11 @@
 }
 
 /*
- * Escape hatch to the full page, over the meta strip.
+ * Opens the details pop-up, at the right edge of the meta strip.
  *
- * Only revealed on hover, but it stays focusable at all times — hiding it from
- * the keyboard would leave the full page unreachable for anyone not using a
- * pointer, so it appears on focus as well.
+ * Always visible, unlike everything else on the card. It is now the only way to open a film — the
+ * card body toggles selection instead — so hiding it until hover would leave no visible route to
+ * the details at all, and none whatsoever on touch.
  */
 .mc__full {
   position: absolute;
@@ -134,9 +148,7 @@
   border-radius: 50%;
   background: var(--nv-surface-2);
   color: var(--nv-text-muted);
-  opacity: 0;
   transition:
-    opacity var(--nv-normal) var(--nv-ease),
     background var(--nv-fast) var(--nv-ease),
     color var(--nv-fast) var(--nv-ease);
 
@@ -169,10 +181,73 @@
   }
 
   .mc__score,
-  .mc__full {
+  .mc__pick {
     opacity: 1;
     translate: 0 0;
   }
+}
+
+/*
+ * Selection control. Quiet and empty until used, filled once chosen.
+ *
+ * Top-left, opposite the score, so the two never collide however long a rating is.
+ */
+.mc__pick {
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-start: var(--nv-space-3);
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--nv-radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  color: transparent;
+  opacity: 0;
+  /* A mark, not a target: the card behind it is the control, and intercepting the press here
+     would make the top-left corner of every card mysteriously inert. */
+  pointer-events: none;
+  transition:
+    opacity var(--nv-normal) var(--nv-ease),
+    background var(--nv-fast) var(--nv-ease),
+    border-color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 14px;
+    block-size: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+/* Held on once chosen: a mark that disappeared when the pointer left would make a built-up
+   selection impossible to review. */
+.mc__pick.is-on {
+  opacity: 1;
+  border-color: var(--nv-accent);
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+}
+
+/*
+ * A ring around the artwork while selected.
+ *
+ * The tick alone is a 24px mark in one corner. Now that the whole card is the control, the whole
+ * card should show the state — scanning a grid for what is chosen should not mean hunting corners.
+ * Inset, so it reads as part of the card rather than a border added around it.
+ */
+.mc.is-selected .mc__art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--nv-accent);
+  pointer-events: none;
 }
 
 /*
@@ -185,7 +260,7 @@
  */
 @media (hover: none), (max-width: 900px) {
   .mc__score,
-  .mc__full {
+  .mc__pick {
     opacity: 1;
     translate: 0 0;
   }

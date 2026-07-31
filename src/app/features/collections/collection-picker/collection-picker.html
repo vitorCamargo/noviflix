@@ -1,0 +1,30 @@
+@if (open()) {
+  <div class="cp">
+    <!-- Clicking away dismisses it, matching every other overlay here. -->
+    <div class="cp__scrim" (click)="close()"></div>
+
+    <div
+      class="cp__panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="i18n.t('collections.pickerTitle')"
+    >
+      <header class="cp__head">
+        <p class="cp__lead">
+          {{ i18n.t('collections.pickerLead', { count: total() }) }}
+        </p>
+
+        @if (posters().length) {
+          <div class="cp__posters" aria-hidden="true">
+            @for (poster of posters(); track poster) {
+              <img [src]="poster" alt="" />
+            }
+          </div>
+        }
+      </header>
+
+      <!-- `finish`, not `close`: the films landed, so they should not stay marked. -->
+      <nv-collection-picker-list #list [movies]="pending()" (done)="finish()" />
+    </div>
+  </div>
+}

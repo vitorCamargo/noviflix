@@ -1,0 +1,113 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.cc {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+.cc__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  background: var(--nv-surface-2);
+  overflow: hidden;
+}
+
+/*
+ * A two-by-two grid that collapses gracefully.
+ *
+ * With one poster it fills the tile; with two or three the spans below keep the shape
+ * balanced rather than leaving a hole where a fourth would go.
+ */
+.cc__mosaic {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1px;
+  block-size: 100%;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.cc__mosaic[data-count='1'] img {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
+/* The first poster takes the full left column, the second the full right. */
+.cc__mosaic[data-count='2'] img {
+  grid-row: 1 / -1;
+}
+
+/* The first spans the top, the other two share the bottom. */
+.cc__mosaic[data-count='3'] img:first-child {
+  grid-column: 1 / -1;
+}
+
+.cc__empty {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 34px;
+    block-size: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+.cc__count {
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-end: var(--nv-space-3);
+  padding: 4px var(--nv-space-2);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  color: var(--nv-text);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two drums tall: a title alone reads as a label, but with a description it needs the
+   room to be a description rather than a truncated line. */
+.cc__meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  block-size: calc(var(--nv-grid-cell) * 2);
+  flex: none;
+  padding-inline: var(--nv-space-4);
+}
+
+.cc__title {
+  font-size: var(--nv-text-base);
+  font-weight: 700;
+  line-height: 1.25;
+  @include clamp-lines(1);
+}
+
+.cc__description {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  line-height: 1.4;
+  @include clamp-lines(2);
+}

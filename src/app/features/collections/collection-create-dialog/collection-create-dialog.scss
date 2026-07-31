@@ -1,0 +1,154 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: contents;
+}
+
+/*
+ * Above the add panel, because it is opened from it. Without the extra step the dialog would
+ * appear behind the thing that asked for it.
+ */
+.cd {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--nv-z-modal) + 3);
+  display: grid;
+  place-items: center;
+  padding: var(--nv-space-5);
+}
+
+.cd__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--nv-overlay);
+  backdrop-filter: blur(6px);
+  animation: nv-fade-in var(--nv-fast) var(--nv-ease);
+}
+
+.cd__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-3);
+  inline-size: min(420px, 100%);
+  padding: var(--nv-space-6);
+  border-radius: var(--nv-radius-lg);
+  background: var(--nv-panel);
+  box-shadow: var(--nv-shadow-pop);
+  animation: nv-rise var(--nv-normal) var(--nv-ease);
+}
+
+.cd__title {
+  margin: 0;
+  font-size: var(--nv-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.cd__lead {
+  margin: 0 0 var(--nv-space-2);
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+.cd__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+}
+
+.cd__label {
+  @include kicker;
+
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nv-space-3);
+  color: var(--nv-text-faint);
+}
+
+.cd__counter {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cd__counter.is-over {
+  color: var(--nv-danger);
+}
+
+.cd__input {
+  inline-size: 100%;
+  padding: var(--nv-space-3) var(--nv-space-4);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-radius);
+  background: var(--nv-panel-2);
+  color: var(--nv-text);
+  font: inherit;
+  font-size: var(--nv-text-base);
+  transition: border-color var(--nv-fast) var(--nv-ease);
+
+  &::placeholder {
+    color: var(--nv-text-faint);
+  }
+
+  &:focus {
+    border-color: var(--nv-accent);
+    outline: none;
+  }
+}
+
+.cd__input--area {
+  resize: vertical;
+  min-block-size: calc(var(--nv-grid-cell) * 1.5);
+  line-height: 1.6;
+}
+
+/* Holds its line whether or not there is a message, so the dialog does not resize as one
+   appears — a panel that jumps while being typed into is hard to aim at. */
+.cd__error {
+  margin: 0;
+  min-block-size: var(--nv-space-4);
+  color: var(--nv-danger);
+  font-size: var(--nv-text-xs);
+  font-weight: 600;
+}
+
+.cd__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+}
+
+.cd__submit {
+  flex: 1;
+  padding: var(--nv-space-3) var(--nv-space-5);
+  border: 0;
+  border-radius: var(--nv-radius);
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+
+  /* A muted surface rather than a faded one, so nothing shows through it. */
+  &:disabled {
+    background: var(--nv-surface-2);
+    color: var(--nv-text-faint);
+    cursor: default;
+  }
+}
+
+.cd__cancel {
+  padding: var(--nv-space-3) var(--nv-space-4);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-radius);
+  background: transparent;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+
+  &:hover {
+    color: var(--nv-text);
+  }
+}

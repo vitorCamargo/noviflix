@@ -1,0 +1,160 @@
+@use '../../../styles/mixins' as *;
+
+/* Tile footprint, matching the result cards so both grids sit on the same lattice. */
+$tile-cols: 3;
+$tile-rows: 5;
+
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+/*
+ * Positioned, because the pad layer is pinned to the viewport when stacked and pinning makes
+ * it paint after ordinary in-flow blocks. Without this the page would sit behind the drums.
+ */
+.cl {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/* Two whole drums, so the grid beneath begins on a seam. */
+.cl__head {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  block-size: calc(var(--nv-grid-cell) * 2);
+  flex: none;
+}
+
+.cl__title {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+.cl__body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+}
+
+/*
+ * Column-major on desktop, in the direction the page moves. Rows come in as a custom
+ * property rather than from auto-fill, because the page needs the same number to work out
+ * how wide it has to be — two independent answers to one question would eventually differ.
+ */
+.cl__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--cl-rows, 2), calc(var(--nv-grid-cell) * #{$tile-rows}));
+  grid-auto-columns: calc(var(--nv-grid-cell) * #{$tile-cols});
+  gap: var(--nv-grid-cell);
+  align-content: center;
+  flex: 1;
+  min-block-size: 0;
+}
+
+/*
+ * The create tile. Dashed, so it reads as a slot to fill rather than a collection that
+ * happens to be empty.
+ */
+.cl__new {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--nv-space-3);
+  padding: var(--nv-space-4);
+  border: 1px dashed var(--nv-accent-line);
+  border-radius: var(--nv-grid-radius);
+  background: var(--nv-accent-soft);
+  color: var(--nv-accent);
+  text-align: center;
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    background var(--nv-fast) var(--nv-ease);
+
+  &:hover {
+    border-color: var(--nv-accent);
+    background: var(--nv-surface-2);
+  }
+}
+
+.cl__new-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: 50%;
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+
+  svg {
+    inline-size: 20px;
+    block-size: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+}
+
+.cl__new-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cl__new-title {
+  font-size: var(--nv-text-base);
+  font-weight: 700;
+}
+
+.cl__new-sub {
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-xs);
+  line-height: 1.4;
+}
+
+// ------------------------------------------------------------------- stacked
+
+@media (max-width: 900px) {
+  /* Spans both columns of the stacked grid — PageGrid pairs blocks side by side at this
+     width, and without this the page renders at half the viewport. */
+  .cl {
+    grid-column: 1 / -1;
+    padding-block: var(--nv-space-5) var(--nv-space-7);
+  }
+
+  .cl__head {
+    block-size: auto;
+    gap: var(--nv-space-2);
+    padding-block-end: var(--nv-space-5);
+  }
+
+  .cl__grid {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    gap: var(--nv-space-4);
+    flex: none;
+  }
+
+  .cl__grid > * {
+    aspect-ratio: #{$tile-cols} / #{$tile-rows};
+  }
+}
+
+@media (min-width: 560px) and (max-width: 900px) {
+  .cl__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--nv-space-5);
+  }
+}

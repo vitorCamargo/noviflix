@@ -1,0 +1,295 @@
+@use '../../../styles/mixins' as *;
+
+/* Tile footprint, matching the result cards so every grid sits on the same lattice. */
+$tile-cols: 3;
+$tile-rows: 5;
+
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+/*
+ * Positioned, because the pad layer is pinned to the viewport when stacked and pinning makes
+ * it paint after ordinary in-flow blocks. Without this the page sits behind the drums.
+ */
+.cd {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/* One whole drum, so the band below begins on a seam. */
+.cd__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  align-self: flex-start;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+
+  svg {
+    inline-size: 16px;
+    block-size: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    color: var(--nv-accent);
+  }
+}
+
+.cd__head {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  block-size: calc(var(--nv-grid-cell) * 2);
+  flex: none;
+  min-inline-size: 0;
+}
+
+.cd__title {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  @include clamp-lines(1);
+}
+
+.cd__meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--nv-space-2);
+  margin: 0;
+  min-inline-size: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+}
+
+.cd__dot {
+  color: var(--nv-text-faint);
+}
+
+.cd__description {
+  @include clamp-lines(1);
+}
+
+.cd__state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+  justify-content: center;
+  max-inline-size: 42ch;
+  flex: 1;
+}
+
+.cd__state-title {
+  margin: 0;
+  font-size: var(--nv-text-xl);
+  font-weight: 800;
+}
+
+.cd__state-body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+/*
+ * Column-major on desktop, in the direction the page moves. Row count arrives as a custom
+ * property rather than from auto-fill, because the page needs the same number to size itself
+ * — two independent answers to one question would eventually differ.
+ */
+.cd__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--cd-rows, 2), calc(var(--nv-grid-cell) * #{$tile-rows}));
+  grid-auto-columns: calc(var(--nv-grid-cell) * #{$tile-cols});
+  gap: var(--nv-grid-cell);
+  align-content: center;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.cd__tile {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+// ------------------------------------------------------------------ the tile
+
+.cm {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+.cm__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.cm__fallback {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 30px;
+    block-size: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+/*
+ * Shown outright rather than on hover, unlike the search card.
+ *
+ * These are films the visitor chose to keep, so the score is a reason they are here rather
+ * than a detail to go looking for — and there is no hover at all on touch.
+ */
+.cm__score {
+  @include score-pill;
+
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-start: var(--nv-space-3);
+}
+
+.cm__star {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: var(--nv-accent);
+}
+
+.cm__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: center;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  padding-inline: var(--nv-space-4);
+  /* Room for the remove control, which sits over this strip. */
+  padding-inline-end: calc(var(--nv-space-4) + 26px);
+}
+
+.cm__title {
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  @include clamp-lines(2);
+}
+
+.cm__year {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Removal, over the meta strip. Always visible: it is the one action this page exists to
+ * offer besides opening a film, and hiding a destructive control behind hover makes it both
+ * hard to find and easy to hit by accident.
+ */
+.cm__remove {
+  position: absolute;
+  inset-block-end: calc((var(--nv-grid-cell) - 26px) / 2);
+  inset-inline-end: var(--nv-space-3);
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-muted);
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 13px;
+    block-size: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--nv-danger);
+    color: #fff;
+  }
+}
+
+// ------------------------------------------------------------------- stacked
+
+@media (max-width: 900px) {
+  /* Spans both columns of the stacked grid; otherwise the page renders at half width. */
+  .cd {
+    grid-column: 1 / -1;
+    padding-block: var(--nv-space-5) var(--nv-space-7);
+  }
+
+  .cd__head {
+    block-size: auto;
+    gap: var(--nv-space-2);
+    padding-block-end: var(--nv-space-5);
+  }
+
+  .cd__meta {
+    flex-wrap: wrap;
+  }
+
+  .cd__grid {
+    grid-auto-flow: row;
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    gap: var(--nv-space-4);
+    flex: none;
+  }
+
+  .cd__tile {
+    aspect-ratio: #{$tile-cols} / #{$tile-rows};
+  }
+
+  .cd__state {
+    flex: none;
+    padding-block: var(--nv-space-6);
+  }
+}
+
+@media (min-width: 560px) and (max-width: 900px) {
+  .cd__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--nv-space-5);
+  }
+}

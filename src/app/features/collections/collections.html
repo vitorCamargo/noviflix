@@ -1,0 +1,36 @@
+<nv-page-grid [minColumns]="minColumns()">
+  <div class="cl" [style.gridArea]="area()" [style.--cl-rows]="cardRows()">
+    <header class="cl__head">
+      <h1 class="cl__title">{{ i18n.t('page.collections.title') }}</h1>
+      <p class="cl__body">
+        @if (isEmpty()) {
+          {{ i18n.t('collections.emptyBody') }}
+        } @else {
+          {{ i18n.t('collections.count', { count: list().length }) }}
+        }
+      </p>
+    </header>
+
+    <div class="cl__grid">
+      <!--
+        First, not last. A collection is made before it holds anything, so the action that
+        makes one belongs where the eye starts rather than after a list that may be long.
+      -->
+      <button type="button" class="cl__new" aria-haspopup="dialog" (click)="createNew()">
+        <span class="cl__new-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </span>
+        <span class="cl__new-text">
+          <span class="cl__new-title">{{ i18n.t('collections.new') }}</span>
+          <span class="cl__new-sub">{{ i18n.t('collections.newSub') }}</span>
+        </span>
+      </button>
+
+      @for (collection of list(); track collection.id) {
+        <nv-collection-card [collection]="collection" />
+      }
+    </div>
+  </div>
+</nv-page-grid>

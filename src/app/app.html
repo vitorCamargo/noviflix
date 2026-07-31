@@ -24,6 +24,21 @@
 <!-- Details pop-up renders above the shell, driven by the `modal` outlet. -->
 <router-outlet name="modal" />
 
+<!--
+  Rendered once here rather than per page: the picker is opened from the search results and
+  from a film's own pop-up, and a second copy would let two overlays open at once.
+-->
+<!--
+  Selection is global — a film can be marked on the results grid, in a related strip inside the
+  details pop-up, or on a details page — so the bar acting on it lives here rather than in any one
+  of them.
+-->
+<nv-selection-bar />
+
+<nv-collection-picker />
+<nv-collection-create-dialog />
+<nv-toast />
+
 <nv-scroll-hint />
 <nv-scroll-top />
 <nv-cursor />

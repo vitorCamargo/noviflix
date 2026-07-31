@@ -194,6 +194,7 @@ export class Popover {
   readonly width = input('560px');
   readonly notch = input(true);
 
+
   readonly opened = output<void>();
   readonly closed = output<void>();
 

@@ -25,6 +25,11 @@ export const routes: Routes = [
       import('./features/collections/collections').then((m) => m.Collections),
     title: 'Noviflix · Collections',
   },
+  /*
+   * No route for creating one. It is two fields, so it is a dialog — sending someone to a page
+   * and back would lose whatever they were doing, which matters most in the case it exists for:
+   * reaching for a new collection halfway through adding films to one.
+   */
   {
     path: 'collections/:id',
     loadComponent: () =>

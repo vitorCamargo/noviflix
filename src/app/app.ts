@@ -5,6 +5,10 @@ import { HorizontalScroll } from './layout/horizontal-scroll/horizontal-scroll';
 import { MouseGlow } from './layout/mouse-glow/mouse-glow';
 import { ScrollHint } from './layout/scroll-hint/scroll-hint';
 import { ScrollTop } from './layout/scroll-top/scroll-top';
+import { CollectionPicker } from './features/collections/collection-picker/collection-picker';
+import { CollectionCreateDialog } from './features/collections/collection-create-dialog/collection-create-dialog';
+import { ToastStack } from './shared/toast/toast';
+import { SelectionBar } from './features/collections/selection-bar/selection-bar';
 import { ScrollOverlay } from './layout/scroll-overlay/scroll-overlay';
 import { SiteHeader } from './layout/site-header/site-header';
 
@@ -20,6 +24,10 @@ import { SiteHeader } from './layout/site-header/site-header';
     ScrollOverlay,
     ScrollHint,
     ScrollTop,
+    CollectionPicker,
+    CollectionCreateDialog,
+    ToastStack,
+    SelectionBar,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

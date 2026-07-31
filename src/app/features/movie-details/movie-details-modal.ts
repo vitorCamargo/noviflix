@@ -17,6 +17,7 @@ import { RatingForm } from './rating-form/rating-form';
 import { RelatedGrid } from './related-grid/related-grid';
 import { createMovieResult } from './movie-request';
 import { releaseYear } from './movie-format';
+import { CollectionPickerService } from '../collections/collection-picker.service';
 
 type Tab = 'facts' | 'cast' | 'related';
 
@@ -43,6 +44,7 @@ export class MovieDetailsModal {
   private readonly tmdb = inject(TmdbService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly picker = inject(CollectionPickerService);
   protected readonly i18n = inject(I18nService);
 
   private readonly params = toSignal(this.route.paramMap, { initialValue: null });
@@ -80,14 +82,15 @@ export class MovieDetailsModal {
   }
 
   /**
-   * Collections are not built yet, so this is a placeholder by request.
+   * Opens the picker for this film alone.
    *
-   * Deliberately inert rather than hidden: the button is here to hold its place in the
-   * bar while the feature is designed, and a no-op is easier to find later than a
-   * commented-out block.
+   * Deliberately not the current selection: someone looking at one film's details means that
+   * film, and quietly sweeping up whatever is still marked on the results grid behind the
+   * overlay would add things they had stopped thinking about.
    */
   protected addToCollection(): void {
-    // TODO: open the collection picker once the collections feature exists.
+    const film = this.movie();
+    if (film) this.picker.openFor(film);
   }
 
   protected readonly tabs = [
