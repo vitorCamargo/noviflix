@@ -1,0 +1,38 @@
+@let list = collection();
+
+<!--
+  A button, not a link. The films appear beside it rather than at an address of their own, so
+  there is nowhere for a link to point — and `aria-current` says which one is showing.
+-->
+<button
+  type="button"
+  class="cr"
+  [class.is-current]="current()"
+  [attr.aria-current]="current() ? 'true' : null"
+  [attr.aria-label]="i18n.t('collections.open', { name: list.name })"
+  (click)="choose.emit()"
+>
+  <span class="cr__art" aria-hidden="true">
+    @if (posters().length) {
+      <span class="cr__mosaic" [attr.data-count]="posters().length">
+        @for (poster of posters(); track poster) {
+          <img [src]="poster" [alt]="" loading="lazy" />
+        }
+      </span>
+    } @else {
+      <span class="cr__empty">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="4" width="20" height="16" rx="2.5" />
+          <path d="M7 4v16M17 4v16" />
+        </svg>
+      </span>
+    }
+  </span>
+
+  <span class="cr__text">
+    <span class="cr__name">{{ list.name }}</span>
+    <span class="cr__count">
+      {{ i18n.t('collections.count', { count: total() }) }}
+    </span>
+  </span>
+</button>

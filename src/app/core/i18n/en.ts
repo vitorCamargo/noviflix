@@ -101,10 +101,6 @@ export const en = {
   'page.movieModal.body': 'Same details, overlaid on the page behind.',
 
   'page.collections.title': 'My collections',
-  'page.collections.body': 'Your saved collections land here, kept in this browser.',
-
-  'page.collectionDetails.title': 'Collection',
-  'page.collectionDetails.body': 'The movies inside one collection land here.',
 
   // Collections
   'collections.count': '{count} films',
@@ -124,12 +120,22 @@ export const en = {
   'collections.cancel': 'Cancel',
   'collections.errorRequired': 'This is required.',
   'collections.errorTooLong': 'Keep this under {max} characters.',
-  'collections.missingTitle': 'This collection is gone',
-  'collections.missingBody':
-    'It may have been removed, or the link may belong to a different browser — collections are kept on the device that made them.',
   'collections.emptyDetail':
     'Nothing here yet. Search for films and add them from the results.',
   'collections.removeMovie': 'Remove {title} from this collection',
+
+  // Editing and deleting one, from the heading above its films
+  'collections.pickOne': 'Pick a collection to see what is in it.',
+  'collections.edit': 'Edit',
+  // The visible label is one word, because it sits beside the collection it acts on. Screen
+  // readers get the name, having arrived at the button without that context.
+  'collections.editOne': 'Edit {name}',
+  'collections.editTitle': 'Edit collection',
+  'collections.editLead': 'Change the name or what it is for. Both are still required.',
+  'collections.editSubmit': 'Save changes',
+  'collections.delete': 'Delete',
+  'collections.removeOne': 'Delete {name}',
+  'collections.deleted': 'Deleted {name}.',
 
   // Adding to a collection
   'collections.select': 'Select {title}',
@@ -182,6 +188,7 @@ export const en = {
   'scroll.toStart': 'Back to start',
   'scroll.toTop': 'Back to top',
 
+  'common.undo': 'Undo',
   'common.close': 'Close',
   'common.openFull': 'Open full page',
   'common.back': 'Back',

@@ -1,36 +1,177 @@
-<nv-page-grid [minColumns]="minColumns()">
-  <div class="cl" [style.gridArea]="area()" [style.--cl-rows]="cardRows()">
-    <header class="cl__head">
-      <h1 class="cl__title">{{ i18n.t('page.collections.title') }}</h1>
-      <p class="cl__body">
-        @if (isEmpty()) {
-          {{ i18n.t('collections.emptyBody') }}
-        } @else {
-          {{ i18n.t('collections.count', { count: list().length }) }}
-        }
-      </p>
-    </header>
+@let open = current();
 
-    <div class="cl__grid">
-      <!--
-        First, not last. A collection is made before it holds anything, so the action that
-        makes one belongs where the eye starts rather than after a list that may be long.
-      -->
-      <button type="button" class="cl__new" aria-haspopup="dialog" (click)="createNew()">
-        <span class="cl__new-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </span>
-        <span class="cl__new-text">
-          <span class="cl__new-title">{{ i18n.t('collections.new') }}</span>
-          <span class="cl__new-sub">{{ i18n.t('collections.newSub') }}</span>
-        </span>
+<nv-page-grid [minColumns]="minColumns()">
+  <div
+    class="cl"
+    [style.gridArea]="area()"
+    [style.--cl-rows]="cardRows()"
+    [style.--cl-list-cols]="listCols"
+    [class.is-films]="showingFilms()"
+  >
+    <!-- ------------------------------------------------------------ the list -->
+    <section class="cl__list" [attr.aria-label]="i18n.t('page.collections.title')">
+      <header class="cl__head">
+        <h1 class="cl__title">{{ i18n.t('page.collections.title') }}</h1>
+        <p class="cl__sub">
+          @if (isEmpty()) {
+            {{ i18n.t('collections.emptyBody') }}
+          } @else {
+            {{ i18n.t('collections.count', { count: list().length }) }}
+          }
+        </p>
+      </header>
+
+      <div class="cl__rows">
+        <!--
+          First, not last. A collection is made before it holds anything, so the action that
+          makes one belongs where the eye starts rather than after a list that may be long.
+        -->
+        <button type="button" class="cl__new" aria-haspopup="dialog" (click)="createNew()">
+          <span class="cl__new-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </span>
+          <span class="cl__new-text">{{ i18n.t('collections.new') }}</span>
+        </button>
+
+        @for (collection of list(); track collection.id) {
+          <nv-collection-row
+            [collection]="collection"
+            [current]="collection.id === open?.id"
+            (choose)="choose(collection)"
+          />
+        }
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------- the films -->
+    <section class="cl__films" [attr.aria-label]="open?.name ?? ''">
+      <!-- Stacked only, where the films replaced the list rather than joining it. -->
+      <button type="button" class="cl__back" (click)="back()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 6-6 6 6 6" />
+        </svg>
+        <span>{{ i18n.t('collections.backToList') }}</span>
       </button>
 
-      @for (collection of list(); track collection.id) {
-        <nv-collection-card [collection]="collection" />
+      @if (!open) {
+        <div class="cl__state">
+          <p class="cl__state-body">{{ i18n.t('collections.pickOne') }}</p>
+        </div>
+      } @else {
+        <header class="cl__films-head">
+          <div class="cl__films-text">
+            <h2 class="cl__films-title">{{ open.name }}</h2>
+            <p class="cl__films-meta">
+              {{ i18n.t('collections.count', { count: open.items.length }) }}
+              @if (open.description) {
+                <span class="cl__dot" aria-hidden="true">·</span>
+                <span class="cl__description">{{ open.description }}</span>
+              }
+            </p>
+          </div>
+
+          <div class="cl__tools">
+            <button
+              type="button"
+              class="cl__tool"
+              aria-haspopup="dialog"
+              [attr.aria-label]="i18n.t('collections.editOne', { name: open.name })"
+              (click)="edit(open)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+                <path d="m14.5 5.5 4 4" />
+              </svg>
+              <span>{{ i18n.t('collections.edit') }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="cl__tool cl__tool--danger"
+              [attr.aria-label]="i18n.t('collections.removeOne', { name: open.name })"
+              (click)="remove(open)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+              </svg>
+              <span>{{ i18n.t('collections.delete') }}</span>
+            </button>
+          </div>
+        </header>
+
+        @if (noFilms()) {
+          <div class="cl__state">
+            <p class="cl__state-body">{{ i18n.t('collections.emptyDetail') }}</p>
+          </div>
+        } @else {
+          <div class="cl__grid">
+            @for (film of films(); track film.id) {
+              <div class="cl__tile">
+                <nv-drum-card [interactive]="true" [glow]="false">
+                  <!-- The tile opens the pop-up. A link, so keyboard focus, middle-click and
+                       open-in-new-tab all work without being reimplemented. -->
+                  <a
+                    class="cm"
+                    [routerLink]="modalLink(film)"
+                    [attr.aria-label]="
+                      i18n.t('movie.openDetails', { title: film.title })
+                    "
+                  >
+                    <span class="cm__art">
+                      @if (poster(film); as src) {
+                        <img [src]="src" [alt]="" loading="lazy" />
+                      } @else {
+                        <span class="cm__fallback" aria-hidden="true">
+                          <svg viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2.5" />
+                            <path d="M7 4v16M17 4v16" />
+                          </svg>
+                        </span>
+                      }
+
+                      @if (score(film); as value) {
+                        <span class="cm__score">
+                          <svg class="cm__star" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+                            />
+                          </svg>
+                          <span>{{ value }}</span>
+                          <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
+                        </span>
+                      }
+                    </span>
+
+                    <span class="cm__meta">
+                      <span class="cm__title">{{ film.title }}</span>
+                      @if (year(film); as y) {
+                        <span class="cm__year">{{ y }}</span>
+                      }
+                    </span>
+                  </a>
+
+                  <!-- Outside the link, because a link cannot contain a button that means
+                       something else. Always focusable, so it is reachable without a pointer. -->
+                  <button
+                    type="button"
+                    class="cm__remove"
+                    [attr.aria-label]="
+                      i18n.t('collections.removeMovie', { title: film.title })
+                    "
+                    (click)="removeFilm(film)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                  </button>
+                </nv-drum-card>
+              </div>
+            }
+          </div>
+        }
       }
-    </div>
+    </section>
   </div>
 </nv-page-grid>

@@ -1,0 +1,115 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+/*
+ * Two drums tall, so a column of these keeps landing on seams.
+ *
+ * The bar down the inline-start edge carries the current state instead of a fill, so the row
+ * reads the same whether or not it is the one showing — only marked.
+ */
+.cr {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  inline-size: 100%;
+  block-size: calc(var(--nv-grid-cell) * 2);
+  padding-inline: var(--nv-space-3);
+  border: 0;
+  border-inline-start: 2px solid transparent;
+  background: none;
+  color: inherit;
+  text-align: start;
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    border-color var(--nv-fast) var(--nv-ease);
+
+  &:hover {
+    background: var(--nv-surface-2);
+  }
+}
+
+.cr.is-current {
+  border-inline-start-color: var(--nv-accent);
+  background: var(--nv-surface-2);
+
+  .cr__name {
+    color: var(--nv-accent);
+  }
+}
+
+/* Square, so the mosaic reads as a thumbnail rather than a poster of its own. */
+.cr__art {
+  display: block;
+  inline-size: calc(var(--nv-grid-cell) * 1.2);
+  block-size: calc(var(--nv-grid-cell) * 1.2);
+  flex: none;
+  border-radius: var(--nv-radius-sm);
+  background: var(--nv-surface-2);
+  overflow: hidden;
+}
+
+/* Two by two, collapsing so one poster fills and three stay balanced. */
+.cr__mosaic {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1px;
+  block-size: 100%;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.cr__mosaic[data-count='1'] img {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
+.cr__mosaic[data-count='2'] img {
+  grid-row: 1 / -1;
+}
+
+.cr__mosaic[data-count='3'] img:first-child {
+  grid-column: 1 / -1;
+}
+
+.cr__empty {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 20px;
+    block-size: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+.cr__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.cr__name {
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  line-height: 1.3;
+  @include clamp-lines(2);
+}
+
+.cr__count {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}

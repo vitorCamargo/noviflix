@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ToastService } from './toast.service';
+import { ToastService, type Toast } from './toast.service';
 
 /**
  * The toast stack, rendered once at the app root.
@@ -17,16 +17,26 @@ import { ToastService } from './toast.service';
            focus: the visitor is mid-task and a message is not worth interrupting it. -->
       <div class="ts" role="status" aria-live="polite">
         @for (toast of toasts(); track toast.id) {
-          <button
-            type="button"
-            class="ts__item"
-            (click)="dismiss(toast.id)"
-          >
-            <svg class="ts__icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12.5l5 5 9-11" />
-            </svg>
-            <span>{{ toast.message }}</span>
-          </button>
+          @if (toast.action; as action) {
+            <!-- A plain box here, not a dismissible button: the offer is the point, and a
+                 button inside a button is neither valid nor operable. -->
+            <div class="ts__item">
+              <svg class="ts__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12.5l5 5 9-11" />
+              </svg>
+              <span>{{ toast.message }}</span>
+              <button type="button" class="ts__action" (click)="act(toast)">
+                {{ action.label }}
+              </button>
+            </div>
+          } @else {
+            <button type="button" class="ts__item" (click)="dismiss(toast.id)">
+              <svg class="ts__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12.5l5 5 9-11" />
+              </svg>
+              <span>{{ toast.message }}</span>
+            </button>
+          }
         }
       </div>
     }
@@ -71,6 +81,20 @@ import { ToastService } from './toast.service';
       animation: nv-rise var(--nv-fast) var(--nv-ease);
     }
 
+    /* Set apart from the message by a rule rather than a gap, so it reads as a control and
+       not as the tail of the sentence. */
+    .ts__action {
+      margin-inline-start: var(--nv-space-2);
+      padding-inline-start: var(--nv-space-3);
+      border: 0;
+      border-inline-start: 1px solid var(--nv-border);
+      background: none;
+      color: var(--nv-accent);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .ts__icon {
       inline-size: 16px;
       block-size: 16px;
@@ -96,5 +120,9 @@ export class ToastStack {
 
   protected dismiss(id: number): void {
     this.service.dismiss(id);
+  }
+
+  protected act(toast: Toast): void {
+    this.service.act(toast);
   }
 }

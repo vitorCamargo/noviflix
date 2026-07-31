@@ -94,10 +94,6 @@ export const ptBR: Dictionary = {
   'page.movieModal.body': 'Os mesmos detalhes, sobrepostos à página de trás.',
 
   'page.collections.title': 'Minhas coleções',
-  'page.collections.body': 'Suas coleções salvas entram aqui, guardadas neste navegador.',
-
-  'page.collectionDetails.title': 'Coleção',
-  'page.collectionDetails.body': 'Os filmes de uma coleção entram aqui.',
 
   // Coleções
   'collections.count': '{count} filmes',
@@ -118,12 +114,21 @@ export const ptBR: Dictionary = {
   'collections.cancel': 'Cancelar',
   'collections.errorRequired': 'Campo obrigatório.',
   'collections.errorTooLong': 'Use menos de {max} caracteres.',
-  'collections.missingTitle': 'Esta coleção não existe mais',
-  'collections.missingBody':
-    'Ela pode ter sido removida, ou o link pode ser de outro navegador — coleções ficam no dispositivo que as criou.',
   'collections.emptyDetail':
     'Nada aqui ainda. Busque filmes e adicione a partir dos resultados.',
   'collections.removeMovie': 'Remover {title} desta coleção',
+
+  // Editar e excluir uma coleção
+  'collections.pickOne': 'Escolha uma coleção para ver o que tem nela.',
+  'collections.edit': 'Editar',
+  'collections.editOne': 'Editar {name}',
+  'collections.editTitle': 'Editar coleção',
+  'collections.editLead':
+    'Mude o nome ou para que ela serve. Os dois continuam obrigatórios.',
+  'collections.editSubmit': 'Salvar alterações',
+  'collections.delete': 'Excluir',
+  'collections.removeOne': 'Excluir {name}',
+  'collections.deleted': '{name} excluída.',
 
   // Adicionar a uma coleção
   'collections.select': 'Selecionar {title}',
@@ -171,6 +176,7 @@ export const ptBR: Dictionary = {
   'scroll.toStart': 'Voltar ao início',
   'scroll.toTop': 'Voltar ao topo',
 
+  'common.undo': 'Desfazer',
   'common.close': 'Fechar',
   'common.openFull': 'Abrir página completa',
   'common.back': 'Voltar',

@@ -26,17 +26,15 @@ export const routes: Routes = [
     title: 'Noviflix · Collections',
   },
   /*
-   * No route for creating one. It is two fields, so it is a dialog — sending someone to a page
-   * and back would lose whatever they were doing, which matters most in the case it exists for:
-   * reaching for a new collection halfway through adding films to one.
+   * One route for all of it, and none for a single collection.
+   *
+   * Creating is two fields, so it is a dialog — sending someone to a page and back would lose
+   * whatever they were doing, which matters most in the case it exists for: reaching for a new
+   * collection halfway through adding films to one.
+   *
+   * A collection's films are a pane on that same page rather than a page of their own, so there is
+   * nothing for `collections/:id` to load: it would be an address for part of a page.
    */
-  {
-    path: 'collections/:id',
-    loadComponent: () =>
-      import('./features/collection-details/collection-details').then(
-        (m) => m.CollectionDetailsPage,
-      ),
-  },
   {
     path: 'movie/:id',
     outlet: 'modal',

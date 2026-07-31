@@ -1,6 +1,6 @@
 @use '../../../styles/mixins' as *;
 
-/* Tile footprint, matching the result cards so both grids sit on the same lattice. */
+/* Tile footprint, matching the result cards so every grid sits on the same lattice. */
 $tile-cols: 3;
 $tile-rows: 5;
 
@@ -10,18 +10,28 @@ $tile-rows: 5;
 }
 
 /*
- * Positioned, because the pad layer is pinned to the viewport when stacked and pinning makes
- * it paint after ordinary in-flow blocks. Without this the page would sit behind the drums.
+ * Positioned, because the pad layer is pinned to the viewport when stacked and pinning makes it
+ * paint after ordinary in-flow blocks. Without this the page sits behind the drums.
  */
 .cl {
   position: relative;
   display: flex;
-  flex-direction: column;
+  gap: var(--nv-grid-cell);
   min-block-size: 0;
   min-inline-size: 0;
 }
 
-/* Two whole drums, so the grid beneath begins on a seam. */
+// -------------------------------------------------------------------- the list
+
+.cl__list {
+  display: flex;
+  flex-direction: column;
+  inline-size: calc(var(--nv-grid-cell) * var(--cl-list-cols, 6));
+  flex: none;
+  min-block-size: 0;
+}
+
+/* Two whole drums, so the pane below begins on a seam — and so both panes' headings align. */
 .cl__head {
   display: flex;
   flex-direction: column;
@@ -32,50 +42,52 @@ $tile-rows: 5;
 
 .cl__title {
   margin: 0;
-  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  font-size: clamp(1.5rem, 2vw, 1.9rem);
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.06;
 }
 
-.cl__body {
+.cl__sub {
   margin: 0;
   color: var(--nv-text-muted);
-  font-size: var(--nv-text-sm);
+  font-size: var(--nv-text-xs);
+  @include clamp-lines(2);
 }
 
 /*
- * Column-major on desktop, in the direction the page moves. Rows come in as a custom
- * property rather than from auto-fill, because the page needs the same number to work out
- * how wide it has to be — two independent answers to one question would eventually differ.
+ * Scrolls on its own, so a long list never pushes the films off the page. The pane is a whole
+ * number of drums tall and every row is two, so what scrolls still lands on seams.
  */
-.cl__grid {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(var(--cl-rows, 2), calc(var(--nv-grid-cell) * #{$tile-rows}));
-  grid-auto-columns: calc(var(--nv-grid-cell) * #{$tile-cols});
-  gap: var(--nv-grid-cell);
-  align-content: center;
+.cl__rows {
+  @include slim-scrollbar;
+
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-block-size: 0;
+  /* `hidden` on the inline axis deliberately: `auto` on one axis computes the other from
+     `visible` to `auto`, which would add a scrollbar for a row that only just fits. */
+  overflow: hidden auto;
 }
 
 /*
- * The create tile. Dashed, so it reads as a slot to fill rather than a collection that
- * happens to be empty.
+ * The create row. Dashed, so it reads as a slot to fill rather than a collection that happens to
+ * be empty, and the same two drums tall as the rows under it.
  */
 .cl__new {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: var(--nv-space-3);
-  padding: var(--nv-space-4);
+  inline-size: 100%;
+  block-size: calc(var(--nv-grid-cell) * 2);
+  flex: none;
+  padding-inline: var(--nv-space-3);
   border: 1px dashed var(--nv-accent-line);
-  border-radius: var(--nv-grid-radius);
+  border-radius: var(--nv-radius);
   background: var(--nv-accent-soft);
   color: var(--nv-accent);
-  text-align: center;
+  text-align: start;
   transition:
     border-color var(--nv-fast) var(--nv-ease),
     background var(--nv-fast) var(--nv-ease);
@@ -89,53 +101,364 @@ $tile-rows: 5;
 .cl__new-icon {
   display: grid;
   place-items: center;
-  inline-size: 42px;
-  block-size: 42px;
+  inline-size: 30px;
+  block-size: 30px;
+  flex: none;
   border-radius: 50%;
   background: var(--nv-accent);
   color: var(--nv-accent-ink);
 
   svg {
-    inline-size: 20px;
-    block-size: 20px;
+    inline-size: 16px;
+    block-size: 16px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 2.2;
+    stroke-width: 2.4;
     stroke-linecap: round;
   }
 }
 
 .cl__new-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cl__new-title {
-  font-size: var(--nv-text-base);
+  font-size: var(--nv-text-sm);
   font-weight: 700;
 }
 
-.cl__new-sub {
-  color: var(--nv-text-muted);
-  font-size: var(--nv-text-xs);
-  line-height: 1.4;
+// ------------------------------------------------------------------- the films
+
+.cl__films {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: 0;
 }
 
-// ------------------------------------------------------------------- stacked
+/* Stacked only: there, the films replaced the list rather than joining it. */
+.cl__back {
+  display: none;
+}
+
+.cl__films-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nv-space-4);
+  block-size: calc(var(--nv-grid-cell) * 2);
+  flex: none;
+  min-inline-size: 0;
+}
+
+.cl__films-text {
+  min-inline-size: 0;
+}
+
+.cl__films-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  @include clamp-lines(1);
+}
+
+.cl__films-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--nv-space-2);
+  margin: 0;
+  min-inline-size: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+}
+
+.cl__dot {
+  color: var(--nv-text-faint);
+}
+
+.cl__description {
+  @include clamp-lines(1);
+}
+
+.cl__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  flex: none;
+}
+
+.cl__tool {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  padding: var(--nv-space-2) var(--nv-space-4);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-radius-pill);
+  background: var(--nv-panel);
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 15px;
+    block-size: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    border-color: var(--nv-accent);
+    color: var(--nv-accent);
+  }
+}
+
+/* Red only on hover: the two controls sit side by side, and a permanently red one would pull the
+   eye towards deleting when the common act is editing. */
+.cl__tool--danger:hover {
+  border-color: var(--nv-danger);
+  color: var(--nv-danger);
+}
+
+.cl__state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+  justify-content: center;
+  max-inline-size: 42ch;
+  flex: 1;
+}
+
+.cl__state-body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+/*
+ * Column-major on desktop, in the direction the page moves. Row count arrives as a custom property
+ * rather than from auto-fill, because the page needs the same number to size itself — two
+ * independent answers to one question would eventually differ.
+ */
+.cl__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--cl-rows, 2), calc(var(--nv-grid-cell) * #{$tile-rows}));
+  grid-auto-columns: calc(var(--nv-grid-cell) * #{$tile-cols});
+  gap: var(--nv-grid-cell);
+  align-content: center;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.cl__tile {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+// -------------------------------------------------------------------- one film
+
+.cm {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+.cm__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.cm__fallback {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 30px;
+    block-size: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+/*
+ * Shown outright rather than on hover, unlike the search card.
+ *
+ * These are films the visitor chose to keep, so the score is a reason they are here rather than a
+ * detail to go looking for — and there is no hover at all on touch.
+ */
+.cm__score {
+  @include score-pill;
+
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-start: var(--nv-space-3);
+}
+
+.cm__star {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: var(--nv-accent);
+}
+
+.cm__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: center;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  padding-inline: var(--nv-space-4);
+  /* Room for the remove control, which sits over this strip. */
+  padding-inline-end: calc(var(--nv-space-4) + 26px);
+}
+
+.cm__title {
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  @include clamp-lines(2);
+}
+
+.cm__year {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Removal, over the meta strip. Always visible: with the collection's own controls up in the
+ * heading, this is the only per-film action here, and hiding it behind hover would make it both
+ * hard to find and unreachable on touch.
+ */
+.cm__remove {
+  position: absolute;
+  inset-block-end: calc((var(--nv-grid-cell) - 26px) / 2);
+  inset-inline-end: var(--nv-space-3);
+  display: grid;
+  place-items: center;
+  inline-size: 26px;
+  block-size: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-muted);
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 13px;
+    block-size: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--nv-danger);
+    color: #fff;
+  }
+}
+
+// --------------------------------------------------------------------- stacked
 
 @media (max-width: 900px) {
-  /* Spans both columns of the stacked grid — PageGrid pairs blocks side by side at this
-     width, and without this the page renders at half the viewport. */
+  /* Spans both columns of the stacked grid; otherwise the page renders at half width. */
   .cl {
     grid-column: 1 / -1;
+    flex-direction: column;
+    gap: var(--nv-space-5);
     padding-block: var(--nv-space-5) var(--nv-space-7);
+  }
+
+  /*
+   * One pane at a time. Half a phone's width is too little for either — a column of names beside a
+   * grid of posters would leave both unreadable — so picking a collection replaces the list, and
+   * the back control returns to it.
+   */
+  .cl.is-films .cl__list,
+  .cl:not(.is-films) .cl__films {
+    display: none;
+  }
+
+  .cl__list {
+    inline-size: auto;
   }
 
   .cl__head {
     block-size: auto;
     gap: var(--nv-space-2);
     padding-block-end: var(--nv-space-5);
+  }
+
+  .cl__films-head {
+    block-size: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--nv-space-3);
+    padding-block-end: var(--nv-space-5);
+  }
+
+  .cl__films-meta {
+    flex-wrap: wrap;
+  }
+
+  .cl__rows {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* One whole drum, so the heading below it begins on a seam. */
+  .cl__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nv-space-2);
+    align-self: flex-start;
+    block-size: var(--nv-grid-cell);
+    flex: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--nv-text-muted);
+    font-size: var(--nv-text-sm);
+    font-weight: 600;
+
+    svg {
+      inline-size: 16px;
+      block-size: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:hover {
+      color: var(--nv-accent);
+    }
   }
 
   .cl__grid {
@@ -147,8 +470,13 @@ $tile-rows: 5;
     flex: none;
   }
 
-  .cl__grid > * {
+  .cl__tile {
     aspect-ratio: #{$tile-cols} / #{$tile-rows};
+  }
+
+  .cl__state {
+    flex: none;
+    padding-block: var(--nv-space-6);
   }
 }
 

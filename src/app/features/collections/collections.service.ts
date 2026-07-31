@@ -43,10 +43,22 @@ export class CollectionsService {
     return this.store().find((collection) => collection.id === id) ?? null;
   }
 
-  /** Creates a collection and returns it, so the caller can navigate to it. */
+  /**
+   * The most recently created collection's id.
+   *
+   * The collections page follows it, so a collection made from the dialog is the one on screen
+   * afterwards. The dialog lives at the app root and knows nothing about that page, so the fact
+   * travels through the store they already share rather than through a wire between them.
+   */
+  private readonly created = signal<string | null>(null);
+
+  readonly lastCreated = this.created.asReadonly();
+
+  /** Creates a collection and returns it, so the caller can show it. */
   create(name: string, description: string): UserCollection {
     const collection = createCollection(name, description);
     this.update([...this.store(), collection]);
+    this.created.set(collection.id);
     return collection;
   }
 
@@ -72,6 +84,7 @@ export class CollectionsService {
     const filled = addMovies(collection, movies);
 
     this.update([...this.store(), filled]);
+    this.created.set(filled.id);
     return { collection: filled, added: filled.items.length };
   }
 
@@ -105,8 +118,30 @@ export class CollectionsService {
     this.replace(id, (collection) => removeMovie(collection, movieId));
   }
 
-  remove(id: string): void {
+  /**
+   * Deletes a collection and hands it back, so the caller can offer it again.
+   *
+   * Returning the whole thing rather than nothing is what makes the undo possible without a
+   * separate bin to keep it in: whoever asked for the deletion holds the only copy, and drops it
+   * when the offer expires.
+   */
+  remove(id: string): UserCollection | null {
+    const removed = this.byId(id);
+    if (!removed) return null;
+
     this.update(this.store().filter((collection) => collection.id !== id));
+    return removed;
+  }
+
+  /**
+   * Puts a deleted collection back, untouched.
+   *
+   * Position is not restored because there is none to restore: the list is ordered by when each
+   * was last changed, and this one has not changed — so it lands where it was.
+   */
+  restore(collection: UserCollection): void {
+    if (this.byId(collection.id)) return;
+    this.update([...this.store(), collection]);
   }
 
   private replace(

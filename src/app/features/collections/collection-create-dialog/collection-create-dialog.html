@@ -6,12 +6,12 @@
       class="cd__panel"
       role="dialog"
       aria-modal="true"
-      [attr.aria-label]="i18n.t('collections.createTitle')"
+      [attr.aria-label]="heading()"
       [formGroup]="form"
       (ngSubmit)="submit()"
       novalidate
     >
-      <h2 class="cd__title">{{ i18n.t('collections.createTitle') }}</h2>
+      <h2 class="cd__title">{{ heading() }}</h2>
 
       @if (pending().length; as count) {
         <!-- Says what creating will do. Reaching for a new collection mid-add means the films
@@ -19,6 +19,8 @@
         <p class="cd__lead">
           {{ i18n.t('collections.createWithFilms', { count: count }) }}
         </p>
+      } @else if (isEditing()) {
+        <p class="cd__lead">{{ i18n.t('collections.editLead') }}</p>
       } @else {
         <p class="cd__lead">{{ i18n.t('collections.createLead') }}</p>
       }
@@ -78,7 +80,7 @@
 
       <div class="cd__actions">
         <button type="submit" class="cd__submit" [disabled]="!canSubmit()">
-          {{ i18n.t('collections.createSubmit') }}
+          {{ submitLabel() }}
         </button>
         <button type="button" class="cd__cancel" (click)="close()">
           {{ i18n.t('collections.cancel') }}
