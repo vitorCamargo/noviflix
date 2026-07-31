@@ -152,11 +152,45 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     this.measure();
   }
 
+  constructor() {
+    this.trackState.register(this.returnToStart);
+  }
+
   ngOnDestroy(): void {
     this.stop();
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
+    this.trackState.unregister(this.returnToStart);
     this.trackState.overflowing.set(false);
+    this.trackState.offset.set(0);
+  }
+
+  /**
+   * Eases the track back to its start.
+   *
+   * Bound as a field so the identity is stable — the same reference registers and
+   * unregisters, which is what lets TrackState tell a stale teardown apart from
+   * the current track's.
+   */
+  private readonly returnToStart = (): void => {
+    const el = this.host.nativeElement;
+    if (!this.canScroll(el)) return;
+
+    this.target = 0;
+
+    if (this.prefersReducedMotion()) {
+      this.stop();
+      el.scrollLeft = 0;
+      this.trackState.offset.set(0);
+      return;
+    }
+    this.start();
+  };
+
+  /** Publishes the position so the return control knows whether it has a job. */
+  @HostListener('scroll')
+  protected onScroll(): void {
+    this.trackState.offset.set(this.host.nativeElement.scrollLeft);
   }
 
   /** Re-observing an element already under observation is a no-op. */

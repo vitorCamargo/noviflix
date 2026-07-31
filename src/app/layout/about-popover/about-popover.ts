@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { APP_INFO } from '../../core/app-info';
+import { ABOUT_LINKS, APP_INFO } from '../../core/app-info';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { Popover } from '../../shared/popover/popover';
 
@@ -13,4 +13,5 @@ import { Popover } from '../../shared/popover/popover';
 export class AboutPopover {
   protected readonly i18n = inject(I18nService);
   protected readonly info = APP_INFO;
+  protected readonly links = ABOUT_LINKS;
 }

@@ -13,6 +13,29 @@
   }
 }
 
+/*
+ * The rating pill that appears over artwork on hover.
+ *
+ * Shared because two unrelated places show it — the search card and the hero's
+ * poster — and a rating that looked slightly different in each would read as two
+ * different pieces of information. Position and reveal stay with the caller, since
+ * those depend on the card it sits in.
+ */
+@mixin score-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--nv-space-2);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  color: var(--nv-text);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
 @mixin clamp-lines($lines: 2) {
   display: -webkit-box;
   -webkit-line-clamp: $lines;

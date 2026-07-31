@@ -30,6 +30,7 @@
         the input rather than with this component.
       -->
       <input
+        #field
         class="sf__input"
         type="search"
         autocomplete="off"
@@ -42,6 +43,24 @@
         (focus)="focused.set(true)"
         (blur)="onBlur()"
       />
+
+      <!--
+        Only rendered when there is something to clear, so the field doesn't carry
+        a permanently dead control. type=button matters: inside a form a bare
+        button submits.
+      -->
+      @if (hasValue()) {
+        <button
+          type="button"
+          class="sf__clear"
+          [attr.aria-label]="i18n.t('search.clear')"
+          (click)="clear()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      }
 
       <!-- Announces the wait to screen readers, which the icon swap alone
            does not. -->

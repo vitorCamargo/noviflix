@@ -8,6 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -66,6 +67,7 @@ const GENRE_LIMIT = 3;
     HeroTrailer,
     SearchField,
     SearchResultsGrid,
+    RouterLink,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -256,6 +258,23 @@ export class Home implements OnDestroy {
   protected readonly cast = computed(
     () => this.details()?.credits?.cast?.slice(0, CAST_LIMIT) ?? [],
   );
+
+  /**
+   * Rating for the poster card, or null when TMDB has no score.
+   *
+   * An unrated film reports 0, which would render as a confident "0.0" — a bad
+   * review rather than the absence of one.
+   */
+  protected readonly score = computed(() => {
+    const value = this.active()?.vote_average;
+    return value ? value.toFixed(1) : null;
+  });
+
+  /** Named-outlet link, so the pop-up is a URL rather than component state. */
+  protected readonly modalLink = computed(() => {
+    const id = this.active()?.id;
+    return id == null ? null : [{ outlets: { modal: ['movie', id] } }];
+  });
 
   /**
    * Tiers are assigned per batch, not per movie: attention is measured against

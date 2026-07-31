@@ -114,6 +114,13 @@ import {
 
     .pv__panel {
       --pv-width: 560px;
+      /*
+       * Reset, not a default. The trigger usually sits in a nav row where items
+       * must not wrap, and white-space is inherited — so the panel picked up
+       * nowrap from its surroundings and every paragraph ran off the side as a
+       * single line. Prose here wraps wherever the trigger happens to live.
+       */
+      white-space: normal;
       position: absolute;
       inset-block-start: calc(100% + var(--nv-space-3));
       inset-inline-start: 0;

@@ -20,16 +20,17 @@ export const en = {
   'search.placeholder': 'Search for a movie',
   'search.label': 'Search for a movie',
   'search.searching': 'Searching',
+  'search.clear': 'Clear search',
   // Says what is wrong and what to do, rather than restating the rule.
   'search.error.tooShort': 'Type at least {min} characters to search.',
   'search.error.charset': 'Use letters and numbers only.',
 
   'search.resultCount': '{count} results for “{query}”',
   'search.retry': 'Try again',
-  'search.voteAverage': 'Average rating',
-  'search.unrated': 'Not rated',
-  'search.openDetails': 'Open details for {title}',
-  'search.openFull': 'Open {title} on its own page',
+  'movie.voteAverage': 'Average rating',
+  'movie.unrated': 'Not rated',
+  'movie.openDetails': 'Open details for {title}',
+  'movie.openFull': 'Open {title} on its own page',
   'search.emptyTitle': 'Nothing found for “{query}”',
   'search.emptyBody':
     'Check the spelling, or try a shorter phrase — a single distinctive word usually works better than a full title.',
@@ -77,20 +78,17 @@ export const en = {
   'about.tmdbApi': "TMDB's API",
   'about.leadAfter': '.',
   'about.notAffiliated': 'It is not endorsed or certified by TMDB.',
-  'about.privacy': 'Privacy',
-  'about.privacyBody':
-    'Noviflix has no account and no server. Your collections and language choice stay in this browser, and nothing you do here is sent anywhere except to TMDB to look up movies.',
   'about.author': 'Author',
   'about.builtBy': 'Built by {name}',
-  'about.resources': 'Resources',
-  'about.exploreCode': 'Explore codebase',
-  'about.designNotes': 'Design notes',
-  'about.openLink': 'Open',
-  'about.comingSoon': 'Coming soon',
+  'about.links': 'Links',
   'about.madeWith': 'Made with Angular',
   'about.version': 'version {version}',
 
   'scroll.hint': 'Swipe or scroll to navigate',
+  // Two labels because two axes: the desktop page travels sideways, the stacked
+  // one downward, and "top" would be wrong on the first.
+  'scroll.toStart': 'Back to start',
+  'scroll.toTop': 'Back to top',
 
   'common.close': 'Close',
   'common.openFull': 'Open full page',

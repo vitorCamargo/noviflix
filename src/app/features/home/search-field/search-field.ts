@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -47,6 +49,9 @@ export class SearchField {
   protected readonly minLength = SEARCH_MIN_LENGTH;
 
   protected readonly term = new FormControl('', { nonNullable: true });
+
+  /** Returned to after clearing, so the next term can be typed straight away. */
+  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
 
   /** Mirrors the control into a signal so the template can react to it. */
   private readonly value = toSignal(this.term.valueChanges, {
@@ -115,5 +120,24 @@ export class SearchField {
     this.focused.set(false);
     // Nothing to complain about if they never typed anything.
     if (normaliseSearchTerm(this.value())) this.settled.set(true);
+  }
+
+  /** Whether there is anything to clear, ignoring whitespace. */
+  protected readonly hasValue = computed(
+    () => normaliseSearchTerm(this.value()).length > 0,
+  );
+
+  protected clear(): void {
+    this.term.setValue('');
+    this.settled.set(false);
+
+    /*
+     * Cleared immediately rather than waiting for the debounce to deliver the
+     * empty term. Pressing clear is an explicit instruction, and half a second of
+     * stale results after it would look like the button had failed. The debounced
+     * empty value still arrives and is a no-op by then.
+     */
+    this.store.clear();
+    this.field()?.nativeElement.focus();
   }
 }

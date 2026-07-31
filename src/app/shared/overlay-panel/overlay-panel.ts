@@ -89,11 +89,26 @@ import {
       inline-size: min(var(--panel-width), 100%);
       max-block-size: min(86dvh, 940px);
       background: var(--nv-panel);
-      border: 1px solid var(--nv-border);
+      /* Borderless, like the popover — the shadow lifts it off the grid on its
+         own, and a drawn edge competes with the lattice behind it. */
+      border: 0;
       border-radius: var(--nv-radius-lg);
       box-shadow: var(--nv-shadow-pop);
       animation: nv-rise var(--nv-normal) var(--nv-ease);
       overflow: hidden;
+    }
+
+    /*
+     * No focus ring on the panel itself.
+     *
+     * It takes focus on open so screen readers and the keyboard land inside the
+     * dialog, but it is a container rather than a control — and a ring around the
+     * whole overlay reads as a drawn border, which is exactly what was asked to go.
+     * The controls within it keep their own indicators.
+     */
+    .panel:focus,
+    .panel:focus-visible {
+      outline: none;
     }
 
     .panel__connector {

@@ -102,22 +102,53 @@
     [style.gridArea]="area('poster')"
     [style.translate]="posterNudge()"
   >
-    <nv-drum-card>
-      @if (poster(); as src) {
-        <img class="poster__img" [src]="src" [alt]="active()?.title ?? ''" />
-      }
-      <div class="poster__meta">
-        <p class="poster__label">{{ i18n.t('home.featuredCast') }}</p>
-        @if (cast().length) {
-          <p class="poster__names">
-            @for (person of cast(); track person.id) {
-              <span>{{ person.name }}</span>
+    <!--
+      Interactive like a result card — reveals the rating and opens the same
+      details pop-up — but without the corner glow. Here the card overlaps the
+      hero, so light escaping around its edges falls on another card rather than
+      on the lattice, and reads as a smudge instead of a lift.
+    -->
+    <nv-drum-card [interactive]="true" [glow]="false">
+      <a
+        class="poster__link"
+        [routerLink]="modalLink()"
+        [attr.aria-label]="
+          i18n.t('movie.openDetails', { title: active()?.title ?? '' })
+        "
+      >
+        <span class="poster__art">
+          @if (poster(); as src) {
+            <img class="poster__img" [src]="src" [alt]="" />
+          }
+
+          <span class="poster__score">
+            @if (score(); as value) {
+              <svg class="poster__star" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+                />
+              </svg>
+              <span>{{ value }}</span>
+              <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
+            } @else {
+              <span>{{ i18n.t('movie.unrated') }}</span>
             }
-          </p>
-        } @else {
-          <p class="poster__names poster__names--empty">—</p>
-        }
-      </div>
+          </span>
+        </span>
+
+        <span class="poster__meta">
+          <span class="poster__label">{{ i18n.t('home.featuredCast') }}</span>
+          @if (cast().length) {
+            <span class="poster__names">
+              @for (person of cast(); track person.id) {
+                <span>{{ person.name }}</span>
+              }
+            </span>
+          } @else {
+            <span class="poster__names poster__names--empty">—</span>
+          }
+        </span>
+      </a>
     </nv-drum-card>
   </div>
 

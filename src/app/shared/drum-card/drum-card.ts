@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 /**
  * A surface that occupies whole drums.
@@ -26,7 +26,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
      *    the grid and two overlapping glows just muddy each other.
      */
     '[attr.data-cursor]': "interactive() ? 'focus' : null",
-    '[attr.data-glow]': "interactive() || active() ? 'card' : null",
+    /*
+     * Tied to whether the card actually lights the grid, not merely to being
+     * interactive. With the corner glow off there is no competing light, so the
+     * pointer keeps its own — stepping aside for a glow that isn't there would
+     * just leave a dead patch following the cursor.
+     */
+    '[attr.data-glow]': "lit() ? 'card' : null",
   },
   template: `
     <div
@@ -37,7 +43,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       <ng-content />
     </div>
 
-    @if (interactive() || active()) {
+    @if (lit()) {
       <span class="glow" aria-hidden="true"></span>
     }
   `,
@@ -171,8 +177,21 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 export class DrumCard {
   /** No surface fill — for cards that are pure imagery. */
   readonly flat = input(false);
-  /** Enables the corner crosshairs on hover. */
+  /** Enables the corner glow on hover, and the focused cursor. */
   readonly interactive = input(false);
-  /** Pins the crosshairs on, for the selected item in a set. */
+  /** Pins the glow on, for the selected item in a set. */
   readonly active = input(false);
+  /**
+   * Opt out of the corner glow while staying interactive.
+   *
+   * For cards set into a composition rather than a field of their own, where four
+   * lights escaping around the edges compete with the cards overlapping them
+   * instead of reading as the lattice lifting.
+   */
+  readonly glow = input(true);
+
+  /** Whether this card lights the grid behind it. */
+  protected readonly lit = computed(
+    () => this.glow() && (this.interactive() || this.active()),
+  );
 }

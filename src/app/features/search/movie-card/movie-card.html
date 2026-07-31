@@ -8,7 +8,7 @@
   <a
     class="mc"
     [routerLink]="modalLink()"
-    [attr.aria-label]="i18n.t('search.openDetails', { title: film.title })"
+    [attr.aria-label]="i18n.t('movie.openDetails', { title: film.title })"
   >
     <span class="mc__art">
       @if (poster(); as src) {
@@ -32,9 +32,9 @@
             />
           </svg>
           <span class="mc__score-value">{{ value }}</span>
-          <span class="nv-sr">{{ i18n.t('search.voteAverage') }}</span>
+          <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
         } @else {
-          <span class="mc__score-value">{{ i18n.t('search.unrated') }}</span>
+          <span class="mc__score-value">{{ i18n.t('movie.unrated') }}</span>
         }
       </span>
     </span>
@@ -56,7 +56,7 @@
   <a
     class="mc__full"
     [routerLink]="['/movie', film.id]"
-    [attr.aria-label]="i18n.t('search.openFull', { title: film.title })"
+    [attr.aria-label]="i18n.t('movie.openFull', { title: film.title })"
     [attr.tabindex]="0"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">

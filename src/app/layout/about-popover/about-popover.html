@@ -18,9 +18,6 @@
     <strong>{{ i18n.t('about.notAffiliated') }}</strong>
   </p>
 
-  <p class="ab__section">{{ i18n.t('about.privacy') }}</p>
-  <p class="ab__body">{{ i18n.t('about.privacyBody') }}</p>
-
   <p class="ab__section">{{ i18n.t('about.author') }}</p>
   <p class="ab__body">
     {{ i18n.t('about.builtBy', { name: info.author }) }}
@@ -29,44 +26,26 @@
     }
   </p>
   @if (info.authorBio) {
-    <p class="ab__body">{{ info.authorBio }}</p>
+    <p class="ab__body ab__italic">{{ info.authorBio }}</p>
   }
 
-  <p class="ab__section">{{ i18n.t('about.resources') }}</p>
-  <div class="ab__tiles">
-    <a
-      class="ab__tile"
-      [class.is-disabled]="!info.links.github"
-      [attr.href]="info.links.github || null"
-      [attr.target]="info.links.github ? '_blank' : null"
-      rel="noopener"
-    >
-      <span class="ab__tile-icon ab__tile-icon--code">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m9 18-6-6 6-6M15 6l6 6-6 6" />
-        </svg>
-      </span>
-      <span class="ab__tile-text">
-        <span class="ab__tile-title">{{ i18n.t('about.exploreCode') }}</span>
-        <span class="ab__tile-sub">
-          {{ info.links.github ? i18n.t('about.openLink') : i18n.t('about.comingSoon') }}
-        </span>
-      </span>
-    </a>
-
-    <a class="ab__tile is-disabled">
-      <span class="ab__tile-icon ab__tile-icon--design">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 3v18M3 12h18" />
-        </svg>
-      </span>
-      <span class="ab__tile-text">
-        <span class="ab__tile-title">{{ i18n.t('about.designNotes') }}</span>
-        <span class="ab__tile-sub">{{ i18n.t('about.comingSoon') }}</span>
-      </span>
-    </a>
-  </div>
+  <p class="ab__section">{{ i18n.t('about.links') }}</p>
+  <ul class="ab__links">
+    @for (link of links; track link.key) {
+      <li>
+        <!-- noopener with a new tab: without it the opened page can reach back
+             through window.opener and navigate this one. -->
+        <a class="ab__chip" [href]="link.url" target="_blank" rel="noopener noreferrer">
+          <svg class="ab__chip-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 4h6v6" />
+            <path d="M20 4l-8.5 8.5" />
+            <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+          </svg>
+          <span>{{ link.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
 
   <div class="ab__foot">
     <span class="ab__built">

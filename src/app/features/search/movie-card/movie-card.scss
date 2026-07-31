@@ -61,26 +61,16 @@
  * has just been asked.
  */
 .mc__score {
+  @include score-pill;
+
   position: absolute;
   inset-block-start: var(--nv-space-3);
   inset-inline-end: var(--nv-space-3);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px var(--nv-space-2);
-  border-radius: var(--nv-radius-pill);
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(6px);
-  color: var(--nv-text);
-  font-size: var(--nv-text-xs);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
   opacity: 0;
   translate: 0 -4px;
   transition:
     opacity var(--nv-normal) var(--nv-ease),
     translate var(--nv-normal) var(--nv-ease);
-  pointer-events: none;
 }
 
 .mc__score.is-empty {

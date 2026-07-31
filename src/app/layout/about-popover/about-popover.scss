@@ -28,7 +28,7 @@
 }
 
 .ab__section {
-  margin: 0 0 var(--nv-space-2);
+  margin: var(--nv-space-3) 0 var(--nv-space-2);
   font-size: var(--nv-text-xs);
   font-weight: 600;
   letter-spacing: var(--nv-tracking-wide);
@@ -37,86 +37,57 @@
 }
 
 .ab__body {
-  margin: 0 0 var(--nv-space-5);
+  margin: 0;
   color: var(--nv-text-muted);
   font-size: var(--nv-text-sm);
   line-height: 1.7;
 }
 
-.ab__tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--nv-space-3);
-  margin-block-end: var(--nv-space-5);
+.ab__italic {
+  font-style: italic;
 }
 
-.ab__tile {
+/* A row of chips rather than the tiles that were here: two profile links don't
+   need a subtitle each, and the tiles gave them more weight than the prose. */
+.ab__links {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--nv-space-2);
+  margin: 0 0 var(--nv-space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.ab__chip {
+  display: inline-flex;
   align-items: center;
-  gap: var(--nv-space-3);
-  padding: var(--nv-space-3);
+  gap: var(--nv-space-2);
+  padding: var(--nv-space-2) var(--nv-space-4);
   border: 1px solid var(--nv-border);
-  border-radius: var(--nv-radius);
+  border-radius: var(--nv-radius-pill);
   background: var(--nv-panel-2);
-  transition:
-    border-color var(--nv-fast) var(--nv-ease),
-    transform var(--nv-fast) var(--nv-ease);
-
-  &:not(.is-disabled):hover {
-    border-color: var(--nv-accent-line);
-    transform: translateY(-2px);
-  }
-
-  &.is-disabled {
-    opacity: 0.55;
-    pointer-events: none;
-  }
-}
-
-.ab__tile-icon {
-  display: grid;
-  place-items: center;
-  inline-size: 42px;
-  block-size: 42px;
-  flex: none;
-  border-radius: var(--nv-radius-sm);
-  color: #fff;
-
-  svg {
-    inline-size: 19px;
-    block-size: 19px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-}
-
-.ab__tile-icon--code {
-  background: #16191b;
-  border: 1px solid var(--nv-border-strong);
-}
-
-.ab__tile-icon--design {
-  background: linear-gradient(150deg, var(--nv-accent), var(--nv-accent-dim));
-  color: var(--nv-accent-ink);
-}
-
-.ab__tile-text {
-  display: flex;
-  flex-direction: column;
-  min-inline-size: 0;
-}
-
-.ab__tile-title {
+  color: var(--nv-text);
   font-size: var(--nv-text-sm);
   font-weight: 600;
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  &:hover {
+    border-color: var(--nv-accent-line);
+    color: var(--nv-accent);
+  }
 }
 
-.ab__tile-sub {
-  font-size: var(--nv-text-xs);
-  color: var(--nv-text-faint);
+.ab__chip-icon {
+  inline-size: 14px;
+  block-size: 14px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .ab__foot {

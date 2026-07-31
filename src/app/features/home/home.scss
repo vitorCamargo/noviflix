@@ -200,20 +200,89 @@
   min-block-size: 0;
 }
 
+.poster__link {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+/* Clips the zoom, so the artwork can grow without the card leaving its seams. */
+.poster__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
 .poster__img {
   inline-size: 100%;
-  /* Leaves room for the meta strip without the card growing off the lattice. */
-  block-size: calc(100% - var(--nv-grid-cell));
+  block-size: 100%;
   object-fit: cover;
+  transition: scale var(--nv-slow) var(--nv-ease-panel);
+}
+
+/* Held back until the card is engaged, matching the result cards: a rating on
+   permanent display turns the composition into a spec sheet. */
+.poster__score {
+  @include score-pill;
+
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-end: var(--nv-space-3);
+  opacity: 0;
+  translate: 0 -4px;
+  transition:
+    opacity var(--nv-normal) var(--nv-ease),
+    translate var(--nv-normal) var(--nv-ease);
+}
+
+.poster__star {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: var(--nv-accent);
+}
+
+.poster:hover,
+.poster:focus-within {
+  .poster__img {
+    scale: 1.06;
+  }
+
+  .poster__score {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* No hover to reveal it, so the rating is simply present. */
+@media (hover: none), (max-width: 900px) {
+  .poster__score {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster__img {
+    transition: none;
+  }
+
+  .poster:hover .poster__img,
+  .poster:focus-within .poster__img {
+    scale: 1;
+  }
 }
 
 .poster__meta {
-  block-size: var(--nv-grid-cell);
-  padding: var(--nv-space-2) var(--nv-space-4);
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 2px;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  padding: var(--nv-space-2) var(--nv-space-4);
 }
 
 .poster__label {
