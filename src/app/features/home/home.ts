@@ -119,8 +119,19 @@ export class Home implements OnDestroy {
    * to work out how wide it has to be — the grid flows in columns, so its width
    * depends on how many cards each column holds.
    */
+  /**
+   * Whole drum rows the viewport contains, floored.
+   *
+   * Distinct from `rows`, which rounds up: that figure is right for the pad field, whose
+   * overhang is clipped and free, but content placed to that last partial line runs past
+   * the bottom edge and the final row of cards is cut.
+   */
+  private readonly wholeRows = computed(() =>
+    Math.max(1, Math.floor(this.viewport().height / readCellSize())),
+  );
+
   protected readonly cardRows = computed(() =>
-    resultRowCount(this.rows() - RESULTS_TOP_ROWS),
+    resultRowCount(this.wholeRows() - RESULTS_TOP_ROWS),
   );
 
   /** Width of the results grid in drums, zero when it isn't showing. */

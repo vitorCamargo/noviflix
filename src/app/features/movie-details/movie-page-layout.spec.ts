@@ -3,6 +3,7 @@ import {
   ASIDE_COLS,
   FACTS_COLS,
   PAGE_START_COL,
+  PAGE_START_ROW,
   PAGE_TOP_ROWS,
   SECTION_GAP,
   moviePageLayout,
@@ -72,5 +73,36 @@ describe('moviePageLayout', () => {
     const layout = moviePageLayout(1, 6, 6);
     expect(layout.rows).toBe(1);
     expect(layout.totalCols).toBeGreaterThan(PAGE_START_COL);
+  });
+
+  /**
+   * The check that actually matters, and the one this kept failing in the browser: the
+   * tile rows plus everything stacked above them must fit inside the viewport. Asserted
+   * as the full chain rather than as a row count, because the count was right twice while
+   * the bottom row was still being clipped — once from measuring a partial drum as whole,
+   * once from a constant that both counted the rows and placed the content.
+   */
+  it.each([12, 14, 16, 18, 20, 21, 25, 30])(
+    'fits the grid inside a %i-row viewport',
+    (wholeRows) => {
+      const { rows } = moviePageLayout(wholeRows, 18, 12);
+
+      const gridDrums = rows * CARD_ROWS + (rows - 1) * CARD_GAP;
+      // Content spans from PAGE_START_ROW to the last whole line, less the back link
+      // and the section heading.
+      const available = wholeRows + 1 - PAGE_START_ROW - 2;
+
+      expect(gridDrums).toBeLessThanOrEqual(available);
+    },
+  );
+
+  /** And it should not leave a whole further row of space unused either. */
+  it.each([14, 20, 26])('uses the space it has at %i rows', (wholeRows) => {
+    const { rows } = moviePageLayout(wholeRows, 18, 12);
+
+    const nextRowDrums = (rows + 1) * CARD_ROWS + rows * CARD_GAP;
+    const available = wholeRows + 1 - PAGE_START_ROW - 2;
+
+    expect(nextRowDrums).toBeGreaterThan(available);
   });
 });

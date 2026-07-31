@@ -28,7 +28,7 @@ import {
   ASIDE_COLS,
   FACTS_COLS,
   PAGE_START_COL,
-  PAGE_TOP_ROWS,
+  PAGE_START_ROW,
   moviePageLayout,
 } from './movie-page-layout';
 
@@ -78,8 +78,16 @@ export class MovieDetailsPage {
 
   private readonly viewport = signal(readViewport());
 
+  /**
+   * Whole drum rows the viewport contains, floored.
+   *
+   * The pad field rounds *up* so it covers a viewport that isn't an exact multiple of a
+   * drum — that overhang is clipped and costs nothing. Content cannot use the same
+   * figure: placed to that last partial line it runs past the bottom edge, which is what
+   * clipped the final row of cards. Flooring gives up the fractional row instead.
+   */
   private readonly rows = computed(() =>
-    Math.max(1, Math.ceil(this.viewport().height / readCellSize())),
+    Math.max(1, Math.floor(this.viewport().height / readCellSize())),
   );
 
   protected readonly stacked = computed(
@@ -118,8 +126,8 @@ export class MovieDetailsPage {
     this.stacked()
       ? null
       : toGridArea({
-          row: PAGE_TOP_ROWS,
-          rowEnd: Math.max(PAGE_TOP_ROWS + 1, this.rows() + 1),
+          row: PAGE_START_ROW,
+          rowEnd: Math.max(PAGE_START_ROW + 1, this.rows() + 1),
           col: PAGE_START_COL,
           colEnd: this.layout().totalCols,
         }),

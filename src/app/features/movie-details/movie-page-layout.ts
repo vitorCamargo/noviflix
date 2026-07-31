@@ -27,12 +27,20 @@ export const FACTS_COLS = 7;
 export const SECTION_GAP = CARD_GAP;
 
 /**
+ * Grid line the content starts on, clearing the header that floats over the first row.
+ *
+ * Deliberately separate from PAGE_TOP_ROWS below. The two were one constant, which made
+ * them impossible to correct independently: raising the row count to stop the grids
+ * overflowing also moved the whole page down a drum, giving back exactly the space the
+ * change was meant to free.
+ */
+export const PAGE_START_ROW = 2;
+
+/**
  * Drum rows unavailable to the tile grids.
  *
- * Three, and each one is spent somewhere specific: the page starts a row below the
- * floating header, then gives a row to the back link and a row to each section's
- * heading. Counting two of them left the grids one row too tall for the space, which is
- * why the bottom row of cards was cut off.
+ * Three, each spent somewhere specific: one above the content for the header, one for
+ * the back link, one for each section's heading.
  */
 export const PAGE_TOP_ROWS = 3;
 

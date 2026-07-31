@@ -124,8 +124,10 @@
  * hidden slider is unusable for anyone who can see but cannot use a pointer
  * precisely, which is a large part of who a half-star target excludes.
  */
+/* Capped rather than fixed: at 180px flat it set a floor its container could not always
+   give, and the whole control overflowed rather than the slider getting shorter. */
 .rf__slider {
-  inline-size: 180px;
+  inline-size: min(180px, 100%);
   accent-color: var(--nv-accent);
 }
 

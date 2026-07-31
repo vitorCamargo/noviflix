@@ -223,7 +223,15 @@
  * viewport gives.
  */
 @media (max-width: 900px) {
+  /*
+   * Spans both columns of the stacked grid.
+   *
+   * PageGrid becomes a two-column grid at this width so a page can pair blocks side by
+   * side. Without saying otherwise this landed in one of those columns and rendered at
+   * half the viewport — a page of prose in a 170px gutter.
+   */
   .mp {
+    grid-column: 1 / -1;
     padding-block: var(--nv-space-5) var(--nv-space-7);
   }
 
@@ -239,18 +247,31 @@
     overflow: visible;
   }
 
+  /*
+   * Stacked by default. The star row and its score have a min-content width of roughly
+   * 200px, and flex items refuse to shrink below that — beside a poster on a 390px screen
+   * the control simply ran off the edge.
+   */
   .mp__aside {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    gap: var(--nv-space-4);
+    gap: var(--nv-space-5);
     margin-block-end: var(--nv-space-6);
   }
 
-  /* Beside the rating rather than above it, so both are on screen at once. */
+  /* Matches the pop-up's proportion — smaller than this and the artwork stops being
+     recognisable, which is the only reason it is here. */
   .mp__poster {
-    inline-size: min(150px, 40%);
+    inline-size: min(190px, 55%);
     flex: none;
+  }
+
+  nv-rating-form {
+    /* Overrides the flex default of auto, which is what let the content set a floor the
+       column could not honour. */
+    min-inline-size: 0;
+    inline-size: 100%;
   }
 
   .mp__title {
@@ -295,5 +316,23 @@
       block-size: 2px;
       background: var(--nv-accent);
     }
+  }
+}
+
+/*
+ * Wide enough for the poster and the rating to sit together: the artwork at its capped
+ * width, a gutter, and the control at its own minimum. Below this they stack.
+ *
+ * A narrow override on top of the block above, deliberately placed after it rather than
+ * nested inside — the stacked rules are the baseline for every width up to 900px.
+ */
+@media (min-width: 480px) and (max-width: 900px) {
+  .mp__aside {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .mp__poster {
+    inline-size: min(190px, 40%);
   }
 }
