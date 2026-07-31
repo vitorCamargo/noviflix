@@ -71,6 +71,10 @@
     >
       @if (state() === 'sending') {
         {{ i18n.t('movie.rateSending') }}
+      } @else if (updating()) {
+        <!-- Says what pressing it does: this film already has a score from this session,
+             so the action replaces one rather than adding one. -->
+        {{ i18n.t('movie.rateUpdate') }}
       } @else {
         {{ i18n.t('movie.rateSubmit') }}
       }

@@ -1,0 +1,83 @@
+<nv-popover
+  [label]="i18n.t('guest.trigger')"
+  align="end"
+  width="320px"
+>
+  <!--
+    The ring is the trigger. Projected as the popover's icon slot so the panel, its
+    animation and its dismissal all come from the shared component rather than being
+    rebuilt here.
+  -->
+  <svg
+    nvPopoverIcon
+    class="gs__ring"
+    [class.is-low]="low()"
+    [class.is-empty]="expired() || !session()"
+    viewBox="0 0 40 40"
+  >
+    <!-- Faint full circle, so the ring reads as a shape even when nearly spent. -->
+    <circle
+      class="gs__track"
+      cx="20"
+      cy="20"
+      [attr.r]="radius"
+    />
+
+    <!-- Drawn whenever a session exists, expired included: at that point the ring is
+         complete, which is what "spent" looks like. -->
+    @if (session()) {
+      <circle
+        class="gs__arc"
+        cx="20"
+        cy="20"
+        [attr.r]="radius"
+        [attr.stroke-dasharray]="circumference"
+        [attr.stroke-dashoffset]="dashOffset()"
+      />
+    }
+
+    <!-- Person mark, centred in the ring. -->
+    <g class="gs__person">
+      <circle cx="20" cy="16.5" r="3.4" />
+      <path d="M13.6 26.4a6.4 6.4 0 0 1 12.8 0" />
+    </g>
+  </svg>
+
+  <div class="gs">
+    <h2 class="gs__title">{{ i18n.t('guest.title') }}</h2>
+
+    @if (!session()) {
+      <p class="gs__body">
+        @if (creating()) {
+          {{ i18n.t('guest.creating') }}
+        } @else {
+          {{ i18n.t('guest.none') }}
+        }
+      </p>
+    } @else if (expired()) {
+      <p class="gs__body">{{ i18n.t('guest.expired') }}</p>
+    } @else {
+      <p class="gs__countdown">
+        <span class="gs__value" [class.is-low]="low()">{{ label() }}</span>
+        <span class="gs__unit">{{ i18n.t('guest.remaining') }}</span>
+      </p>
+
+      @if (expiresAt(); as at) {
+        <p class="gs__meta">{{ i18n.t('guest.until', { time: at }) }}</p>
+      }
+    }
+
+    <button
+      type="button"
+      class="gs__extend"
+      [disabled]="creating()"
+      (click)="extend()"
+    >
+      @if (creating()) {
+        {{ i18n.t('guest.extending') }}
+      } @else {
+        {{ i18n.t('guest.extend') }}
+      }
+    </button>
+  </div>
+</nv-popover>

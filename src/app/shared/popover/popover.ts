@@ -101,9 +101,11 @@ import {
     .pv__icon {
       display: inline-flex;
 
+      /* Sized by the caller. Most triggers want a small glyph beside a label, but one
+         projects a countdown ring, which has to be legible on its own. */
       ::ng-deep svg {
-        inline-size: 18px;
-        block-size: 18px;
+        inline-size: var(--nv-popover-icon-size, 18px);
+        block-size: var(--nv-popover-icon-size, 18px);
         fill: none;
         stroke: currentColor;
         stroke-width: 1.8;

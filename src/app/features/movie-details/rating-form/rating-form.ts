@@ -2,14 +2,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, switchMap } from 'rxjs';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TmdbService } from '../../../core/tmdb/tmdb.service';
+import { GuestRatingsService } from '../guest-ratings.service';
 import { GuestSessionService } from '../guest-session.service';
 import {
   RATING_MAX,
@@ -39,6 +42,7 @@ type SubmitState = 'idle' | 'sending' | 'sent' | 'failed';
 export class RatingForm {
   private readonly tmdb = inject(TmdbService);
   private readonly guest = inject(GuestSessionService);
+  private readonly ratings = inject(GuestRatingsService);
   protected readonly i18n = inject(I18nService);
 
   readonly movieId = input.required<number>();
@@ -50,6 +54,9 @@ export class RatingForm {
 
   /** Chosen but unsent. Null until the visitor picks something. */
   protected readonly value = signal<number | null>(null);
+
+  /** What this session already rated this film, if anything. */
+  protected readonly saved = computed(() => this.ratings.ratingFor(this.movieId()));
 
   /** Follows the pointer across the stars, without committing anything. */
   protected readonly preview = signal<number | null>(null);
@@ -63,6 +70,9 @@ export class RatingForm {
     () => this.value() !== null && this.state() !== 'sending',
   );
 
+  /** Whether pressing submit would change an existing score rather than set a first one. */
+  protected readonly updating = computed(() => this.saved() !== null);
+
   /**
    * Spoken form of the slider's position.
    *
@@ -75,6 +85,26 @@ export class RatingForm {
       ? null
       : this.i18n.t('movie.ratingOf', { value: picked, max: RATING_MAX });
   });
+
+  constructor() {
+    // Fetched once per session, shared by every control that mounts.
+    this.ratings.ensureLoaded().subscribe({ error: () => undefined });
+
+    /*
+     * Adopts the saved score as the starting value.
+     *
+     * The rated list arrives after this control mounts, so it cannot be an initial value.
+     * It only fills an untouched control — overwriting a choice the visitor has already
+     * made, because a request happened to land, would be worse than not restoring it.
+     */
+    effect(() => {
+      const saved = this.saved();
+
+      untracked(() => {
+        if (saved !== null && this.value() === null) this.value.set(saved);
+      });
+    });
+  }
 
   protected fill(star: number): 0 | 0.5 | 1 {
     return starFill(star, this.shown());
@@ -114,7 +144,7 @@ export class RatingForm {
      * good, so this is usually free.
      */
     this.guest
-      .sessionId()
+      .ensure()
       .pipe(
         switchMap((sessionId) =>
           this.tmdb.rateMovie(this.movieId(), rating, sessionId),
@@ -123,6 +153,10 @@ export class RatingForm {
       )
       .subscribe((result) => {
         if (result && !(result instanceof HttpErrorResponse) && result.success) {
+          // Recorded locally rather than refetched: TMDB's rated list lags behind a write,
+          // so asking it to confirm would often answer that the rating isn't there and the
+          // stars would empty immediately after the visitor watched them save.
+          this.ratings.remember(this.movieId(), rating);
           this.state.set('sent');
           return;
         }

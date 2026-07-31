@@ -15,6 +15,26 @@ const RATING_PATH = /^\/3\/movie\/\d+\/rating$/;
 /** Largest body accepted on a write. A rating is a couple of dozen bytes. */
 const MAX_BODY_BYTES = 512;
 
+/**
+ * Requests that must never be cached, however cacheable they look.
+ *
+ * The edge cache is right for catalogue data — a film's details are the same for everyone
+ * and change rarely. It is wrong for anything scoped to one visitor's session: the rated
+ * list is a GET, so it was being cached for half an hour, and a rating posted a moment
+ * later read back as absent because the empty list from before it was still being served.
+ *
+ * Matched on the path and the query, since the session id appears in either depending on
+ * the endpoint.
+ */
+function isSessionScoped(url) {
+  return (
+    url.pathname.startsWith('/3/guest_session/') ||
+    url.pathname.startsWith('/3/authentication/') ||
+    url.searchParams.has('guest_session_id') ||
+    url.searchParams.has('session_id')
+  );
+}
+
 function allowedOrigins(env) {
   return (env.ALLOWED_ORIGINS ?? '')
     .split(',')
@@ -111,6 +131,24 @@ export default {
         response.headers.set(key, value);
       }
       return response;
+    }
+
+    // Session-scoped reads bypass the cache entirely, in both directions: a stale hit is
+    // wrong, and storing one would keep serving it for half an hour.
+    if (isSessionScoped(url)) {
+      const upstreamResponse = await fetch(upstream.toString(), {
+        method: 'GET',
+        headers,
+      });
+
+      const fresh = new Response(upstreamResponse.body, upstreamResponse);
+      fresh.headers.set('Cache-Control', 'no-store');
+      fresh.headers.delete('Set-Cookie');
+
+      for (const [key, value] of Object.entries(corsHeaders(origin))) {
+        fresh.headers.set(key, value);
+      }
+      return fresh;
     }
 
     const cache = caches.default;

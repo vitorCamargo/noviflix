@@ -7,6 +7,7 @@ import type {
   MovieDetails,
   MovieSummary,
   Paginated,
+  RatedMovie,
   RatingResponse,
   Video,
 } from '../models/tmdb.models';
@@ -90,6 +91,23 @@ export class TmdbService {
    */
   guestSession(): Observable<GuestSession> {
     return this.get<GuestSession>('/authentication/guest_session/new');
+  }
+
+  /**
+   * Films this guest session has rated, each with the guest's own score.
+   *
+   * The only way to recover what someone rated: the score is theirs, not TMDB's average,
+   * and nothing else returns it. Without this a reload loses every rating the visitor
+   * gave, since the app has no account to read them back from.
+   */
+  guestRatedMovies(
+    guestSessionId: string,
+    page = 1,
+  ): Observable<Paginated<RatedMovie>> {
+    return this.get<Paginated<RatedMovie>>(
+      `/guest_session/${guestSessionId}/rated/movies`,
+      { page },
+    );
   }
 
   /**

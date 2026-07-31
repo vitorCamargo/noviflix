@@ -115,6 +115,16 @@ export interface GuestSession {
   expires_at: string;
 }
 
+/**
+ * A film as it appears in a guest session's rated list.
+ *
+ * `rating` is the guest's own score, which is the whole reason for reading this endpoint —
+ * it is the only way to recover what someone rated after a reload.
+ */
+export interface RatedMovie extends MovieSummary {
+  rating: number;
+}
+
 export interface RatingResponse {
   success: boolean;
   status_code: number;

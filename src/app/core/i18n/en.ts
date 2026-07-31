@@ -56,6 +56,7 @@ export const en = {
   'movie.rateHint': 'Choose a score for {title}. Half stars count.',
   'movie.rateThis': 'Your rating',
   'movie.rateSubmit': 'Submit rating',
+  'movie.rateUpdate': 'Update rating',
   'movie.rateSending': 'Sending…',
   'movie.rateSent': 'Thanks — your rating was recorded.',
   'movie.rateFailed': 'That did not go through. Try again.',
@@ -117,6 +118,16 @@ export const en = {
   'about.links': 'Links',
   'about.madeWith': 'Made with Angular',
   'about.version': 'version {version}',
+
+  'guest.trigger': 'Guest session',
+  'guest.title': 'Guest session',
+  'guest.remaining': 'left',
+  'guest.until': 'Expires at {time}',
+  'guest.none': 'No session yet.',
+  'guest.creating': 'Starting a session…',
+  'guest.expired': 'This session has expired.',
+  'guest.extend': 'Extend session',
+  'guest.extending': 'Extending…',
 
   'scroll.hint': 'Swipe or scroll to navigate',
   // Two labels because two axes: the desktop page travels sideways, the stacked

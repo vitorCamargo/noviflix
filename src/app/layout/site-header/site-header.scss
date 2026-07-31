@@ -19,7 +19,9 @@
   align-items: center;
   gap: var(--nv-space-2);
   block-size: 100%;
-  padding-inline-start: var(--nv-grid-cell);
+  /* A drum in from each edge, so the mark on the left and the session ring on the right
+     sit the same distance off the lattice boundary. */
+  padding-inline: var(--nv-grid-cell);
 }
 
 .hdr__logo {
@@ -93,6 +95,16 @@
   margin-inline-start: var(--nv-grid-cell);
 }
 
+/*
+ * Pushed to the far end by an auto margin, which absorbs whatever space the nav leaves.
+ * A fixed margin would drift with the width of the items before it.
+ */
+.hdr__guest {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: auto;
+}
+
 @media (max-width: 900px) {
   .hdr__row {
     gap: var(--nv-space-4);
@@ -118,6 +130,14 @@
  * accessible name, and their hit area, and the language selector keeps its code
  * visible since that *is* its state.
  */
+/* The bar has no room for the countdown here — the nav labels are already dropped to
+   fit, and the session still works whether or not it can be seen. */
+@media (max-width: 900px) {
+  .hdr__guest {
+    display: none;
+  }
+}
+
 @media (max-width: 480px) {
   .hdr__row {
     gap: var(--nv-space-2);

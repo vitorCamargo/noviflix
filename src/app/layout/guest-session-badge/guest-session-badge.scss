@@ -1,0 +1,142 @@
+@use '../../../styles/mixins' as *;
+
+:host {
+  /*
+   * Larger than the popover's default icon, since this one carries information rather
+   * than decorating a label — see the property's definition in Popover.
+   */
+  --nv-popover-icon-size: 34px;
+  /* The trigger is the ring; a text label beside it would only repeat the panel. */
+  --nv-popover-label-display: none;
+
+  display: block;
+}
+
+.gs__ring {
+  display: block;
+  /* Rotated so the arc starts at twelve o'clock rather than three. */
+  rotate: -90deg;
+}
+
+.gs__track {
+  fill: none;
+  stroke: var(--nv-border-strong);
+  stroke-width: 2.5;
+}
+
+.gs__arc {
+  fill: none;
+  stroke: var(--nv-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  /* Only the offset animates: the countdown moves once a second, and a jump between
+     two positions reads as a stutter where a slide reads as time passing. */
+  transition:
+    stroke-dashoffset var(--nv-normal) linear,
+    stroke var(--nv-normal) var(--nv-ease);
+}
+
+/* The last minutes, in the colour the app uses for everything else that needs
+   attention. */
+.gs__ring.is-low .gs__arc {
+  stroke: var(--nv-danger);
+}
+
+/*
+ * Counter-rotated, because the ring itself is turned a quarter turn to move the arc's
+ * start point — without this the figure inside would lie on its side.
+ */
+.gs__person {
+  rotate: 90deg;
+  transform-origin: center;
+  fill: none;
+  stroke: var(--nv-text);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  transition: stroke var(--nv-fast) var(--nv-ease);
+}
+
+.gs__ring.is-empty .gs__person {
+  stroke: var(--nv-text-faint);
+}
+
+// ------------------------------------------------------------------- panel
+
+.gs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-3);
+}
+
+.gs__title {
+  margin: 0;
+  font-size: var(--nv-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.gs__countdown {
+  display: flex;
+  align-items: baseline;
+  gap: var(--nv-space-2);
+  margin: 0;
+}
+
+.gs__value {
+  font-size: var(--nv-text-2xl);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.gs__value.is-low {
+  color: var(--nv-danger);
+}
+
+.gs__unit {
+  @include kicker;
+
+  color: var(--nv-text-faint);
+}
+
+.gs__body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+.gs__body--note {
+  padding-block-start: var(--nv-space-2);
+  border-block-start: 1px solid var(--nv-border);
+}
+
+.gs__meta {
+  margin: 0;
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  line-height: 1.5;
+}
+
+/* Matches the rating form's submit exactly — both are the one action of a small panel,
+   and they should not read as different weights of control. */
+.gs__extend {
+  inline-size: 100%;
+  padding: var(--nv-space-3) var(--nv-space-5);
+  border: 0;
+  border-radius: var(--nv-radius);
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  /* A muted surface rather than a faded one, so the lattice cannot show through it. */
+  &:disabled {
+    background: var(--nv-surface-2);
+    color: var(--nv-text-faint);
+    cursor: default;
+  }
+}
