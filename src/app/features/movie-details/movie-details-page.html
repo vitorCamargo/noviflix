@@ -1,0 +1,129 @@
+@let film = movie();
+
+<nv-page-grid [minColumns]="minColumns()">
+  <div class="mp" [style.gridArea]="area()">
+    <a class="mp__back" routerLink="/">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 6-6 6 6 6" />
+      </svg>
+      <span>{{ i18n.t('common.back') }}</span>
+    </a>
+
+    @if (loading()) {
+      <p class="mp__state" role="status">{{ i18n.t('movie.loading') }}</p>
+    } @else if (!film) {
+      <div class="mp__state">
+        <h1 class="mp__state-title">{{ i18n.t('movie.failedTitle') }}</h1>
+        <p>{{ i18n.t('movie.failedBody') }}</p>
+      </div>
+    } @else {
+      <!--
+        Tabs only where the page scrolls downward. On desktop the sections sit side by
+        side and the track scrolls to them, so hiding two behind a control would be
+        hiding content the layout already has room for.
+      -->
+      @if (stacked()) {
+        <div
+          class="tabs"
+          role="tablist"
+          [attr.aria-label]="i18n.t('movie.sections')"
+        >
+          @for (item of tabs; track item.id) {
+            <button
+              type="button"
+              class="tabs__btn"
+              role="tab"
+              [id]="'nv-page-tab-' + item.id"
+              [class.is-active]="tab() === item.id"
+              [attr.aria-selected]="tab() === item.id"
+              aria-controls="nv-page-tabpanel"
+              [attr.tabindex]="tab() === item.id ? 0 : -1"
+              (click)="select(item.id)"
+            >
+              {{ i18n.t(item.key) }}
+            </button>
+          }
+        </div>
+      }
+
+      <div class="mp__row">
+        <!-- Poster and the one thing the visitor can contribute. -->
+        <section class="mp__aside">
+          <div class="mp__poster">
+            @if (poster(); as src) {
+              <img [src]="src" [alt]="film.title" />
+            } @else {
+              <span class="mp__poster-empty" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <rect x="2" y="4" width="20" height="16" rx="2.5" />
+                  <path d="M7 4v16M17 4v16" />
+                </svg>
+              </span>
+            }
+          </div>
+
+          <nv-rating-form [movieId]="film.id" />
+        </section>
+
+        <div
+          class="mp__panels"
+          id="nv-page-tabpanel"
+          [attr.role]="stacked() ? 'tabpanel' : null"
+          [attr.aria-labelledby]="stacked() ? 'nv-page-tab-' + tab() : null"
+        >
+          @if (shows('facts')) {
+            <section class="mp__section mp__section--facts">
+              <h1 class="mp__title">
+                {{ film.title }}
+                @if (year(); as y) {
+                  <span class="mp__year">{{ y }}</span>
+                }
+              </h1>
+
+              @if (film.tagline) {
+                <p class="mp__tagline">{{ film.tagline }}</p>
+              }
+
+              @if (genres().length) {
+                <ul class="mp__genres">
+                  @for (genre of genres(); track genre) {
+                    <li class="mp__genre">{{ genre }}</li>
+                  }
+                </ul>
+              }
+
+              <h2 class="mp__heading">{{ i18n.t('movie.overview') }}</h2>
+              <p class="mp__overview" [class.is-empty]="!overview()">
+                {{ overview() ?? i18n.t('movie.noOverview') }}
+              </p>
+
+              <nv-movie-facts [movie]="film" />
+            </section>
+          }
+
+          @if (shows('cast')) {
+            <section class="mp__section">
+              <h2 class="mp__heading mp__heading--band">{{ i18n.t('movie.tab.cast') }}</h2>
+              <nv-cast-grid
+                [cast]="cast()"
+                [horizontal]="!stacked()"
+                [rows]="cardRows()"
+              />
+            </section>
+          }
+
+          @if (shows('related')) {
+            <section class="mp__section">
+              <h2 class="mp__heading mp__heading--band">{{ i18n.t('movie.tab.related') }}</h2>
+              <nv-related-grid
+                [movies]="related()"
+                [horizontal]="!stacked()"
+                [rows]="cardRows()"
+              />
+            </section>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</nv-page-grid>

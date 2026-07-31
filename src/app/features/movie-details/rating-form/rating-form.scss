@@ -1,0 +1,203 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.rf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+}
+
+.rf__label {
+  @include kicker;
+
+  margin: 0;
+  color: var(--nv-text-faint);
+}
+
+.rf__row {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-4);
+}
+
+.rf__stars {
+  display: flex;
+  gap: 2px;
+}
+
+/* Each star is its own positioning context, so the two hit areas and the clip
+   both resolve against one glyph rather than the row. */
+.rf__star {
+  position: relative;
+  display: block;
+  inline-size: 32px;
+  block-size: 32px;
+
+  svg {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+
+/*
+ * Bright enough to read as a row of stars before anything is chosen.
+ *
+ * On the panel's fill these were nearly invisible, so the control looked like an empty
+ * gap and there was nothing to suggest it could be clicked — the form appeared to offer
+ * a Submit button and no way to pick a score.
+ */
+.rf__star-base {
+  fill: rgba(255, 255, 255, 0.2);
+}
+
+/*
+ * The filled overlay. Clipped rather than drawn as a second half-star path: one
+ * shape means the two halves can never drift out of alignment, and the same path
+ * serves whole and half states.
+ */
+.rf__star-fill {
+  fill: var(--nv-accent);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--nv-fast) var(--nv-ease);
+}
+
+.rf__star[data-fill='0.5'] .rf__star-fill {
+  clip-path: inset(0 50% 0 0);
+}
+
+.rf__star[data-fill='1'] .rf__star-fill {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Transparent halves over the glyph. Removed from the tab order — the range
+   input is the keyboard path, and ten extra stops would be a maze. */
+.rf__half {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 50%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  /*
+   * No focus ring. These are removed from the tab order — the range input below is the
+   * keyboard path — so a ring here only ever appears from a click, drawing a box around
+   * the star that was just chosen.
+   */
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.rf__half--first {
+  inset-inline-start: 0;
+}
+
+.rf__half--second {
+  inset-inline-end: 0;
+}
+
+.rf__value {
+  font-size: var(--nv-text-lg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.rf__value-max {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+}
+
+.rf__value-empty {
+  color: var(--nv-text-faint);
+}
+
+/*
+ * The keyboard control. Kept narrow and quiet rather than hidden: a visually
+ * hidden slider is unusable for anyone who can see but cannot use a pointer
+ * precisely, which is a large part of who a half-star target excludes.
+ */
+.rf__slider {
+  inline-size: 180px;
+  accent-color: var(--nv-accent);
+}
+
+/*
+ * Out of sight on desktop, where the stars carry the interaction on their own — but
+ * still focusable, because they don't: the half-star targets are pointer-only, so
+ * deleting this would leave keyboard users with no way to set a score at all.
+ *
+ * It reappears the moment it takes focus, so nobody is left driving a control they
+ * cannot see.
+ */
+@media (min-width: 901px) {
+  .rf__slider:not(:focus):not(:focus-visible) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+.rf__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+}
+
+/*
+ * Full width, matching the dismissal beneath it. As a pill beside a full-width Close
+ * the two read as unrelated controls of different importance, when they are in fact the
+ * two ways out of the same form.
+ */
+.rf__submit {
+  inline-size: 100%;
+  padding: var(--nv-space-3) var(--nv-space-5);
+  border: 0;
+  border-radius: var(--nv-radius);
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  /*
+   * A muted surface rather than a faded accent. Translucency let the drum lattice show
+   * straight through the button, so it read as damaged rather than as not-yet-available.
+   */
+  &:disabled {
+    background: var(--nv-surface-2);
+    color: var(--nv-text-faint);
+    cursor: default;
+  }
+}
+
+/*
+ * Reserves a line so the panel doesn't shift when a message arrives, but a shorter one
+ * than the text needs — a full line of empty space below the button read as a gap
+ * separating it from the dismissal beneath.
+ */
+.rf__status {
+  margin: 0;
+  min-block-size: var(--nv-space-4);
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+}
+
+.rf__status.is-error {
+  color: var(--nv-danger);
+}

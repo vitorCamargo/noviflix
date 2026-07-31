@@ -1,0 +1,58 @@
+<!-- Headline figures first: the rating, and when it came out. -->
+<div class="mf__highlights">
+  <div class="mf__highlight">
+    <svg class="mf__icon mf__icon--star" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+      />
+    </svg>
+    <span class="mf__highlight-text">
+      <span class="mf__label">{{ i18n.t('movie.voteAverage') }}</span>
+      <span class="mf__value">
+        {{ score() ?? i18n.t('movie.unrated') }}
+        @if (votes(); as count) {
+          <span class="mf__sub">{{ i18n.t('movie.voteCount', { count: count }) }}</span>
+        }
+      </span>
+    </span>
+  </div>
+
+  <div class="mf__highlight">
+    <svg class="mf__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="2.5" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </svg>
+    <span class="mf__highlight-text">
+      <span class="mf__label">{{ i18n.t('movie.releaseDate') }}</span>
+      <span class="mf__value">{{ releaseDate() ?? empty }}</span>
+    </span>
+  </div>
+</div>
+
+<!--
+  Each field shows a dash rather than being dropped when TMDB has nothing. An absent
+  row would leave the reader unsure whether the figure is unknown or simply not
+  shown here.
+-->
+<dl class="mf__grid">
+  <div class="mf__fact">
+    <dt>{{ i18n.t('movie.budget') }}</dt>
+    <dd [class.is-empty]="!budget()">{{ budget() ?? empty }}</dd>
+  </div>
+  <div class="mf__fact">
+    <dt>{{ i18n.t('movie.revenue') }}</dt>
+    <dd [class.is-empty]="!revenue()">{{ revenue() ?? empty }}</dd>
+  </div>
+  <div class="mf__fact">
+    <dt>{{ i18n.t('movie.voteCountLabel') }}</dt>
+    <dd [class.is-empty]="!votes()">{{ votes() ?? empty }}</dd>
+  </div>
+  <div class="mf__fact">
+    <dt>{{ i18n.t('movie.runtime') }}</dt>
+    <dd [class.is-empty]="!runtime()">{{ runtime() ?? empty }}</dd>
+  </div>
+  <div class="mf__fact mf__fact--wide">
+    <dt>{{ i18n.t('movie.languages') }}</dt>
+    <dd [class.is-empty]="!languages()">{{ languages() ?? empty }}</dd>
+  </div>
+</dl>

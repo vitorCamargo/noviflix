@@ -1,0 +1,91 @@
+<div class="rf">
+  <p class="rf__label" id="nv-rating-label">{{ i18n.t('movie.rateThis') }}</p>
+
+  <div class="rf__row">
+    <!--
+      The stars are the pointer affordance; the range input below carries the same
+      value for keyboard and assistive tech. One value, two ways in — the stars are
+      hidden from the accessibility tree so it isn't announced twice.
+    -->
+    <div class="rf__stars" aria-hidden="true" (pointerleave)="clearHover()">
+      @for (star of stars; track star) {
+        <span class="rf__star" [attr.data-fill]="fill(star)">
+          <svg viewBox="0 0 24 24">
+            <path
+              class="rf__star-base"
+              d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+            />
+            <!-- Clipped to the left half, so a half step is legible as one. -->
+            <path
+              class="rf__star-fill"
+              d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+            />
+          </svg>
+
+          <!-- Two hit areas per star: the left half sets the half step. -->
+          <button
+            type="button"
+            class="rf__half rf__half--first"
+            tabindex="-1"
+            (pointerenter)="hover(star, true)"
+            (click)="pick(star, true)"
+          ></button>
+          <button
+            type="button"
+            class="rf__half rf__half--second"
+            tabindex="-1"
+            (pointerenter)="hover(star, false)"
+            (click)="pick(star, false)"
+          ></button>
+        </span>
+      }
+    </div>
+
+    <output class="rf__value">
+      @if (value(); as picked) {
+        {{ picked }}<span class="rf__value-max">/{{ max }}</span>
+      } @else {
+        <span class="rf__value-empty">—</span>
+      }
+    </output>
+  </div>
+
+  <input
+    class="rf__slider"
+    type="range"
+    [min]="min"
+    [max]="max"
+    [step]="step"
+    [value]="value() ?? min"
+    [attr.aria-labelledby]="'nv-rating-label'"
+    [attr.aria-valuetext]="valueText()"
+    (input)="onSlider($event)"
+  />
+
+  <div class="rf__actions">
+    <button
+      type="button"
+      class="rf__submit"
+      [disabled]="!canSubmit()"
+      (click)="submit()"
+    >
+      @if (state() === 'sending') {
+        {{ i18n.t('movie.rateSending') }}
+      } @else {
+        {{ i18n.t('movie.rateSubmit') }}
+      }
+    </button>
+
+    <!-- Live region so the outcome is announced without moving focus. -->
+    <p class="rf__status" role="status" [class.is-error]="state() === 'failed'">
+      @switch (state()) {
+        @case ('sent') {
+          {{ i18n.t('movie.rateSent') }}
+        }
+        @case ('failed') {
+          {{ i18n.t('movie.rateFailed') }}
+        }
+      }
+    </p>
+  </div>
+</div>

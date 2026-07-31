@@ -48,7 +48,20 @@ export class SearchField {
 
   protected readonly minLength = SEARCH_MIN_LENGTH;
 
-  protected readonly term = new FormControl('', { nonNullable: true });
+  /**
+   * Seeded from the store rather than starting empty.
+   *
+   * The store outlives this component, so navigating away and back rebuilt the field
+   * while the results were still there — an empty box above a page of results for a
+   * query with nothing on screen naming it. Reading the current query back means the
+   * two always agree.
+   *
+   * Set through the constructor argument, not `setValue`, so no change event fires
+   * and the debounced pipeline doesn't re-run the search that is already loaded.
+   */
+  protected readonly term = new FormControl(this.store.query(), {
+    nonNullable: true,
+  });
 
   /** Returned to after clearing, so the next term can be typed straight away. */
   private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');

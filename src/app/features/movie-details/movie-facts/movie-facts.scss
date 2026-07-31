@@ -1,0 +1,110 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-4);
+}
+
+.mf__highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--nv-space-3);
+}
+
+.mf__highlight {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-3);
+  padding: var(--nv-space-4);
+  border-radius: var(--nv-radius);
+  background: var(--nv-panel-2);
+}
+
+.mf__icon {
+  inline-size: 22px;
+  block-size: 22px;
+  flex: none;
+  fill: none;
+  stroke: var(--nv-accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The star is a solid shape, unlike the outlined calendar beside it. */
+.mf__icon--star {
+  fill: var(--nv-accent);
+  stroke: none;
+}
+
+.mf__highlight-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.mf__label {
+  @include kicker;
+
+  color: var(--nv-text-faint);
+}
+
+.mf__value {
+  font-size: var(--nv-text-lg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mf__sub {
+  margin-inline-start: var(--nv-space-2);
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-weight: 600;
+}
+
+.mf__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--nv-space-3);
+  margin: 0;
+}
+
+.mf__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--nv-space-4);
+  border-radius: var(--nv-radius);
+  background: var(--nv-panel-2);
+  min-inline-size: 0;
+
+  dt {
+    @include kicker;
+
+    color: var(--nv-text-faint);
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--nv-text-base);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Languages run long, so this one takes the full row where the grid allows. */
+.mf__fact--wide {
+  grid-column: 1 / -1;
+
+  dd {
+    font-variant-numeric: normal;
+  }
+}
+
+/* Dimmed, so a dash reads as "not reported" rather than as a value. */
+.mf__fact dd.is-empty {
+  color: var(--nv-text-faint);
+  font-weight: 600;
+}

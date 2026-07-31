@@ -1,0 +1,299 @@
+@use '../../../styles/mixins' as *;
+
+:host {
+  display: block;
+  block-size: 100%;
+}
+
+/*
+ * Positioned, because the pad layer is pinned to the viewport when stacked and pinning
+ * makes it paint after ordinary in-flow blocks. Without this the whole page sat behind
+ * the drums — visible only where the seams let it through.
+ */
+/*
+ * No gap between the back link and the row below it. Every band here is a whole number
+ * of drums so the tile grids start on a seam — an arbitrary gap pushes them off the
+ * lattice by however many pixels it happens to be, which is what left the cards
+ * visibly unaligned with the grid behind them.
+ */
+.mp {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/* Exactly one drum, so the row beneath begins on the next seam. */
+.mp__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  align-self: flex-start;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+
+  svg {
+    inline-size: 16px;
+    block-size: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    color: var(--nv-accent);
+  }
+}
+
+.mp__state {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+}
+
+.mp__state-title {
+  margin: 0 0 var(--nv-space-2);
+  color: var(--nv-text);
+  font-size: var(--nv-text-2xl);
+  font-weight: 800;
+}
+
+/*
+ * Sections in a row, in the direction the page moves. A column-major layout is what
+ * makes the page readable as "keep going right", and the track scrolls to whatever the
+ * row needs — its width is declared by the component so nothing lands past the clip.
+ */
+.mp__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--nv-grid-cell);
+  flex: 1;
+  min-block-size: 0;
+}
+
+.mp__panels {
+  display: flex;
+  align-items: stretch;
+  gap: var(--nv-grid-cell);
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+.mp__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-5);
+  /* Four drums, so the poster and the rating below it sit on the lattice. */
+  inline-size: calc(var(--nv-grid-cell) * 4);
+  flex: none;
+  min-block-size: 0;
+}
+
+.mp__poster {
+  aspect-ratio: 2 / 3;
+  flex: none;
+  border-radius: var(--nv-radius);
+  background: var(--nv-surface-2);
+  overflow: hidden;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.mp__poster-empty {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 34px;
+    block-size: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+.mp__section {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/*
+ * Also a whole drum, for the same reason as the back link: the tile grid below it has to
+ * begin on a seam. Only the grid sections need this — prose is not laid on the lattice,
+ * so its headings space themselves normally.
+ */
+.mp__heading--band {
+  display: flex;
+  align-items: center;
+  block-size: var(--nv-grid-cell);
+  flex: none;
+}
+
+/*
+ * The one section with a declared width. Cast and related size themselves from their
+ * tile counts, but prose has no natural width — left to flex it would either squeeze to
+ * its longest word or run to a line nobody can track back from.
+ */
+.mp__section--facts {
+  inline-size: calc(var(--nv-grid-cell) * 7);
+  gap: var(--nv-space-3);
+  flex: none;
+  overflow-y: auto;
+  @include slim-scrollbar;
+}
+
+.mp__title {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+.mp__year {
+  margin-inline-start: var(--nv-space-2);
+  color: var(--nv-text-faint);
+  font-size: 0.55em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+.mp__tagline {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-base);
+  font-style: italic;
+}
+
+.mp__genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nv-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mp__genre {
+  padding: 3px var(--nv-space-3);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: var(--nv-text-xs);
+  font-weight: 600;
+}
+
+.mp__heading {
+  margin: 0;
+  font-size: var(--nv-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.mp__overview {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.7;
+}
+
+.mp__overview.is-empty {
+  color: var(--nv-text-faint);
+}
+
+// ------------------------------------------------------------------ stacked
+
+/*
+ * Below this the page is an ordinary vertical one: sections stack, tabs choose between
+ * them, and nothing takes a drum-derived width because the column is whatever the
+ * viewport gives.
+ */
+@media (max-width: 900px) {
+  .mp {
+    padding-block: var(--nv-space-5) var(--nv-space-7);
+  }
+
+  .mp__row,
+  .mp__panels {
+    display: block;
+    flex: none;
+  }
+
+  .mp__aside,
+  .mp__section--facts {
+    inline-size: auto;
+    overflow: visible;
+  }
+
+  .mp__aside {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--nv-space-4);
+    margin-block-end: var(--nv-space-6);
+  }
+
+  /* Beside the rating rather than above it, so both are on screen at once. */
+  .mp__poster {
+    inline-size: min(150px, 40%);
+    flex: none;
+  }
+
+  .mp__title {
+    font-size: clamp(1.7rem, 7vw, 2.2rem);
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--nv-space-4);
+    flex-wrap: wrap;
+    border-block-end: 1px solid var(--nv-border);
+  }
+
+  .tabs__btn {
+    position: relative;
+    padding: 0 0 var(--nv-space-3);
+    border: 0;
+    background: transparent;
+    color: var(--nv-text-faint);
+    font-size: var(--nv-text-xs);
+    font-weight: 700;
+    letter-spacing: var(--nv-tracking-wide);
+    text-transform: uppercase;
+
+    /* Selection follows focus in a roving tablist, so the accent and the underline
+       already show which tab is current — a ring is a second mark for one state. */
+    &:focus,
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  .tabs__btn.is-active {
+    color: var(--nv-accent);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: -1px;
+      block-size: 2px;
+      background: var(--nv-accent);
+    }
+  }
+}

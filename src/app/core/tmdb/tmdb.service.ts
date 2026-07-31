@@ -3,9 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { map, type Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
+  GuestSession,
   MovieDetails,
   MovieSummary,
   Paginated,
+  RatingResponse,
   Video,
 } from '../models/tmdb.models';
 
@@ -61,7 +63,9 @@ export class TmdbService {
    */
   movie(id: number | string): Observable<MovieDetails> {
     return this.get<MovieDetails>(`/movie/${id}`, {
-      append_to_response: 'credits',
+      // Cast and related films arrive with the record, so opening the details
+      // costs one request rather than three — and switching tabs costs none.
+      append_to_response: 'credits,recommendations',
     });
   }
 
@@ -75,6 +79,35 @@ export class TmdbService {
   videos(id: number | string): Observable<Video[]> {
     return this.get<{ results: Video[] }>(`/movie/${id}/videos`).pipe(
       map((res) => res.results ?? []),
+    );
+  }
+
+  /**
+   * A short-lived session identifying an anonymous visitor.
+   *
+   * TMDB will not accept a rating without one, and it is the only way to rate
+   * without asking the visitor to sign in to an account they may not have.
+   */
+  guestSession(): Observable<GuestSession> {
+    return this.get<GuestSession>('/authentication/guest_session/new');
+  }
+
+  /**
+   * Posts a rating, attributed to a guest session.
+   *
+   * The one write in the app. The proxy permits POST for this path alone — see the
+   * note beside its allow-list, since widening that is a security decision rather
+   * than a convenience.
+   */
+  rateMovie(
+    id: number | string,
+    value: number,
+    guestSessionId: string,
+  ): Observable<RatingResponse> {
+    return this.http.post<RatingResponse>(
+      `${this.base}/movie/${id}/rating`,
+      { value },
+      { params: new HttpParams().set('guest_session_id', guestSessionId) },
     );
   }
 

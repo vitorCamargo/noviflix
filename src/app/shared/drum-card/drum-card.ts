@@ -79,7 +79,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
        */
       margin: 0 var(--nv-card-seam, var(--nv-grid-gap))
         var(--nv-card-seam, var(--nv-grid-gap)) 0;
-      background: var(--nv-panel);
+      /*
+       * Overridable, because a card is only legible against a surface it differs
+       * from. On the lattice the panel fill is right; inside a panel of the same
+       * colour the card's meta strip vanishes into its background.
+       */
+      background: var(--nv-card-surface, var(--nv-panel));
       overflow: hidden;
       isolation: isolate;
     }

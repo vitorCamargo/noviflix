@@ -44,7 +44,13 @@ import { TrackState } from '../horizontal-scroll/track-state';
       display: contents;
     }
 
-    /* Tucked into the corner, roughly half a drum from each edge. */
+    /*
+     * Tucked into the corner, roughly half a drum from each edge.
+     *
+     * Carries its own surface because it floats over whatever the page happens to be
+     * showing. Against artwork the bare glyph and label were unreadable, which is a
+     * poor outcome for the one thing telling you the page continues.
+     */
     .hint {
       position: fixed;
       inset-block-end: var(--nv-space-6);
@@ -53,6 +59,11 @@ import { TrackState } from '../horizontal-scroll/track-state';
       display: flex;
       align-items: center;
       gap: var(--nv-space-3);
+      padding: var(--nv-space-2) var(--nv-space-4) var(--nv-space-2)
+        var(--nv-space-3);
+      border-radius: var(--nv-radius-pill);
+      background: rgba(0, 0, 0, 0.66);
+      backdrop-filter: blur(8px);
       pointer-events: none;
       color: var(--nv-text);
       transition: color var(--nv-normal) var(--nv-ease);

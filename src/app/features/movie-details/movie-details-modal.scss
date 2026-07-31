@@ -1,0 +1,349 @@
+/*
+ * Top padding of OverlayPanel's bar. Referenced, not guessed: the tab indicator has to
+ * reach from the tab button up to the panel's top edge, and that distance *is* the
+ * bar's padding. If the panel changes its padding this must change with it.
+ */
+$bar-inset-block: var(--nv-space-5);
+
+/** Size of OverlayPanel's close button, which sets the bar's content height. */
+$bar-control-size: 34px;
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  min-inline-size: 0;
+}
+
+.bar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  flex: none;
+  padding: var(--nv-space-2) var(--nv-space-4);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-radius-pill);
+  background: transparent;
+  color: var(--nv-text);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 15px;
+    block-size: 15px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    border-color: var(--nv-accent-line);
+    color: var(--nv-accent);
+  }
+}
+
+/* Held on while its form is open, so the button reads as the thing that opened it
+   rather than something that was merely clicked. */
+.bar__btn.is-on {
+  border-color: transparent;
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+
+  svg {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  &:hover {
+    color: var(--nv-accent-ink);
+  }
+}
+
+// ------------------------------------------------------------------------ tabs
+
+/*
+ * Filling the bar's content height is what makes the indicator placement
+ * deterministic. The bar centres its groups, so a short strip sits partway down and an
+ * offset measured from the button lands short of the panel edge — which is why the mark
+ * floated above it. At the bar's full height the button's top edge *is* the bar's
+ * content top, so the panel's top edge is exactly one bar-padding above.
+ *
+ * The height matches the bar's tallest control, its close button. If that size changes
+ * this has to change with it.
+ */
+.tabs {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  min-block-size: $bar-control-size;
+  gap: var(--nv-space-5);
+  min-inline-size: 0;
+}
+
+/*
+ * The button fills the strip and centres its own label, rather than being centred
+ * within it. That is the whole trick: a centred button sits partway down, so an offset
+ * measured from its top edge lands short of the panel and the mark floats free. Filling
+ * the strip puts the button's top edge exactly at the bar's content top.
+ */
+.tabs__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--nv-tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color var(--nv-fast) var(--nv-ease);
+
+  &:hover {
+    color: var(--nv-text-muted);
+  }
+
+  /*
+   * No focus ring. In a roving tablist focus follows selection, so the accent colour
+   * and the mark at the panel's edge already say which tab is focused — a ring on top
+   * of that is a second indicator for the same state, and it boxed the label.
+   */
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.tabs__btn.is-active {
+  color: var(--nv-accent);
+
+  /* Drawn on the selected tab rather than slid between them: a moving indicator would
+     have to measure where the others are, for an effect a pseudo-element gives free. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(#{$bar-inset-block} * -1);
+    block-size: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--nv-accent);
+    box-shadow: 0 0 18px var(--nv-accent-glow);
+  }
+}
+
+// ------------------------------------------------------------------ the film
+
+/*
+ * The panel's aside centres its content and spaces it tightly. Both are wrong here:
+ * this column reads top to bottom like a page, so the auto bottom margin pins it to
+ * the start — auto margins beat the container's justify-content — and the gap is set
+ * here rather than inherited so the blocks have room to read as separate things.
+ */
+.film {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-4);
+  min-inline-size: 0;
+}
+
+/*
+ * Only where the aside is a bounded column of its own. Stacked, there is no free space
+ * to absorb and the auto margin instead pushed everything below it down the page —
+ * leaving a chasm between the film and the tab content.
+ */
+@media (min-width: 901px) {
+  .film {
+    margin-block-end: auto;
+  }
+}
+
+.film__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+  min-inline-size: 0;
+}
+
+/*
+ * Deliberately not the full column width. The aside is wide, and a 2:3 poster filling
+ * it would stand taller than the panel and push the title out of sight — the artwork is
+ * here for recognition, not to be the whole left side.
+ */
+.film__poster {
+  inline-size: min(190px, 45%);
+  aspect-ratio: 2 / 3;
+  flex: none;
+  border-radius: var(--nv-radius);
+  background: var(--nv-surface-2);
+  overflow: hidden;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.film__poster-empty {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 34px;
+    block-size: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+.film__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+/*
+ * Rating form heading. Set apart from the toolbar above it and grouped tightly with its
+ * own hint — the column's uniform gap spaced the two the same as everything else, so the
+ * hint read as a separate paragraph rather than as part of the heading.
+ */
+.rate__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-2);
+  padding-block-start: var(--nv-space-4);
+}
+
+.rate__title {
+  margin: 0;
+  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.rate__hint {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+.film__year {
+  margin-inline-start: var(--nv-space-3);
+  color: var(--nv-text-faint);
+  font-size: 0.55em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+
+.film__tagline {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-lg);
+  font-style: italic;
+}
+
+.film__genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nv-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.film__genre {
+  padding: 3px var(--nv-space-3);
+  border-radius: var(--nv-radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: var(--nv-text-xs);
+  font-weight: 600;
+}
+
+.film__overview {
+  margin: 0;
+  max-inline-size: 46ch;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-base);
+  line-height: 1.7;
+}
+
+.film__overview.is-empty {
+  color: var(--nv-text-faint);
+}
+
+.film__hint,
+.film__state {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+/* Full width and quiet, mirroring the reference's dismissal below its form. */
+.film__close {
+  padding: var(--nv-space-3) var(--nv-space-5);
+  border: 0;
+  border-radius: var(--nv-radius);
+  background: var(--nv-panel-2);
+  color: var(--nv-accent);
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+
+  &:hover {
+    background: var(--nv-surface-2);
+  }
+}
+
+/* The body scrolls, so it takes focus — but it is a region, not a control. */
+#nv-tabpanel:focus,
+#nv-tabpanel:focus-visible {
+  outline: none;
+}
+
+/* Labels are the first thing to go: three tabs, three buttons and a close control do
+   not fit one bar on a narrow screen, and the icons still identify the buttons. */
+@media (max-width: 900px) {
+  .bar__btn span {
+    display: none;
+  }
+
+  .bar__btn {
+    padding: var(--nv-space-2);
+  }
+
+  /*
+   * The bar wraps at this width, so the strip is no longer guaranteed to be the row
+   * touching the panel's top edge — a mark placed there would float over unrelated
+   * content. Underlining the label instead needs no knowledge of what is above it.
+   */
+  .tabs {
+    align-self: auto;
+    min-block-size: auto;
+    gap: var(--nv-space-4);
+  }
+
+  .tabs__btn.is-active::before {
+    inset-block-start: auto;
+    inset-block-end: -5px;
+    border-radius: 3px 3px 0 0;
+    box-shadow: none;
+  }
+}

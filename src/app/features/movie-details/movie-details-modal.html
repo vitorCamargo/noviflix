@@ -1,0 +1,177 @@
+@let film = movie();
+
+<nv-overlay-panel
+  [ariaLabel]="i18n.t('page.movieModal.title')"
+  [closeLabel]="i18n.t('common.close')"
+  (closed)="close()"
+>
+  <div nvPanelToolbar class="bar">
+    <!--
+      An href for middle-click and open-in-new-tab, but the navigation itself is
+      handled in code — see openFull for why a routerLink cannot express this one
+      from inside the outlet it needs to close.
+    -->
+    <a
+      class="bar__btn"
+      [href]="fullPageUrl()"
+      [attr.aria-label]="i18n.t('common.openFull')"
+      (click)="openFull($event)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14 4h6v6" />
+        <path d="M20 4l-8.5 8.5" />
+        <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+      </svg>
+      <span>{{ i18n.t('common.openFull') }}</span>
+    </a>
+
+    @if (film) {
+      <!-- Pressed state carried by aria-pressed as well as the fill, since the
+           colour alone says nothing to a screen reader. -->
+      <button
+        type="button"
+        class="bar__btn"
+        [class.is-on]="rating()"
+        [attr.aria-pressed]="rating()"
+        (click)="toggleRating()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+          />
+        </svg>
+        <span>{{ i18n.t('movie.rate') }}</span>
+      </button>
+
+      <button type="button" class="bar__btn" (click)="addToCollection()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          <path d="M12 8v6M9 11h6" />
+        </svg>
+        <span>{{ i18n.t('movie.addToCollection') }}</span>
+      </button>
+    }
+  </div>
+
+  <!--
+    Tabs in the panel's own top bar, level with the toolbar. The selected one is marked
+    by a bar at the very top edge of the panel rather than an underline beneath the
+    label — so the indicator reads as the panel itself changing, not as decoration
+    under a word.
+
+    A real tablist: arrow keys move between tabs, and the panel is announced as
+    belonging to whichever opened it.
+  -->
+  @if (film) {
+    <div
+      nvPanelFilters
+      class="tabs"
+      role="tablist"
+      [attr.aria-label]="i18n.t('movie.sections')"
+    >
+      @for (item of tabs; track item.id) {
+        <button
+          type="button"
+          class="tabs__btn"
+          role="tab"
+          [id]="'nv-tab-' + item.id"
+          [class.is-active]="tab() === item.id"
+          [attr.aria-selected]="tab() === item.id"
+          aria-controls="nv-tabpanel"
+          [attr.tabindex]="tab() === item.id ? 0 : -1"
+          (click)="select(item.id)"
+        >
+          {{ i18n.t(item.key) }}
+        </button>
+      }
+    </div>
+  }
+
+  <!--
+    Left column: the film by default, the rating form once asked for. The two swap
+    rather than stack — the column is a single screen and pushing the film's own
+    details out of view to reveal a form would be a poor trade.
+  -->
+  <div nvPanelAside class="film">
+    @if (!film) {
+      @if (loading()) {
+        <p class="film__state" role="status">{{ i18n.t('movie.loading') }}</p>
+      } @else {
+        <h2 class="film__title">{{ i18n.t('movie.failedTitle') }}</h2>
+        <p class="film__state">{{ i18n.t('movie.failedBody') }}</p>
+      }
+    } @else if (rating()) {
+      <!-- Heading and its hint are one block, so they sit closer to each other than to
+           the control they introduce. -->
+      <div class="rate__head">
+        <h2 class="rate__title">{{ i18n.t('movie.rateHeading') }}</h2>
+        <p class="rate__hint">{{ i18n.t('movie.rateHint', { title: film.title }) }}</p>
+      </div>
+
+      <nv-rating-form [movieId]="film.id" />
+    } @else {
+      <div class="film__poster">
+        @if (poster(); as src) {
+          <img [src]="src" [alt]="film.title" />
+        } @else {
+          <span class="film__poster-empty" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="2" y="4" width="20" height="16" rx="2.5" />
+              <path d="M7 4v16M17 4v16" />
+            </svg>
+          </span>
+        }
+      </div>
+
+      <!-- Title, tagline and genres are one heading block: they describe the same
+           thing, so they sit closer together than to the synopsis below. -->
+      <div class="film__head">
+        <h1 class="film__title">
+          {{ film.title }}
+          @if (year(); as y) {
+            <span class="film__year">{{ y }}</span>
+          }
+        </h1>
+
+        @if (film.tagline) {
+          <p class="film__tagline">{{ film.tagline }}</p>
+        }
+
+        @if (genres().length) {
+          <ul class="film__genres">
+            @for (genre of genres(); track genre) {
+              <li class="film__genre">{{ genre }}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <p class="film__overview" [class.is-empty]="!overview()">
+        {{ overview() ?? i18n.t('movie.noOverview') }}
+      </p>
+    }
+  </div>
+
+  <!-- Right column: everything about it, one section at a time. -->
+  <div
+    nvPanelBody
+    id="nv-tabpanel"
+    role="tabpanel"
+    tabindex="0"
+    [attr.aria-labelledby]="'nv-tab-' + tab()"
+  >
+    @if (film) {
+      @switch (tab()) {
+        @case ('facts') {
+          <nv-movie-facts [movie]="film" />
+        }
+        @case ('cast') {
+          <nv-cast-grid [cast]="cast()" />
+        }
+        @case ('related') {
+          <nv-related-grid [movies]="related()" />
+        }
+      }
+    }
+  </div>
+</nv-overlay-panel>

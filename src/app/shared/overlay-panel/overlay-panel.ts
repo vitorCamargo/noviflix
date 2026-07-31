@@ -64,6 +64,8 @@ import {
     </div>
   `,
   styles: `
+    @use '../../../styles/mixins' as *;
+
     :host {
       position: fixed;
       inset: 0;
@@ -194,28 +196,61 @@ import {
       min-block-size: 0;
     }
 
+    /*
+     * The one place in the app that shows its scrollbar. Elsewhere the lattice and
+     * the scroll hint make movement obvious; inside a panel the content just stops
+     * at an edge, with nothing to say there is more below it.
+     */
     .panel__body {
       overflow-y: auto;
+      /*
+       * Explicit, because it isn't the default: setting overflow-y alone computes
+       * overflow-x from visible to auto, so a grid a pixel too wide grew a second
+       * scrollbar along the bottom. This column scrolls one way only.
+       */
+      overflow-x: hidden;
       overscroll-behavior: contain;
       min-block-size: 0;
-      padding-inline-end: var(--nv-space-3);
+      padding-inline-end: var(--nv-space-4);
+      @include slim-scrollbar;
     }
 
     @media (max-width: 900px) {
-      .panel__cols {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--nv-space-5);
-        overflow-y: auto;
+      /* The bar carries a toolbar, tabs and a close button. On a narrow screen those
+         cannot share one line, and without wrapping they simply overlapped. */
+      .panel__bar {
+        flex-wrap: wrap;
+        row-gap: var(--nv-space-3);
       }
 
-      .panel__aside {
-        justify-content: flex-start;
+      /*
+       * A plain scrolling column, not a one-column grid.
+       *
+       * Each side is its own scroll region on desktop, which needs a zero block-size
+       * minimum to work. Carried into a stacked layout that rule let the body shrink below
+       * its content, and with overflow visible the content spilled out of its row and
+       * painted over the column above it — the cast grid landing on top of the title.
+       * Resetting the minimum is the actual fix; flex just removes any question about
+       * which cell things are in.
+       */
+      .panel__cols {
+        display: flex;
+        flex-direction: column;
+        gap: var(--nv-space-5);
+        overflow-y: auto;
+        @include slim-scrollbar;
+      }
+
+      .panel__aside,
+      .panel__body {
+        flex: none;
+        min-block-size: auto;
         overflow: visible;
         padding-inline-end: 0;
       }
 
-      .panel__body {
-        overflow: visible;
+      .panel__aside {
+        justify-content: flex-start;
       }
     }
 

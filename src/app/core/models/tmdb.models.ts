@@ -64,12 +64,20 @@ export interface CollectionRef {
   backdrop_path: string | null;
 }
 
+export interface SpokenLanguage {
+  iso_639_1: string;
+  /** Localised name, present only when the request carried a language. */
+  name: string;
+  english_name?: string;
+}
+
 export interface MovieDetails extends MovieSummary {
   runtime: number | null;
   status: string;
   tagline: string | null;
   budget: number;
   revenue: number;
+  spoken_languages: SpokenLanguage[];
   homepage: string | null;
   imdb_id: string | null;
   genres: Genre[];
@@ -94,3 +102,21 @@ export interface CollectionDetails extends CollectionSummary {
 }
 
 export type LoadState = 'idle' | 'loading' | 'success' | 'error';
+
+/**
+ * Guest session, which is what lets an anonymous visitor rate a film.
+ *
+ * `expires_at` is a UTC string without a timezone marker, so it has to be parsed
+ * deliberately rather than handed to `new Date()` and hoped for.
+ */
+export interface GuestSession {
+  success: boolean;
+  guest_session_id: string;
+  expires_at: string;
+}
+
+export interface RatingResponse {
+  success: boolean;
+  status_code: number;
+  status_message: string;
+}

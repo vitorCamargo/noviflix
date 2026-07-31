@@ -44,6 +44,37 @@
   overflow: hidden;
 }
 
+/*
+ * A visible, slim scrollbar — for the few places where hiding it costs more than it
+ * gains.
+ *
+ * Scroll chrome is suppressed globally, which is right for the page: the scroll hint
+ * says the page continues and the lattice makes movement obvious. Inside a panel
+ * neither is true — content simply stops at an edge with nothing to say there is more
+ * below it. This has to out-specify the global rule, which is why it sets `display`
+ * back rather than only sizing.
+ */
+@mixin slim-scrollbar($size: 6px) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nv-accent) transparent;
+
+  &::-webkit-scrollbar {
+    display: block;
+    width: $size;
+    height: $size;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--nv-border);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--nv-accent);
+    border-radius: 999px;
+  }
+}
+
 @mixin hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
