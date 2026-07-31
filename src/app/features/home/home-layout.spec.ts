@@ -7,10 +7,33 @@ import {
 describe('homeAreas', () => {
   const rows = 14;
 
-  it('centres the composition vertically', () => {
-    const wide = homeAreas(rows);
-    // 14 rows around a 10-row block leaves two spare above.
-    expect(wide.hero.row).toBe(2 + 2);
+  /**
+   * The real invariant, asserted instead of a hand-computed row number — the
+   * previous test agreed with the arithmetic while the arithmetic was wrong.
+   * Off-by-one is allowed because an odd number of spare tracks cannot split
+   * evenly, and the header's reserved row is excluded from the space above.
+   */
+  function gaps(rowCount: number) {
+    const areas = homeAreas(rowCount);
+    const values = Object.values(areas);
+    const first = Math.min(...values.map((a) => a.row));
+    const last = Math.max(...values.map((a) => a.rowEnd));
+    return { above: first - 1 - 1, below: rowCount - (last - 1) };
+  }
+
+  it.each([12, 14, 16, 21, 30])(
+    'centres the composition below the header at %i rows',
+    (rowCount) => {
+      const { above, below } = gaps(rowCount);
+      expect(Math.abs(above - below)).toBeLessThanOrEqual(1);
+    },
+  );
+
+  /** A viewport with no room to spare keeps the composition on screen. */
+  it('does not push content off a short viewport', () => {
+    const areas = homeAreas(9);
+    const last = Math.max(...Object.values(areas).map((a) => a.rowEnd));
+    expect(last - 1).toBeLessThanOrEqual(9);
   });
 
   /** Row 0 placements exist in the base, and grid lines start at 1. */

@@ -4,9 +4,17 @@
   <meta charset="utf-8">
   <title>Noviflix</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    viewport-fit=cover extends the page under the status bar and the home
+    indicator. Without it iOS keeps those bands for itself and paints them a flat
+    colour, which broke the drum field into a lattice with a plain strip above and
+    below it. With it, the pinned pad layer reaches the physical screen edges and
+    the grid is continuous; safe-area insets then keep content clear of the notch.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Discover how you watch.">
-  <meta name="theme-color" content="#000000">
+  <!-- Matches the pads, so the band iOS paints before first render blends in. -->
+  <meta name="theme-color" content="#0a0c0d">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://api.themoviedb.org">
   <link rel="preconnect" href="https://image.tmdb.org">

@@ -12,7 +12,15 @@ import {
  * count changes with window height — pinning content to absolute rows would
  * slide it up and down the screen as the window resizes.
  */
-export const HOME_CONTENT_ROWS = 10;
+export const HOME_CONTENT_ROWS = 9;
+
+/**
+ * The header floats over the first row on desktop, so centring happens in the
+ * rows below it. Without reserving it the composition was measured against the
+ * whole viewport and settled a drum too high, with the camera badge landing
+ * level with the nav.
+ */
+const HEADER_ROWS = 1;
 
 /**
  * Below this width the composition shifts to its compact columns.
@@ -103,15 +111,41 @@ export function homeMinColumns(compact = false): number {
   return Math.max(...Object.values(areas).map((area) => area.colEnd));
 }
 
+/** First and last grid line the composition touches, taken from the areas. */
+const BASE_ROW_START = Math.min(...Object.values(BASE).map((a) => a.row));
+const BASE_ROW_END = Math.max(...Object.values(BASE).map((a) => a.rowEnd));
+
+/**
+ * Rows to push the composition down so it sits centred below the header.
+ *
+ * The arithmetic is easy to get subtly wrong, which is what happened here. Grid
+ * lines are 1-based while the base areas start at line 0, so a block spanning
+ * lines 0 to 9 is *nine* tracks, not ten — centring against ten put it a drum
+ * and a half too high. On a tall monitor that slack is a small fraction of the
+ * page and reads as fine; on a laptop it is most of the slack there is, so the
+ * content ends up against the top.
+ *
+ * The result is clamped both ways: never above the first row, since line 0 is
+ * invalid CSS, and never so far down that the composition is pushed off the
+ * bottom of a short viewport.
+ */
+function verticalOffset(rows: number): number {
+  const span = BASE_ROW_END - BASE_ROW_START;
+  const available = Math.max(span, rows - HEADER_ROWS);
+
+  const desired =
+    1 + HEADER_ROWS + centreOffset(available, span) - BASE_ROW_START;
+  const furthest = Math.max(1, rows - BASE_ROW_END + 1);
+
+  return Math.min(desired, furthest);
+}
+
 /**
  * Shifts every area down so the composition sits centred vertically, and left
  * when the viewport is too narrow to carry the full-width arrangement.
- *
- * Base rows start at 0 for blocks that sit above the hero, so the offset also
- * has to keep them on the grid — a row 0 placement would be invalid CSS.
  */
 export function homeAreas(rows: number, compact = false): HomeAreas {
-  const offset = Math.max(1, centreOffset(rows, HOME_CONTENT_ROWS));
+  const offset = verticalOffset(rows);
   const out = {} as HomeAreas;
 
   for (const key of Object.keys(BASE) as HomeAreaKey[]) {
