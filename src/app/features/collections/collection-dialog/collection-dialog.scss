@@ -1,0 +1,389 @@
+@use '../../../../styles/mixins' as *;
+
+/*
+ * Top padding of OverlayPanel's bar. Referenced, not guessed: the tab indicator has to reach from
+ * the tab button up to the panel's top edge, and that distance *is* the bar's padding. If the panel
+ * changes its padding this must change with it.
+ */
+$bar-inset-block: var(--nv-space-5);
+
+/** Size of OverlayPanel's close button, which sets the bar's content height. */
+$bar-control-size: 34px;
+
+/*
+ * A step *below* the film pop-up, so opening a film from in here layers over this rather than under
+ * it — and closing that film comes back to the collection instead of the bare page.
+ *
+ * The panel inside is `position: fixed` at the modal layer; giving this host a lower one makes it a
+ * stacking context and takes the whole subtree with it. Pointer events pass straight through, since
+ * the host covers the viewport whether or not anything is open.
+ */
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--nv-z-modal) - 1);
+  pointer-events: none;
+}
+
+nv-overlay-panel {
+  pointer-events: auto;
+}
+
+// ------------------------------------------------------------------------- bar
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  min-inline-size: 0;
+}
+
+.bar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nv-space-2);
+  flex: none;
+  padding: var(--nv-space-2) var(--nv-space-4);
+  border: 1px solid var(--nv-border);
+  border-radius: var(--nv-radius-pill);
+  background: transparent;
+  color: var(--nv-text);
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    border-color var(--nv-fast) var(--nv-ease),
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 15px;
+    block-size: 15px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    border-color: var(--nv-accent-line);
+    color: var(--nv-accent);
+  }
+}
+
+/* Red only on hover: the two sit side by side, and a permanently red one would pull the eye towards
+   deleting when the common act is opening a film. */
+.bar__btn--danger:hover {
+  border-color: var(--nv-danger);
+  color: var(--nv-danger);
+}
+
+// ------------------------------------------------------------------------ tabs
+
+/*
+ * Filling the bar's content height is what makes the indicator placement deterministic. The bar
+ * centres its groups, so a short strip sits partway down and an offset measured from the button
+ * lands short of the panel edge. At the bar's full height the button's top edge *is* the bar's
+ * content top, so the panel's top edge is exactly one bar-padding above.
+ */
+.tabs {
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  min-block-size: $bar-control-size;
+  gap: var(--nv-space-5);
+  min-inline-size: 0;
+}
+
+.tabs__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--nv-tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.tabs__btn.is-active {
+  color: var(--nv-accent);
+
+  /* Reaches up to the panel's own edge, so the mark reads as the panel belonging to this tab rather
+     than as decoration under a word. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(#{$bar-inset-block} * -1);
+    block-size: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--nv-accent);
+    box-shadow: 0 0 18px var(--nv-accent-glow);
+  }
+}
+
+// ------------------------------------------------------------- what it is
+
+.meta {
+  min-inline-size: 0;
+}
+
+/* Title and count are one block: they describe the same thing, so they sit closer to each other
+   than to the description below. */
+.meta__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-1);
+}
+
+.meta__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+.meta__count {
+  margin: 0;
+  color: var(--nv-accent);
+  font-size: var(--nv-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.meta__description {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-base);
+  line-height: 1.6;
+}
+
+.meta__description.is-empty {
+  color: var(--nv-text-faint);
+  font-style: italic;
+}
+
+.meta__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nv-space-3);
+  margin: 0;
+}
+
+.meta__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta__label {
+  @include kicker;
+
+  color: var(--nv-text-faint);
+}
+
+.meta__value {
+  margin: 0;
+  font-size: var(--nv-text-sm);
+  font-weight: 600;
+}
+
+// -------------------------------------------------------- what it contains
+
+/*
+ * Ordinary wrapping rows, not the lattice.
+ *
+ * Inside a panel there are no pads to align to — the drum grid is behind the scrim — so the tiles
+ * are sized by the column's width and the column scrolls when there are more than fit.
+ */
+.films {
+  /* A step lighter than the panel behind it, matching the cast and related tiles — on the default
+     fill a card's meta strip is the same colour as the panel it sits on. */
+  --nv-card-surface: var(--nv-panel-2);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--nv-space-4);
+}
+
+.films__tile {
+  aspect-ratio: 3 / 5;
+  min-inline-size: 0;
+}
+
+.films__state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--nv-space-3);
+  max-inline-size: 40ch;
+  padding-block: var(--nv-space-5);
+}
+
+.films__state-icon {
+  inline-size: 30px;
+  block-size: 30px;
+  fill: none;
+  stroke: var(--nv-text-faint);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.films__state-title {
+  margin: 0;
+  font-size: var(--nv-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.films__state-body {
+  margin: 0;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-sm);
+  line-height: 1.6;
+}
+
+// --------------------------------------------------------------------- one film
+
+.cm {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  color: inherit;
+}
+
+.cm__art {
+  position: relative;
+  display: block;
+  flex: 1;
+  min-block-size: 0;
+  overflow: hidden;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+}
+
+.cm__fallback {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  background: var(--nv-surface-2);
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 30px;
+    block-size: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+}
+
+/*
+ * Shown outright rather than on hover, unlike the search card.
+ *
+ * These are films the visitor chose to keep, so the score is a reason they are here rather than a
+ * detail to go looking for — and there is no hover at all on touch.
+ */
+.cm__score {
+  @include score-pill;
+
+  position: absolute;
+  inset-block-start: var(--nv-space-3);
+  inset-inline-start: var(--nv-space-3);
+}
+
+.cm__star {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: var(--nv-accent);
+}
+
+.cm__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: center;
+  block-size: calc(var(--nv-grid-cell) * 0.8);
+  flex: none;
+  padding-inline: var(--nv-space-3);
+  /* Room for the remove control, which sits over this strip. */
+  padding-inline-end: calc(var(--nv-space-3) + 26px);
+}
+
+.cm__title {
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  line-height: 1.3;
+  @include clamp-lines(2);
+}
+
+.cm__year {
+  color: var(--nv-text-faint);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Removal, over the meta strip. Always visible: with the collection's own controls up in the bar,
+ * this is the only per-film action here, and hiding it behind hover would make it both hard to find
+ * and unreachable on touch.
+ */
+.cm__remove {
+  position: absolute;
+  inset-block-end: calc((var(--nv-grid-cell) * 0.8 - 24px) / 2);
+  inset-inline-end: var(--nv-space-2);
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  /* A step up from the tile it sits on, which is itself a step up from the panel. */
+  background: var(--nv-panel-tile);
+  color: var(--nv-text-muted);
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 12px;
+    block-size: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--nv-danger);
+    color: #fff;
+  }
+}
+
+// ---------------------------------------------------------------------- stacked
+
+@media (max-width: 900px) {
+  .films {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--nv-space-3);
+  }
+}

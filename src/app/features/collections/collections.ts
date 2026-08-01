@@ -3,18 +3,11 @@ import {
   Component,
   HostListener,
   computed,
-  effect,
   inject,
   signal,
-  untracked,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
-import { TmdbService } from '../../core/tmdb/tmdb.service';
-import type {
-  SavedMovie,
-  UserCollection,
-} from '../../core/models/user-collection.models';
+import type { UserCollection } from '../../core/models/user-collection.models';
 import {
   PageGrid,
   readCellSize,
@@ -22,156 +15,78 @@ import {
   toGridArea,
 } from '../../layout/page-grid/page-grid';
 import { DrumCard } from '../../shared/drum-card/drum-card';
-import { ToastService } from '../../shared/toast/toast.service';
+import { DotField } from '../home/dot-field/dot-field';
 import { HOME_STACK_MAX } from '../home/home-layout';
-import { CollectionRow } from './collection-row/collection-row';
+import { CollectionCard } from './collection-card/collection-card';
 import { CollectionCreateService } from './collection-create.service';
+import { CollectionViewService } from './collection-view.service';
 import { CollectionsService } from './collections.service';
+import { filterByName } from './collection-filter';
 import {
-  LIST_COLS,
+  LEFT_COLS,
   PAGE_START_COL,
-  PAGE_START_ROW,
+  PANE_GAP,
   collectionsLayout,
 } from './collections-layout';
 
 /**
- * Collections, as one page: the list on the left, the films of the open one on the right.
+ * The collections page: a headline block, and a field of collections beside it.
  *
- * The same shape as the details page, and for the same reason — moving between collections is
- * comparing them, and a page per collection makes that a series of loads with the list gone from
- * view each time. Which one is open is held in memory rather than the URL: there is one page here
- * now, and a second address for a pane's contents would promise a page that no longer exists.
+ * Built like the home page rather than like a list. The blurb and the filter hold the left of the
+ * lattice while the collections scatter across the right, staggered so the row of equal squares
+ * reads as a field rather than a table.
  *
- * Layout follows the rest of the app. On desktop the panes sit in a row and the page declares its
- * own width so the track can scroll to the far end; below the stacking breakpoint the list and the
- * films become two views, one at a time, since neither is usable at half a phone's width.
+ * Opening one is a pop-up, not a page. The value of this arrangement is having every collection in
+ * view at once; sending someone away to look inside one and back to look inside the next would turn
+ * browsing into a series of loads.
  */
 @Component({
   selector: 'nv-collections',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageGrid, DrumCard, RouterLink, CollectionRow],
+  imports: [PageGrid, DrumCard, DotField, CollectionCard],
   templateUrl: './collections.html',
   styleUrl: './collections.scss',
 })
 export class Collections {
   protected readonly i18n = inject(I18nService);
-  private readonly tmdb = inject(TmdbService);
   private readonly collections = inject(CollectionsService);
-  private readonly dialog = inject(CollectionCreateService);
-  private readonly toast = inject(ToastService);
+  private readonly form = inject(CollectionCreateService);
+  private readonly view = inject(CollectionViewService);
 
   protected readonly list = this.collections.recent;
 
   protected readonly isEmpty = this.collections.isEmpty;
 
-  /** Which collection the visitor picked, if it is still there. */
-  private readonly chosen = signal<string | null>(null);
+  /** What has been typed into the filter. */
+  protected readonly query = signal('');
 
-  /**
-   * The collection on show.
-   *
-   * Falls back to the first on desktop, where an empty right pane beside a full list would be a
-   * pane doing nothing. Stacked, it stays null until something is picked: that is the list view,
-   * and picking one is what moves to the other.
-   */
-  protected readonly current = computed<UserCollection | null>(() => {
-    const list = this.list();
-    const picked = list.find((item) => item.id === this.chosen());
-
-    if (picked) return picked;
-    return this.stacked() ? null : (list[0] ?? null);
-  });
-
-  /** Newest first: the last thing added is the thing most likely being looked for. */
-  protected readonly films = computed(() =>
-    [...(this.current()?.items ?? [])].reverse(),
+  /** The cards on show: everything, or what matches the filter. */
+  protected readonly shown = computed(() =>
+    filterByName(this.list(), this.query()),
   );
 
-  protected readonly noFilms = computed(() => this.films().length === 0);
-
-  /** Stacked, the films replace the list rather than sitting beside it. */
-  protected readonly showingFilms = computed(
-    () => !this.stacked() || this.chosen() !== null,
+  protected readonly noMatch = computed(
+    () => !this.isEmpty() && this.shown().length === 0,
   );
 
-  constructor() {
-    /*
-     * Follow whatever was just created.
-     *
-     * A collection made from the dialog is the one to be looking at — including the empty one made
-     * from the add panel, which is otherwise created out of sight.
-     */
-    effect(() => {
-      const id = this.collections.lastCreated();
-      if (id) untracked(() => this.chosen.set(id));
-    });
+  protected onQuery(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
   }
 
-  protected choose(collection: UserCollection): void {
-    this.chosen.set(collection.id);
-  }
-
-  /** Stacked only: back from a collection's films to the list. */
-  protected back(): void {
-    this.chosen.set(null);
+  protected clearQuery(): void {
+    this.query.set('');
   }
 
   /** A dialog rather than a page: two fields don't warrant leaving this one. */
   protected createNew(): void {
-    this.dialog.openDialog();
+    this.form.openDialog();
   }
 
-  protected edit(collection: UserCollection): void {
-    this.dialog.openEdit(collection);
+  protected openCollection(collection: UserCollection): void {
+    this.view.open(collection.id);
   }
 
-  /**
-   * Deletes outright, and offers it back.
-   *
-   * No confirmation step: asking before every deletion taxes the many deliberate ones to guard
-   * against the rare accident, and an undo covers the accident without costing anything. The
-   * collection rides along in the closure, so nothing has to be kept anywhere in the meantime.
-   */
-  protected remove(collection: UserCollection): void {
-    const removed = this.collections.remove(collection.id);
-    if (!removed) return;
-
-    if (this.chosen() === removed.id) this.chosen.set(null);
-
-    this.toast.show(this.i18n.t('collections.deleted', { name: removed.name }), {
-      label: this.i18n.t('common.undo'),
-      run: () => {
-        this.collections.restore(removed);
-        this.chosen.set(removed.id);
-      },
-    });
-  }
-
-  protected removeFilm(film: SavedMovie): void {
-    const collection = this.current();
-    if (collection) this.collections.removeFrom(collection.id, film.id);
-  }
-
-  // ------------------------------------------------------------------- a film
-
-  protected poster(film: SavedMovie): string | null {
-    return this.tmdb.imageUrl(film.posterPath, 'w342');
-  }
-
-  protected year(film: SavedMovie): string | null {
-    return film.releaseDate ? film.releaseDate.slice(0, 4) : null;
-  }
-
-  protected score(film: SavedMovie): string | null {
-    return film.voteAverage ? film.voteAverage.toFixed(1) : null;
-  }
-
-  /** Named-outlet link, so the pop-up is a URL rather than component state. */
-  protected modalLink(film: SavedMovie) {
-    return [{ outlets: { modal: ['movie', film.id] } }];
-  }
-
-  // ------------------------------------------------------------------- layout
+  // -------------------------------------------------------------------- layout
 
   private readonly viewport = signal(readViewport());
 
@@ -179,7 +94,7 @@ export class Collections {
    * Whole drum rows, floored.
    *
    * The pad field rounds up so it covers a partial row; content cannot, or it is placed past the
-   * bottom edge and the last row of tiles is cut.
+   * bottom edge and the last row of cards is cut.
    */
   private readonly rows = computed(() =>
     Math.max(1, Math.floor(this.viewport().height / readCellSize())),
@@ -190,27 +105,64 @@ export class Collections {
   );
 
   private readonly layout = computed(() =>
-    collectionsLayout(this.rows(), this.films().length),
+    collectionsLayout(this.rows(), this.shown().length),
   );
 
-  protected readonly cardRows = computed(() => this.layout().rows);
-
-  protected readonly listCols = LIST_COLS;
+  /** How far the card at this position drops, in drums. */
+  protected drop(index: number): number {
+    return this.layout().drops[index] ?? 0;
+  }
 
   protected readonly minColumns = computed(() =>
     this.stacked() ? 18 : this.layout().totalCols,
   );
 
-  protected readonly area = computed(() =>
-    this.stacked()
-      ? null
-      : toGridArea({
-          row: PAGE_START_ROW,
-          rowEnd: Math.max(PAGE_START_ROW + 1, this.rows() + 1),
-          col: PAGE_START_COL,
-          colEnd: this.layout().totalCols,
-        }),
-  );
+  /** The headline block, five drums of it, centred with the filter as one composition. */
+  protected readonly captionArea = computed(() => {
+    if (this.stacked()) return null;
+
+    const { captionRow, captionRowEnd } = this.layout();
+
+    return toGridArea({
+      row: captionRow,
+      rowEnd: captionRowEnd,
+      col: PAGE_START_COL,
+      colEnd: PAGE_START_COL + LEFT_COLS,
+    });
+  });
+
+  /**
+   * The filter, its own block so it begins on a seam.
+   *
+   * Six drums wide rather than the caption's nine: it holds a few words, and a field the width of
+   * the headline reads as a search bar for the page rather than a way to narrow a short list.
+   */
+  protected readonly findArea = computed(() => {
+    if (this.stacked()) return null;
+
+    const { findRow, findRowEnd } = this.layout();
+
+    return toGridArea({
+      row: findRow,
+      rowEnd: findRowEnd,
+      col: PAGE_START_COL,
+      colEnd: PAGE_START_COL + 6,
+    });
+  });
+
+  /** The card field, exactly as tall as the arrangement and centred by the layout. */
+  protected readonly fieldArea = computed(() => {
+    if (this.stacked()) return null;
+
+    const { bandRow, bandRowEnd, totalCols } = this.layout();
+
+    return toGridArea({
+      row: bandRow,
+      rowEnd: bandRowEnd,
+      col: PAGE_START_COL + LEFT_COLS + PANE_GAP,
+      colEnd: totalCols,
+    });
+  });
 
   private resizeFrame: number | null = null;
 

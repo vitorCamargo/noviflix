@@ -1,116 +1,269 @@
 @use '../../../styles/mixins' as *;
 
-/* Tile footprint, matching the result cards so every grid sits on the same lattice. */
-$tile-cols: 3;
-$tile-rows: 5;
+/* Card footprint, in drums. Kept in step with collections-layout.ts, which sizes the page. */
+$card-cols: 5;
+$card-rows: 5;
+$create-cols: 2;
+$create-rows: 2;
 
 :host {
   display: block;
   block-size: 100%;
 }
 
+// ---------------------------------------------------------------- the headline
+
 /*
- * Positioned, because the pad layer is pinned to the viewport when stacked and pinning makes it
- * paint after ordinary in-flow blocks. Without this the page sits behind the drums.
+ * The headline block: five drums, with the text settled at the foot of them.
+ *
+ * Bottom-aligned rather than centred so the last line sits directly above the filter whatever the
+ * type does at that width — the two read as one block, and the filter's own drum is fixed.
+ *
+ * `isolation` makes this a stacking context so the dots can sit behind the text while the block as a
+ * whole still paints above the pad field. Without it a negative z-index would escape and land under
+ * the pads, hiding the dots. The filter is deliberately *not* in here: its card lights the lattice
+ * from a negative layer, which this context would trap.
  */
 .cl {
   position: relative;
+  isolation: isolate;
   display: flex;
-  gap: var(--nv-grid-cell);
-  min-block-size: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--nv-space-4);
+  padding-block-end: var(--nv-space-4);
+  padding-inline-end: var(--nv-space-5);
   min-inline-size: 0;
 }
 
-// -------------------------------------------------------------------- the list
-
-.cl__list {
-  display: flex;
-  flex-direction: column;
-  inline-size: calc(var(--nv-grid-cell) * var(--cl-list-cols, 6));
-  flex: none;
-  min-block-size: 0;
+/*
+ * A 4x5 matrix to the left of the headline, echoing the drum lattice. Sized by its own content, so
+ * only the anchor point is set here — pinning both axes would stretch the pitch.
+ */
+.cl__dots {
+  position: absolute;
+  /* Exactly the home page's offset: a drum and a half above the block, bleeding off its left. */
+  inset-block-start: calc(4% - var(--nv-grid-cell) * 1.5);
+  /* Measured from this block's right edge, so a larger value moves the matrix left. */
+  inset-inline-end: calc(100% - var(--nv-grid-cell) * 1.5);
+  z-index: 0;
 }
 
-/* Two whole drums, so the pane below begins on a seam — and so both panes' headings align. */
-.cl__head {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  block-size: calc(var(--nv-grid-cell) * 2);
-  flex: none;
+.cl__kicker,
+.cl__title,
+.cl__body {
+  position: relative;
+  z-index: 1;
+}
+
+.cl__kicker {
+  @include kicker;
+
+  margin: 0;
+  color: var(--nv-accent);
 }
 
 .cl__title {
-  margin: 0;
-  font-size: clamp(1.5rem, 2vw, 1.9rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.06;
-}
-
-.cl__sub {
-  margin: 0;
-  color: var(--nv-text-muted);
-  font-size: var(--nv-text-xs);
-  @include clamp-lines(2);
-}
-
-/*
- * Scrolls on its own, so a long list never pushes the films off the page. The pane is a whole
- * number of drums tall and every row is two, so what scrolls still lands on seams.
- */
-.cl__rows {
-  @include slim-scrollbar;
-
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-block-size: 0;
-  /* `hidden` on the inline axis deliberately: `auto` on one axis computes the other from
-     `visible` to `auto`, which would add a scrollbar for a row that only just fits. */
-  overflow: hidden auto;
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.cl__accent {
+  font-style: normal;
+  color: var(--nv-accent);
+}
+
+.cl__body {
+  margin: 0;
+  max-inline-size: 34ch;
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-base);
+  line-height: 1.6;
 }
 
 /*
- * The create row. Dashed, so it reads as a slot to fill rather than a collection that happens to
- * be empty, and the same two drums tall as the rows under it.
+ * The filter, in a block of its own.
+ *
+ * The same field as the home page's search, down to the numbers: a drum-tall card with its border
+ * inside that height, an 18px glyph and the input at the base size. Not the same component, though —
+ * that one carries the spec's validation, its debounce, a spinner and an error line, none of which
+ * apply to narrowing a list of seven names. What the two share is the shell.
+ *
+ * Positioned so it paints above the pad layer, but with no z-index and no isolation: either would
+ * make it a stacking context and trap the card's glow above the pads instead of under them.
  */
-.cl__new {
+.cq {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.cq__row {
   display: flex;
   align-items: center;
   gap: var(--nv-space-3);
-  inline-size: 100%;
-  block-size: calc(var(--nv-grid-cell) * 2);
+  block-size: 100%;
+  padding-inline: var(--nv-space-5);
+  border: 1px solid var(--nv-border);
+  border-radius: inherit;
+  transition: border-color var(--nv-fast) var(--nv-ease);
+
+  &:focus-within {
+    border-color: var(--nv-accent);
+
+    .cq__icon {
+      color: var(--nv-accent);
+    }
+  }
+}
+
+.cq__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 18px;
+  block-size: 18px;
   flex: none;
-  padding-inline: var(--nv-space-3);
+  color: var(--nv-text-faint);
+  transition: color var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+  }
+}
+
+.cq__input {
+  inline-size: 100%;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--nv-text);
+  font: inherit;
+  font-size: var(--nv-text-base);
+
+  &::placeholder {
+    color: var(--nv-text-faint);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  /* The clear control is ours, so the one the browser adds would be a second of the same. */
+  &::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+.cq__clear {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 12px;
+    block-size: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  &:hover {
+    color: var(--nv-text);
+  }
+}
+
+// -------------------------------------------------------------------- the field
+
+/*
+ * A row of squares, every other one dropped by a whole number of drums.
+ *
+ * Positioned, because the pad layer is pinned when stacked and pinning makes it paint after
+ * ordinary in-flow blocks — without this the field would sit behind the drums.
+ *
+ * Items are aligned to the top of the band rather than centred in it, because the band is exactly
+ * as tall as a card plus the stagger: the offset cards fill the rest of it, and centring would
+ * split the difference and put both halves off the lattice.
+ */
+.cf {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nv-grid-cell);
+  min-inline-size: 0;
+}
+
+/*
+ * The stagger arrives as a per-card custom property and is spent as a margin.
+ *
+ * A margin, deliberately, not `translate`: transforms create a stacking context, and DrumCard's
+ * corner glow works by escaping to the page grid on a negative z-index to sit *under* the pads.
+ * Trapped in the card's own context it painted on top of them instead — a halo round the card
+ * rather than light leaking through the seams, which is exactly how the dropped cards looked.
+ */
+.cf__card {
+  inline-size: calc(var(--nv-grid-cell) * #{$card-cols});
+  block-size: calc(var(--nv-grid-cell) * #{$card-rows});
+  margin-block-start: calc(var(--nv-grid-cell) * var(--cf-drop, 0));
+  flex: none;
+}
+
+.cf__new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nv-space-2);
+  inline-size: calc(var(--nv-grid-cell) * #{$create-cols});
+  block-size: calc(var(--nv-grid-cell) * #{$create-rows});
+  flex: none;
+  /* Its foot level with the first card's, where the eye lands after reading the headline. The first
+     card never drops, so this is a constant rather than something the wave has to be asked about. */
+  margin-block-start: calc(var(--nv-grid-cell) * #{$card-rows - $create-rows});
+  padding: var(--nv-space-2);
   border: 1px dashed var(--nv-accent-line);
-  border-radius: var(--nv-radius);
-  background: var(--nv-accent-soft);
+  border-radius: var(--nv-grid-radius);
+  background: color-mix(in srgb, var(--nv-accent) 8%, var(--nv-panel));
   color: var(--nv-accent);
-  text-align: start;
   transition:
     border-color var(--nv-fast) var(--nv-ease),
     background var(--nv-fast) var(--nv-ease);
 
   &:hover {
     border-color: var(--nv-accent);
-    background: var(--nv-surface-2);
+    background: color-mix(in srgb, var(--nv-accent) 16%, var(--nv-panel));
   }
 }
 
-.cl__new-icon {
+.cf__new-icon {
   display: grid;
   place-items: center;
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: 34px;
+  block-size: 34px;
   flex: none;
   border-radius: 50%;
   background: var(--nv-accent);
   color: var(--nv-accent-ink);
 
   svg {
-    inline-size: 16px;
-    block-size: 16px;
+    inline-size: 18px;
+    block-size: 18px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2.4;
@@ -118,98 +271,67 @@ $tile-rows: 5;
   }
 }
 
-.cl__new-text {
-  font-size: var(--nv-text-sm);
+/* Two drums wide leaves room for two short lines, which is what the label needs. */
+.cf__new-text {
+  font-size: var(--nv-text-xs);
   font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
 }
 
-// ------------------------------------------------------------------- the films
-
-.cl__films {
+/*
+ * Nothing matched.
+ *
+ * In the field, where the cards would have been, rather than under the input that caused it: a
+ * message below a drum-tall field pushes it off its seam every time it appears. Sized like the
+ * search grid's own empty state — six drums wide and a card tall, so it takes a card's place rather
+ * than floating in the gap.
+ */
+.cf__state {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-inline-size: 0;
-  min-block-size: 0;
-}
-
-/* Stacked only: there, the films replaced the list rather than joining it. */
-.cl__back {
-  display: none;
-}
-
-.cl__films-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--nv-space-4);
-  block-size: calc(var(--nv-grid-cell) * 2);
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--nv-space-3);
+  inline-size: calc(var(--nv-grid-cell) * 6);
+  block-size: calc(var(--nv-grid-cell) * #{$card-rows});
   flex: none;
-  min-inline-size: 0;
+  padding-inline-end: var(--nv-space-5);
 }
 
-.cl__films-text {
-  min-inline-size: 0;
+.cf__state-icon {
+  inline-size: 30px;
+  block-size: 30px;
+  fill: none;
+  stroke: var(--nv-text-faint);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.cl__films-title {
+.cf__state-title {
   margin: 0;
-  font-size: clamp(1.4rem, 2vw, 1.8rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  @include clamp-lines(1);
+  font-size: var(--nv-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.cl__films-meta {
-  display: flex;
-  align-items: baseline;
-  gap: var(--nv-space-2);
+.cf__state-body {
   margin: 0;
-  min-inline-size: 0;
   color: var(--nv-text-muted);
   font-size: var(--nv-text-sm);
+  line-height: 1.6;
 }
 
-.cl__dot {
-  color: var(--nv-text-faint);
-}
-
-.cl__description {
-  @include clamp-lines(1);
-}
-
-.cl__tools {
-  display: flex;
-  align-items: center;
-  gap: var(--nv-space-2);
-  flex: none;
-}
-
-.cl__tool {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--nv-space-2);
+.cf__state-clear {
   padding: var(--nv-space-2) var(--nv-space-4);
   border: 1px solid var(--nv-border);
   border-radius: var(--nv-radius-pill);
-  background: var(--nv-panel);
-  color: var(--nv-text-muted);
+  background: transparent;
+  color: var(--nv-text);
   font-size: var(--nv-text-xs);
   font-weight: 700;
-  transition:
-    border-color var(--nv-fast) var(--nv-ease),
-    color var(--nv-fast) var(--nv-ease);
-
-  svg {
-    inline-size: 15px;
-    block-size: 15px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
 
   &:hover {
     border-color: var(--nv-accent);
@@ -217,271 +339,84 @@ $tile-rows: 5;
   }
 }
 
-/* Red only on hover: the two controls sit side by side, and a permanently red one would pull the
-   eye towards deleting when the common act is editing. */
-.cl__tool--danger:hover {
-  border-color: var(--nv-danger);
-  color: var(--nv-danger);
-}
-
-.cl__state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--nv-space-2);
-  justify-content: center;
-  max-inline-size: 42ch;
-  flex: 1;
-}
-
-.cl__state-body {
-  margin: 0;
-  color: var(--nv-text-muted);
-  font-size: var(--nv-text-sm);
-  line-height: 1.6;
-}
-
-/*
- * Column-major on desktop, in the direction the page moves. Row count arrives as a custom property
- * rather than from auto-fill, because the page needs the same number to size itself — two
- * independent answers to one question would eventually differ.
- */
-.cl__grid {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(var(--cl-rows, 2), calc(var(--nv-grid-cell) * #{$tile-rows}));
-  grid-auto-columns: calc(var(--nv-grid-cell) * #{$tile-cols});
-  gap: var(--nv-grid-cell);
-  align-content: center;
-  flex: 1;
-  min-block-size: 0;
-}
-
-.cl__tile {
-  min-inline-size: 0;
-  min-block-size: 0;
-}
-
-// -------------------------------------------------------------------- one film
-
-.cm {
-  display: flex;
-  flex-direction: column;
-  block-size: 100%;
-  color: inherit;
-}
-
-.cm__art {
-  position: relative;
-  display: block;
-  flex: 1;
-  min-block-size: 0;
-  overflow: hidden;
-
-  img {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-  }
-}
-
-.cm__fallback {
-  display: grid;
-  place-items: center;
-  block-size: 100%;
-  background: var(--nv-surface-2);
-  color: var(--nv-text-faint);
-
-  svg {
-    inline-size: 30px;
-    block-size: 30px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.4;
-  }
-}
-
-/*
- * Shown outright rather than on hover, unlike the search card.
- *
- * These are films the visitor chose to keep, so the score is a reason they are here rather than a
- * detail to go looking for — and there is no hover at all on touch.
- */
-.cm__score {
-  @include score-pill;
-
-  position: absolute;
-  inset-block-start: var(--nv-space-3);
-  inset-inline-start: var(--nv-space-3);
-}
-
-.cm__star {
-  inline-size: 12px;
-  block-size: 12px;
-  fill: var(--nv-accent);
-}
-
-.cm__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  justify-content: center;
-  block-size: var(--nv-grid-cell);
-  flex: none;
-  padding-inline: var(--nv-space-4);
-  /* Room for the remove control, which sits over this strip. */
-  padding-inline-end: calc(var(--nv-space-4) + 26px);
-}
-
-.cm__title {
-  font-size: var(--nv-text-sm);
-  font-weight: 700;
-  line-height: 1.25;
-  @include clamp-lines(2);
-}
-
-.cm__year {
-  color: var(--nv-text-faint);
-  font-size: var(--nv-text-xs);
-  font-variant-numeric: tabular-nums;
-}
-
-/*
- * Removal, over the meta strip. Always visible: with the collection's own controls up in the
- * heading, this is the only per-film action here, and hiding it behind hover would make it both
- * hard to find and unreachable on touch.
- */
-.cm__remove {
-  position: absolute;
-  inset-block-end: calc((var(--nv-grid-cell) - 26px) / 2);
-  inset-inline-end: var(--nv-space-3);
-  display: grid;
-  place-items: center;
-  inline-size: 26px;
-  block-size: 26px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--nv-surface-2);
-  color: var(--nv-text-muted);
-  transition:
-    background var(--nv-fast) var(--nv-ease),
-    color var(--nv-fast) var(--nv-ease);
-
-  svg {
-    inline-size: 13px;
-    block-size: 13px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-  }
-
-  &:hover,
-  &:focus-visible {
-    background: var(--nv-danger);
-    color: #fff;
-  }
-}
-
 // --------------------------------------------------------------------- stacked
 
 @media (max-width: 900px) {
-  /* Spans both columns of the stacked grid; otherwise the page renders at half width. */
-  .cl {
+  /* Both blocks span the two columns PageGrid pairs at this width; otherwise each renders at half
+     the viewport. */
+  .cl,
+  .cq,
+  .cf {
     grid-column: 1 / -1;
-    flex-direction: column;
-    gap: var(--nv-space-5);
-    padding-block: var(--nv-space-5) var(--nv-space-7);
   }
 
-  /*
-   * One pane at a time. Half a phone's width is too little for either — a column of names beside a
-   * grid of posters would leave both unreadable — so picking a collection replaces the list, and
-   * the back control returns to it.
-   */
-  .cl.is-films .cl__list,
-  .cl:not(.is-films) .cl__films {
+  .cl {
+    /* No top padding: the header already sits a row above, and adding more leaves a band of nothing
+       between the nav and the first thing on the page. */
+    padding-block: 0;
+    padding-inline-end: 0;
+  }
+
+  .cl__dots {
     display: none;
   }
 
-  .cl__list {
-    inline-size: auto;
-  }
-
-  .cl__head {
-    block-size: auto;
-    gap: var(--nv-space-2);
-    padding-block-end: var(--nv-space-5);
-  }
-
-  .cl__films-head {
-    block-size: auto;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--nv-space-3);
-    padding-block-end: var(--nv-space-5);
-  }
-
-  .cl__films-meta {
-    flex-wrap: wrap;
-  }
-
-  .cl__rows {
-    flex: none;
-    overflow: visible;
-  }
-
-  /* One whole drum, so the heading below it begins on a seam. */
-  .cl__back {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--nv-space-2);
-    align-self: flex-start;
+  /* Still a drum tall — the field's proportions are not what the narrow layout changes. */
+  .cq {
     block-size: var(--nv-grid-cell);
-    flex: none;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--nv-text-muted);
-    font-size: var(--nv-text-sm);
-    font-weight: 600;
-
-    svg {
-      inline-size: 16px;
-      block-size: 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    &:hover {
-      color: var(--nv-accent);
-    }
+    margin-block: var(--nv-space-4) var(--nv-space-5);
   }
 
-  .cl__grid {
-    grid-auto-flow: row;
-    grid-template-rows: none;
+  /*
+   * The stagger goes with the row.
+   *
+   * It reads as a scatter across a lattice; stacked, there is no lattice to scatter over and it
+   * would just be cards that don't line up. Two to a row, as every other grid does here.
+   */
+  .cf {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: auto;
     gap: var(--nv-space-4);
-    flex: none;
+    align-items: stretch;
+    padding-block-end: var(--nv-space-7);
   }
 
-  .cl__tile {
-    aspect-ratio: #{$tile-cols} / #{$tile-rows};
+  .cf__card {
+    inline-size: auto;
+    block-size: auto;
+    aspect-ratio: 1;
   }
 
-  .cl__state {
-    flex: none;
+  /* The wave is a scatter across a lattice; stacked there is no lattice to scatter over, so the
+     per-card drop is dropped. */
+  .cf__card {
+    margin-block-start: 0;
+  }
+
+  .cf__state {
+    inline-size: auto;
+    block-size: auto;
     padding-block: var(--nv-space-6);
+    padding-inline-end: 0;
+    grid-column: 1 / -1;
+  }
+
+  .cf__new {
+    inline-size: auto;
+    block-size: auto;
+    aspect-ratio: 2;
+    /* The three drums that put its foot level with the first card belong to the row layout. Stacked
+       there is no row, and they were left as a band of nothing under the filter. */
+    margin-block-start: 0;
+    align-self: stretch;
+    /* Spans the row, so it reads as the action above the field rather than a half-sized card in
+       it. */
+    grid-column: 1 / -1;
   }
 }
 
 @media (min-width: 560px) and (max-width: 900px) {
-  .cl__grid {
+  .cf {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--nv-space-5);
   }

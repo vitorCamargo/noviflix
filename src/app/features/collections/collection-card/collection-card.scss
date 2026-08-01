@@ -1,0 +1,158 @@
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+.cc {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: var(--nv-surface-2);
+  color: inherit;
+  overflow: hidden;
+  text-align: start;
+}
+
+/* Two by two, collapsing so one cover fills and three stay balanced. */
+.cc__mosaic {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1px;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    /* Settles as the mosaic is read, rather than four full-strength posters competing with the
+       name across them. */
+    transition: scale var(--nv-normal) var(--nv-ease);
+  }
+}
+
+.cc:hover .cc__mosaic img {
+  scale: 1.04;
+}
+
+.cc__mosaic[data-count='1'] img {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
+/* The first takes the whole left column, the second the whole right. */
+.cc__mosaic[data-count='2'] img {
+  grid-row: 1 / -1;
+}
+
+/* The first spans the top, the other two share the bottom. */
+.cc__mosaic[data-count='3'] img:first-child {
+  grid-column: 1 / -1;
+}
+
+.cc__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--nv-text-faint);
+
+  svg {
+    inline-size: 38px;
+    block-size: 38px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.3;
+  }
+}
+
+/* Bottom half only: enough to carry the name, not enough to dim the covers. */
+.cc__scrim {
+  position: absolute;
+  inset-block: 40% 0;
+  inset-inline: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, #000 78%, transparent)
+  );
+}
+
+.cc__foot {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--nv-space-3);
+  padding: var(--nv-space-4);
+}
+
+.cc__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-inline-size: 0;
+}
+
+.cc__rank {
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc__name {
+  font-size: var(--nv-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  @include clamp-lines(2);
+}
+
+.cc__count {
+  color: var(--nv-text-muted);
+  font-size: var(--nv-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The accent disc from the reference, filled on hover rather than always lit. */
+.cc__go {
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  flex: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, #000 55%, transparent);
+  color: var(--nv-text);
+  transition:
+    background var(--nv-fast) var(--nv-ease),
+    color var(--nv-fast) var(--nv-ease),
+    translate var(--nv-fast) var(--nv-ease);
+
+  svg {
+    inline-size: 16px;
+    block-size: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.cc:hover .cc__go {
+  background: var(--nv-accent);
+  color: var(--nv-accent-ink);
+  translate: 2px 0;
+}

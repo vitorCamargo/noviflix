@@ -7,11 +7,13 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, switchMap } from 'rxjs';
+import { AppReadyService } from '../../core/app-ready.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { TmdbService } from '../../core/tmdb/tmdb.service';
 import type { MovieDetails, MovieSummary } from '../../core/models/tmdb.models';
@@ -75,6 +77,7 @@ const GENRE_LIMIT = 3;
 })
 export class Home implements OnDestroy {
   private readonly tmdb = inject(TmdbService);
+  private readonly appReady = inject(AppReadyService);
   private readonly search = inject(SearchStore);
   protected readonly i18n = inject(I18nService);
 
@@ -385,6 +388,25 @@ export class Home implements OnDestroy {
   private lastFrameAt = 0;
 
   constructor() {
+    /*
+     * Tell the first-load screen it can go.
+     *
+     * This page is the one thing in the app with something worth waiting for — a batch of films from
+     * TMDB — so it is the one that reports. Once, on the first batch: the screen only exists at the
+     * start, and later refetches have nothing to announce.
+     *
+     * Nothing is reported when the request fails, because an empty batch is also what the signal
+     * starts as and the two cannot be told apart here. The screen carries its own cap for that: it
+     * finishes on its own rather than waiting to be told by a page that never will.
+     */
+    effect(() => {
+      const arrived = this.nowPlaying();
+
+      untracked(() => {
+        if (arrived.length) this.appReady.markReady();
+      });
+    });
+
     // Restart the countdown whenever the movie changes, however it changed —
     // clicking an avatar shouldn't leave a half-elapsed ring behind.
     effect(() => {

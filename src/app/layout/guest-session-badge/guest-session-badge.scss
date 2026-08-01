@@ -12,6 +12,19 @@
   display: block;
 }
 
+/*
+ * Smaller on a phone, where the ring shares one drum of bar with everything else.
+ *
+ * The row cannot shrink — every item in it is flex: none — so its width is the sum of its parts,
+ * and each part has to earn its size. A little under the desktop diameter still reads as a
+ * progress ring at arm's length.
+ */
+@media (max-width: 560px) {
+  :host {
+    --nv-popover-icon-size: 30px;
+  }
+}
+
 .gs__ring {
   display: block;
   /* Rotated so the arc starts at twelve o'clock rather than three. */

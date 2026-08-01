@@ -32,6 +32,18 @@ body.nv-modal-open {
   overflow: hidden;
 }
 
+/*
+ * While the first-load screen is up.
+ *
+ * The page behind it is already built, so a wheel or a swipe over the screen would scroll something
+ * nobody can see and leave it somewhere unexpected once the screen clears.
+ */
+html.nv-booting,
+html.nv-booting body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 @media (pointer: fine) and (min-width: 576px) {
   body,
   body * {

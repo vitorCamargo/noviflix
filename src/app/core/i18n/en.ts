@@ -1,5 +1,6 @@
 export const en = {
   'app.name': 'Noviflix',
+  'boot.loading': 'Starting Noviflix',
   'app.tagline': 'Discover how you watch.',
 
   'nav.home': 'Home',
@@ -100,15 +101,19 @@ export const en = {
   'page.movieModal.title': 'Movie details (pop-up)',
   'page.movieModal.body': 'Same details, overlaid on the page behind.',
 
-  'page.collections.title': 'My collections',
 
   // Collections
+  // Split so the accent word can be styled on its own, and so translators can reorder it.
+  'collections.headlineLead': 'All your collections,',
+  'collections.headlineAccent': 'saved.',
+  'collections.headlineBody':
+    'Kept in this browser rather than on a server, so they are yours alone. Group the films you mean to watch, or the ones you already love.',
+  'collections.none': 'Nothing saved yet',
   'collections.count': '{count} films',
+  // The page counts collections; a collection counts films. Two units, so two strings.
+  'collections.total': '{count} collections',
   'collections.open': 'Open {name}',
   'collections.new': 'New collection',
-  'collections.newSub': 'Group films you want to keep together.',
-  'collections.emptyBody': 'Nothing saved yet. Make a collection and start filling it.',
-  'collections.backToList': 'Collections',
   'collections.createTitle': 'New collection',
   'collections.createLead':
     'Give it a name and say what belongs in it. Both are required.',
@@ -120,12 +125,16 @@ export const en = {
   'collections.cancel': 'Cancel',
   'collections.errorRequired': 'This is required.',
   'collections.errorTooLong': 'Keep this under {max} characters.',
+  'collections.emptyTitle': 'This collection is empty',
   'collections.emptyDetail':
     'Nothing here yet. Search for films and add them from the results.',
+  'collections.noDescription': 'No description was written for this one.',
+  'collections.tabMovies': 'Movies',
+  'collections.createdAt': 'Created',
+  'collections.updatedAt': 'Last changed',
   'collections.removeMovie': 'Remove {title} from this collection',
 
   // Editing and deleting one, from the heading above its films
-  'collections.pickOne': 'Pick a collection to see what is in it.',
   'collections.edit': 'Edit',
   // The visible label is one word, because it sits beside the collection it acts on. Screen
   // readers get the name, having arrived at the button without that context.
@@ -146,7 +155,12 @@ export const en = {
   'collections.pickerLead': 'Choose where these {count} films should go.',
   'collections.pickerEmpty': 'No collections yet. Make one and they will land there.',
   'collections.find': 'Find a collection',
+  // The short one is for the add panel's list, where the row it replaces is a single line.
   'collections.noMatch': 'No collection matches that.',
+  'collections.noMatchTitle': 'Nothing called “{query}”',
+  'collections.noMatchBody':
+    'Check the spelling, or try part of a name — the filter matches anywhere in it, not just the start.',
+  'collections.showAll': 'Show all {count}',
   'collections.createWithFilms':
     'Name it, and the {count} films you picked will go straight in.',
   // Quick-create has no form to ask for these, so it invents them. Numbered past what exists, so

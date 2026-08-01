@@ -160,4 +160,11 @@
   --nv-z-scroll-overlay: 800;
   /* Above everything — the pointer must never be occluded. */
   --nv-z-cursor: 900;
+  /*
+   * The first-load screen, over every other layer but the pointer's.
+   *
+   * Under the cursor deliberately: the custom cursor replaces the native one, so covering it would
+   * leave the mouse invisible for the length of the introduction.
+   */
+  --nv-z-boot: 850;
 }

@@ -43,22 +43,10 @@ export class CollectionsService {
     return this.store().find((collection) => collection.id === id) ?? null;
   }
 
-  /**
-   * The most recently created collection's id.
-   *
-   * The collections page follows it, so a collection made from the dialog is the one on screen
-   * afterwards. The dialog lives at the app root and knows nothing about that page, so the fact
-   * travels through the store they already share rather than through a wire between them.
-   */
-  private readonly created = signal<string | null>(null);
-
-  readonly lastCreated = this.created.asReadonly();
-
   /** Creates a collection and returns it, so the caller can show it. */
   create(name: string, description: string): UserCollection {
     const collection = createCollection(name, description);
     this.update([...this.store(), collection]);
-    this.created.set(collection.id);
     return collection;
   }
 
@@ -84,7 +72,6 @@ export class CollectionsService {
     const filled = addMovies(collection, movies);
 
     this.update([...this.store(), filled]);
-    this.created.set(filled.id);
     return { collection: filled, added: filled.items.length };
   }
 

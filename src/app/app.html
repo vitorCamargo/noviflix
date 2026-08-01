@@ -35,6 +35,12 @@
 -->
 <nv-selection-bar />
 
+<!--
+  A collection's films. Here rather than on the collections page so it can layer under the movie
+  pop-up above and over the page behind, which a child of the page could not.
+-->
+<nv-collection-dialog />
+
 <nv-collection-picker />
 <nv-collection-create-dialog />
 <nv-toast />
@@ -42,3 +48,9 @@
 <nv-scroll-hint />
 <nv-scroll-top />
 <nv-cursor />
+
+<!--
+  The first-load screen, last in the file and above everything but the pointer. It covers a page that
+  is already being built rather than standing in for one, which is why it can leave on a fade.
+-->
+<nv-boot />

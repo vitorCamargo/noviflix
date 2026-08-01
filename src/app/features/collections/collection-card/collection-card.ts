@@ -9,48 +9,50 @@ import {
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TmdbService } from '../../../core/tmdb/tmdb.service';
 import type { UserCollection } from '../../../core/models/user-collection.models';
+import { DrumCard } from '../../../shared/drum-card/drum-card';
 
-/** Posters in the thumbnail. Four fills a tidy square without becoming a contact sheet. */
+/** Covers shown in the mosaic. Four fills a tidy square without becoming a contact sheet. */
 const MOSAIC_SIZE = 4;
 
 /**
- * One collection, as a row in the list beside the films.
+ * One collection, as a square of covers on the lattice.
  *
- * A row rather than the tile it used to be: the list is now a column of choices next to what the
- * choice reveals, so each entry needs a name and a size more than it needs a poster the size of a
- * film. The thumbnail stays because a collection is recognised by what is in it.
+ * Shows what is inside rather than a count alone: a collection is recognised by its films, and four
+ * posters say more than "12 films" does. The name sits over the foot of the mosaic, so the covers
+ * keep the whole square.
  */
 @Component({
-  selector: 'nv-collection-row',
+  selector: 'nv-collection-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './collection-row.html',
-  styleUrl: './collection-row.scss',
+  imports: [DrumCard],
+  templateUrl: './collection-card.html',
+  styleUrl: './collection-card.scss',
 })
-export class CollectionRow {
+export class CollectionCard {
   private readonly tmdb = inject(TmdbService);
   protected readonly i18n = inject(I18nService);
 
   readonly collection = input.required<UserCollection>();
 
-  /** Whether this is the collection whose films are on show. */
-  readonly current = input(false);
+  /** Position in the field, shown as a rank the way the reference does. */
+  readonly index = input(0);
 
-  readonly choose = output<void>();
+  readonly open = output<void>();
 
   protected readonly total = computed(() => this.collection().items.length);
 
   /**
-   * Poster paths for the thumbnail, most recently added first.
+   * Cover paths, most recently added first.
    *
    * Reversed because the newest additions are what someone is most likely looking for — a
    * collection built up over time would otherwise always show the same four.
    */
-  protected readonly posters = computed(() =>
+  protected readonly covers = computed(() =>
     [...this.collection().items]
       .reverse()
       .filter((item) => item.posterPath)
       .slice(0, MOSAIC_SIZE)
-      .map((item) => this.tmdb.imageUrl(item.posterPath, 'w185'))
+      .map((item) => this.tmdb.imageUrl(item.posterPath, 'w342'))
       .filter((src): src is string => src !== null),
   );
 }

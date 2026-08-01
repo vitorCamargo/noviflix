@@ -1,0 +1,171 @@
+@let list = collection();
+
+@if (list) {
+  <nv-overlay-panel
+    [ariaLabel]="list.name"
+    [closeLabel]="i18n.t('common.close')"
+    width="1040px"
+    (closed)="close()"
+  >
+    <!-- Left of the bar: what can be done to the collection itself. -->
+    <div nvPanelToolbar class="bar">
+      <button
+        type="button"
+        class="bar__btn"
+        aria-haspopup="dialog"
+        [attr.aria-label]="i18n.t('collections.editOne', { name: list.name })"
+        (click)="edit(list)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+          <path d="m14.5 5.5 4 4" />
+        </svg>
+        <span>{{ i18n.t('collections.edit') }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="bar__btn bar__btn--danger"
+        [attr.aria-label]="i18n.t('collections.removeOne', { name: list.name })"
+        (click)="remove(list)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+        </svg>
+        <span>{{ i18n.t('collections.delete') }}</span>
+      </button>
+    </div>
+
+    <!--
+      One tab, and still a tab.
+
+      There is only one section here, but the bar is the same bar as the film pop-up's — a lone
+      label where that one has a strip would read as a heading that happens to be in the corner.
+      Marked as selected because it is, and the mark at the panel's top edge is what says the panel
+      below belongs to it.
+    -->
+    <div nvPanelFilters class="tabs" role="tablist" [attr.aria-label]="list.name">
+      <button
+        type="button"
+        class="tabs__btn is-active"
+        role="tab"
+        id="nv-collection-tab"
+        aria-selected="true"
+        aria-controls="nv-collection-panel"
+      >
+        {{ i18n.t('collections.tabMovies') }}
+      </button>
+    </div>
+
+    <!-- Left column: what the collection is. -->
+    <div nvPanelAside class="meta">
+      <div class="meta__head">
+        <h1 class="meta__title">{{ list.name }}</h1>
+        <p class="meta__count">
+          {{ i18n.t('collections.count', { count: list.items.length }) }}
+        </p>
+      </div>
+
+      <p class="meta__description" [class.is-empty]="!list.description">
+        {{ list.description || i18n.t('collections.noDescription') }}
+      </p>
+
+      <dl class="meta__facts">
+        <div class="meta__fact">
+          <dt class="meta__label">{{ i18n.t('collections.createdAt') }}</dt>
+          <dd class="meta__value">{{ created() }}</dd>
+        </div>
+
+        <!-- Only when it says something the created date does not. -->
+        @if (updated(); as when) {
+          <div class="meta__fact">
+            <dt class="meta__label">{{ i18n.t('collections.updatedAt') }}</dt>
+            <dd class="meta__value">{{ when }}</dd>
+          </div>
+        }
+      </dl>
+    </div>
+
+    <!-- Right column: the films. -->
+    <div
+      nvPanelBody
+      id="nv-collection-panel"
+      role="tabpanel"
+      tabindex="0"
+      aria-labelledby="nv-collection-tab"
+    >
+      @if (isEmpty()) {
+        <div class="films__state">
+          <svg class="films__state-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2.5" />
+            <path d="M7 4v16M17 4v16" />
+          </svg>
+          <h2 class="films__state-title">{{ i18n.t('collections.emptyTitle') }}</h2>
+          <p class="films__state-body">{{ i18n.t('collections.emptyDetail') }}</p>
+        </div>
+      } @else {
+        <div class="films">
+          @for (film of films(); track film.id) {
+            <div class="films__tile">
+              <nv-drum-card [interactive]="true" [glow]="false">
+                <!-- The tile opens the film. A link, so keyboard focus, middle-click and
+                     open-in-new-tab all work without being reimplemented. -->
+                <a
+                  class="cm"
+                  [href]="filmHref(film)"
+                  [attr.aria-label]="i18n.t('movie.openDetails', { title: film.title })"
+                  (click)="openFilm($event, film)"
+                >
+                  <span class="cm__art">
+                    @if (poster(film); as src) {
+                      <img [src]="src" [alt]="" loading="lazy" />
+                    } @else {
+                      <span class="cm__fallback" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <rect x="2" y="4" width="20" height="16" rx="2.5" />
+                          <path d="M7 4v16M17 4v16" />
+                        </svg>
+                      </span>
+                    }
+
+                    @if (score(film); as value) {
+                      <span class="cm__score">
+                        <svg class="cm__star" viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+                          />
+                        </svg>
+                        <span>{{ value }}</span>
+                        <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
+                      </span>
+                    }
+                  </span>
+
+                  <span class="cm__meta">
+                    <span class="cm__title">{{ film.title }}</span>
+                    @if (year(film); as y) {
+                      <span class="cm__year">{{ y }}</span>
+                    }
+                  </span>
+                </a>
+
+                <!-- Outside the link, because a link cannot contain a button that means
+                     something else. Always focusable, so it is reachable without a pointer. -->
+                <button
+                  type="button"
+                  class="cm__remove"
+                  [attr.aria-label]="i18n.t('collections.removeMovie', { title: film.title })"
+                  (click)="removeFilm(film)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                </button>
+              </nv-drum-card>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </nv-overlay-panel>
+}

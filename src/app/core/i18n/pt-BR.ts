@@ -2,6 +2,7 @@ import type { Dictionary } from './en';
 
 export const ptBR: Dictionary = {
   'app.name': 'Noviflix',
+  'boot.loading': 'Iniciando o Noviflix',
   'app.tagline': 'Descubra como você assiste.',
 
   'nav.home': 'Início',
@@ -93,16 +94,17 @@ export const ptBR: Dictionary = {
   'page.movieModal.title': 'Detalhes do filme (pop-up)',
   'page.movieModal.body': 'Os mesmos detalhes, sobrepostos à página de trás.',
 
-  'page.collections.title': 'Minhas coleções',
 
   // Coleções
+  'collections.headlineLead': 'Todas as suas coleções,',
+  'collections.headlineAccent': 'salvas.',
+  'collections.headlineBody':
+    'Guardadas neste navegador, não em um servidor — só suas. Junte os filmes que você quer ver, ou os que já ama.',
+  'collections.none': 'Nada salvo ainda',
   'collections.count': '{count} filmes',
+  'collections.total': '{count} coleções',
   'collections.open': 'Abrir {name}',
   'collections.new': 'Nova coleção',
-  'collections.newSub': 'Junte filmes que você quer manter por perto.',
-  'collections.emptyBody':
-    'Nada salvo ainda. Crie uma coleção e comece a preenchê-la.',
-  'collections.backToList': 'Coleções',
   'collections.createTitle': 'Nova coleção',
   'collections.createLead':
     'Dê um nome e diga o que entra nela. Os dois são obrigatórios.',
@@ -114,12 +116,16 @@ export const ptBR: Dictionary = {
   'collections.cancel': 'Cancelar',
   'collections.errorRequired': 'Campo obrigatório.',
   'collections.errorTooLong': 'Use menos de {max} caracteres.',
+  'collections.emptyTitle': 'Esta coleção está vazia',
   'collections.emptyDetail':
     'Nada aqui ainda. Busque filmes e adicione a partir dos resultados.',
+  'collections.noDescription': 'Nenhuma descrição foi escrita para esta.',
+  'collections.tabMovies': 'Filmes',
+  'collections.createdAt': 'Criada em',
+  'collections.updatedAt': 'Última alteração',
   'collections.removeMovie': 'Remover {title} desta coleção',
 
   // Editar e excluir uma coleção
-  'collections.pickOne': 'Escolha uma coleção para ver o que tem nela.',
   'collections.edit': 'Editar',
   'collections.editOne': 'Editar {name}',
   'collections.editTitle': 'Editar coleção',
@@ -141,6 +147,10 @@ export const ptBR: Dictionary = {
     'Nenhuma coleção ainda. Crie uma e eles vão para lá.',
   'collections.find': 'Encontrar uma coleção',
   'collections.noMatch': 'Nenhuma coleção corresponde a isso.',
+  'collections.noMatchTitle': 'Nada chamado “{query}”',
+  'collections.noMatchBody':
+    'Confira a grafia, ou tente parte de um nome — o filtro procura em qualquer posição, não só no começo.',
+  'collections.showAll': 'Ver todas as {count}',
   'collections.createWithFilms':
     'Dê um nome e os {count} filmes escolhidos entram direto nela.',
   'collections.generatedName': 'Coleção',

@@ -111,8 +111,14 @@
     padding-inline: var(--nv-space-4);
   }
 
+  /* The pair moves to the end together, so the auto margin goes on the first of them and the
+     ring is separated from the selector by the row's own gap. */
   .hdr__lang {
     margin-inline-start: auto;
+  }
+
+  .hdr__guest {
+    margin-inline-start: 0;
   }
 }
 
@@ -120,25 +126,20 @@
  * Icon-only nav on small phones.
  *
  * This row cannot shrink: every item is flex: none and nowrap, so its width is
- * the sum of its parts — measured at 434px with the mobile padding. Below that
- * it pushed the document wider than the viewport, and since the page could then
- * slide sideways, every block on the page looked wrongly inset on one side while
- * actually being full width. Dropping the two nav labels takes the row to about
- * 245px, which clears the narrowest phones in use.
+ * the sum of its parts — measured at 434px with the mobile padding, before the
+ * session ring joined it here. Past the viewport width it pushed the document
+ * wider, and since the page could then slide sideways, every block on the page
+ * looked wrongly inset on one side while actually being full width.
  *
  * The labels are the right thing to give up: both items keep their icon, their
  * accessible name, and their hit area, and the language selector keeps its code
  * visible since that *is* its state.
+ *
+ * Dropped from 560px rather than 480px because the ring made the labelled row
+ * wider, and the threshold has to sit above the width where it stops fitting —
+ * not at the width where the last phone did.
  */
-/* The bar has no room for the countdown here — the nav labels are already dropped to
-   fit, and the session still works whether or not it can be seen. */
-@media (max-width: 900px) {
-  .hdr__guest {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .hdr__row {
     gap: var(--nv-space-2);
     padding-inline: var(--nv-space-3);
