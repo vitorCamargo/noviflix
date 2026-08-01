@@ -421,3 +421,68 @@ $create-rows: 2;
     gap: var(--nv-space-5);
   }
 }
+
+// ----------------------------------------------------------------- entrance
+
+/*
+ * The page assembles in reading order — headline, copy, count, filter, then the field, card by card
+ * — with the same machinery as the home page: `is-entering` lands when the app may animate, and each
+ * block carries its delay in `--enter`.
+ *
+ * Held invisible until then, because on a deep-linked refresh the first-load screen is still over
+ * the top — a block that faded in behind it would simply be there when the cover came off.
+ */
+nv-page-grid:not(.is-entering) {
+  .cl__line,
+  .cl__body,
+  .cl__kicker,
+  .cl__dots,
+  .cq,
+  .cf__new,
+  .cf__card {
+    opacity: 0;
+  }
+}
+
+nv-page-grid.is-entering {
+  .cl__line,
+  .cl__body,
+  .cl__kicker {
+    animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  /* Behind the type, so it fades rather than moves. Follows the kicker's beat: it has no row of its
+     own in the table because it belongs to the block, not the sequence. */
+  .cl__dots {
+    animation: nv-fade-in 700ms var(--nv-ease-panel) var(--enter, 240ms) backwards;
+  }
+
+  .cq {
+    animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  .cf__new {
+    animation: nv-pop 460ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  .cf__card {
+    animation: nv-rise 560ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+}
+
+/* Nothing arrives for anyone who asked for that — it is simply already there. */
+@media (prefers-reduced-motion: reduce) {
+  nv-page-grid:not(.is-entering),
+  nv-page-grid.is-entering {
+    .cl__line,
+    .cl__body,
+    .cl__kicker,
+    .cl__dots,
+    .cq,
+    .cf__new,
+    .cf__card {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}

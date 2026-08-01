@@ -1,4 +1,5 @@
-<nv-page-grid [minColumns]="minColumns()">
+<!-- `is-entering` starts the page assembling; each block carries its own delay in --enter. -->
+<nv-page-grid [minColumns]="minColumns()" [class.is-entering]="entering()">
   <!-- Headline. Dots sit behind it, bleeding left off the text block, as on the home page. -->
   <div class="cl" [style.gridArea]="captionArea()">
     <div class="cl__dots">
@@ -6,13 +7,17 @@
     </div>
 
     <h1 class="cl__title">
-      <span class="cl__line">{{ i18n.t('collections.headlineLead') }}</span>
-      <span class="cl__line">
+      <span class="cl__line" [style.--enter]="delay('title')">
+        {{ i18n.t('collections.headlineLead') }}
+      </span>
+      <span class="cl__line" [style.--enter]="delay('accent')">
         <em class="cl__accent">{{ i18n.t('collections.headlineAccent') }}</em>
       </span>
     </h1>
 
-    <p class="cl__body">{{ i18n.t('collections.headlineBody') }}</p>
+    <p class="cl__body" [style.--enter]="delay('body')">
+      {{ i18n.t('collections.headlineBody') }}
+    </p>
 
     <!--
       Under the copy, not over the headline.
@@ -21,7 +26,7 @@
       moving them up to do that broke the one thing being copied — where the matrix sits relative to
       the words.
     -->
-    <p class="cl__kicker">
+    <p class="cl__kicker" [style.--enter]="delay('kicker')">
       @if (isEmpty()) {
         {{ i18n.t('collections.none') }}
       } @else {
@@ -40,7 +45,7 @@
     Only worth its drum once there is a list to narrow.
   -->
   @if (!isEmpty()) {
-    <div class="cq" [style.gridArea]="findArea()">
+    <div class="cq" [style.gridArea]="findArea()" [style.--enter]="delay('find')">
       <nv-drum-card [interactive]="true">
         <div class="cq__row">
           <span class="cq__icon" aria-hidden="true">
@@ -84,7 +89,13 @@
       the action that makes one belongs where the eye starts — but it holds a plus and two words, not
       four posters, so it does not need a poster's worth of room.
     -->
-    <button type="button" class="cf__new" aria-haspopup="dialog" (click)="createNew()">
+    <button
+      type="button"
+      class="cf__new"
+      aria-haspopup="dialog"
+      [style.--enter]="delay('create')"
+      (click)="createNew()"
+    >
       <span class="cf__new-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <path d="M12 5v14M5 12h14" />
@@ -94,7 +105,7 @@
     </button>
 
     @for (collection of shown(); track collection.id; let i = $index) {
-      <div class="cf__card" [style.--cf-drop]="drop(i)">
+      <div class="cf__card" [style.--cf-drop]="drop(i)" [style.--enter]="cardDelay(i)">
         <nv-collection-card
           [collection]="collection"
           [index]="i"

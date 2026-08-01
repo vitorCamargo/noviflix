@@ -320,8 +320,12 @@ nv-overlay-panel {
   flex-direction: column;
   gap: 1px;
   justify-content: center;
-  block-size: calc(var(--nv-grid-cell) * 0.8);
+  /* Nine tenths of a drum, not eight: the worst case — a two-line title over a year — filled the
+     shorter strip to its edges, and the title sat against the artwork. Not lattice-bound in here;
+     inside a panel the tiles are sized by the column, not the drums. */
+  block-size: calc(var(--nv-grid-cell) * 0.9);
   flex: none;
+  padding-block-start: var(--nv-space-1);
   padding-inline: var(--nv-space-3);
   /* Room for the remove control, which sits over this strip. */
   padding-inline-end: calc(var(--nv-space-3) + 26px);
@@ -347,7 +351,7 @@ nv-overlay-panel {
  */
 .cm__remove {
   position: absolute;
-  inset-block-end: calc((var(--nv-grid-cell) * 0.8 - 24px) / 2);
+  inset-block-end: calc((var(--nv-grid-cell) * 0.9 - 24px) / 2);
   inset-inline-end: var(--nv-space-2);
   display: grid;
   place-items: center;

@@ -1,23 +1,32 @@
-<nv-page-grid [minColumns]="minColumns()">
+<!--
+  `is-entering` is what starts the composition assembling. It lands when the first-load screen begins
+  to clear, so the blocks arrive into the space it leaves rather than behind it — and each one carries
+  its own delay from the entrance table.
+-->
+<nv-page-grid [minColumns]="minColumns()" [class.is-entering]="entering()">
   <!-- Headline. Dots sit behind it, bleeding left off the text block. -->
   <div class="caption" [style.gridArea]="area('caption')">
-    <div class="caption__dots">
+    <div class="caption__dots" [style.--enter]="delay('dots')">
       <nv-dot-field [columns]="4" [rows]="5" />
     </div>
 
     <h1 class="caption__title">
-      <span class="caption__line">{{ i18n.t('home.headlineLead') }}</span>
-      <span class="caption__line">
+      <span class="caption__line" [style.--enter]="delay('headline')">
+        {{ i18n.t('home.headlineLead') }}
+      </span>
+      <span class="caption__line" [style.--enter]="delay('headlineTail')">
         {{ i18n.t('home.headlineTailBefore') }}
         <em class="caption__accent">{{ i18n.t('home.headlineAccent') }}</em>
       </span>
     </h1>
 
-    <p class="caption__body">{{ i18n.t('home.subhead') }}</p>
+    <p class="caption__body" [style.--enter]="delay('subhead')">
+      {{ i18n.t('home.subhead') }}
+    </p>
   </div>
 
   <!-- Search, in the slot the dashed placeholder was reserving. -->
-  <div class="action" [style.gridArea]="area('action')">
+  <div class="action" [style.gridArea]="area('action')" [style.--enter]="delay('search')">
     <nv-search-field />
   </div>
 
@@ -33,7 +42,7 @@
   } @else {
 
   <!-- Camera badge, floating above the card stack, with its dot trail. -->
-  <div class="badge" [style.gridArea]="area('badge')">
+  <div class="badge" [style.gridArea]="area('badge')" [style.--enter]="delay('badge')">
     <span class="badge__dot">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="2" y="6" width="13" height="12" rx="2.5" />
@@ -49,6 +58,7 @@
         [style.width.px]="dot.size"
         [style.height.px]="dot.size"
         [style.opacity]="dot.opacity"
+        [style.--enter]="trailDelay($index)"
       ></span>
     }
   </div>
@@ -62,7 +72,10 @@
   <div
     class="hero"
     [class.is-playing]="trailerPlaying()"
+    [class.swap-a]="swapSide() === 'a'"
+    [class.swap-b]="swapSide() === 'b'"
     [style.gridArea]="area('hero')"
+    [style.--enter]="delay('hero')"
     (pointerenter)="onHeroEnter($event)"
     (pointerleave)="onHeroLeave()"
   >
@@ -79,7 +92,7 @@
 
       <div class="hero__scrim"></div>
 
-      <div class="hero__text">
+      <div class="hero__text" [style.--enter]="delay('heroText')">
         <h2 class="hero__title">{{ active()?.title }}</h2>
         @if (genres().length) {
           <ul class="tags">
@@ -99,8 +112,11 @@
        with the hero rather than sitting flush against it. -->
   <div
     class="poster"
+    [class.swap-a]="swapSide() === 'a'"
+    [class.swap-b]="swapSide() === 'b'"
     [style.gridArea]="area('poster')"
     [style.translate]="posterNudge()"
+    [style.--enter]="delay('poster')"
   >
     <!--
       Interactive like a result card — reveals the rating and opens the same
@@ -154,7 +170,13 @@
   </div>
 
   <!-- Popularity. One drum tall, so label and tier only — no room for tags. -->
-  <div class="stats" [style.gridArea]="area('stats')">
+  <div
+    class="stats"
+    [class.swap-a]="swapSide() === 'a'"
+    [class.swap-b]="swapSide() === 'b'"
+    [style.gridArea]="area('stats')"
+    [style.--enter]="delay('stats')"
+  >
     <nv-drum-card>
       <div class="stats__body">
         <nv-popularity-badge [tier]="tier()" />
@@ -175,6 +197,7 @@
     class="carousel"
     [style.gridArea]="area('carousel')"
     [style.translate]="carouselNudge()"
+    [style.--enter]="delay('carousel')"
     (pointerenter)="pause()"
     (pointerleave)="resume()"
     (focusin)="pause()"
@@ -191,7 +214,7 @@
 
     <ul class="carousel__list">
       @for (item of strip(); track item.index) {
-        <li class="carousel__slot">
+        <li class="carousel__slot" [style.--enter]="avatarDelay($index)">
           <button
             type="button"
             class="carousel__item"

@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { AppReadyService } from '../../core/app-ready.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import {
   PageGrid,
@@ -17,6 +18,20 @@ import {
 } from '../../layout/page-grid/page-grid';
 import { DotField } from '../home/dot-field/dot-field';
 import { HOME_STACK_MAX } from '../home/home-layout';
+
+/**
+ * The page's entrance, in reading order. Even an error page arrives like the rest of the app —
+ * especially an error page, since it is where the visitor is most inclined to think it broke.
+ */
+const ENTRANCE = {
+  kicker: 0,
+  title: 80,
+  accent: 170,
+  body: 280,
+  dots: 320,
+  path: 380,
+  actions: 460,
+} as const;
 
 /** First column, clearing the left gutter the rest of the app uses. */
 const START_COL = 3;
@@ -49,33 +64,39 @@ const TEXT_ROWS = 7;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageGrid, DotField, RouterLink],
   template: `
-    <nv-page-grid [minColumns]="minColumns()">
+    <nv-page-grid [minColumns]="minColumns()" [class.is-entering]="entering()">
       <div class="nf" [style.gridArea]="textArea()">
-        <div class="nf__dots">
+        <div class="nf__dots" [style.--enter]="delay('dots')">
           <nv-dot-field [columns]="4" [rows]="5" />
         </div>
 
-        <p class="nf__kicker">{{ i18n.t('error.kicker') }}</p>
+        <p class="nf__kicker" [style.--enter]="delay('kicker')">
+          {{ i18n.t('error.kicker') }}
+        </p>
 
         <h1 class="nf__title">
-          <span class="nf__line">{{ i18n.t('error.titleLead') }}</span>
-          <span class="nf__line">
+          <span class="nf__line" [style.--enter]="delay('title')">
+            {{ i18n.t('error.titleLead') }}
+          </span>
+          <span class="nf__line" [style.--enter]="delay('accent')">
             <em class="nf__accent">{{ i18n.t('error.titleAccent') }}</em>
           </span>
         </h1>
 
-        <p class="nf__body">{{ i18n.t('error.body') }}</p>
+        <p class="nf__body" [style.--enter]="delay('body')">
+          {{ i18n.t('error.body') }}
+        </p>
 
         <!--
           What was actually asked for. Cheap to show, and the one fact on this page the visitor
           cannot get from anywhere else on it.
         -->
-        <p class="nf__path">
+        <p class="nf__path" [style.--enter]="delay('path')">
           <span class="nf__path-label">{{ i18n.t('error.path') }}</span>
           <code class="nf__path-value">{{ path }}</code>
         </p>
 
-        <div class="nf__actions">
+        <div class="nf__actions" [style.--enter]="delay('actions')">
           <a class="nf__btn nf__btn--primary" routerLink="/">
             {{ i18n.t('error.goHome') }}
           </a>
@@ -221,6 +242,49 @@ const TEXT_ROWS = 7;
       }
     }
 
+    // ----------------------------------------------------------------- entrance
+
+    /* The same machinery as every other page: hidden until the app may animate, then in order. */
+    nv-page-grid:not(.is-entering) {
+      .nf__kicker,
+      .nf__line,
+      .nf__body,
+      .nf__path,
+      .nf__actions,
+      .nf__dots {
+        opacity: 0;
+      }
+    }
+
+    nv-page-grid.is-entering {
+      .nf__kicker,
+      .nf__line,
+      .nf__body,
+      .nf__path,
+      .nf__actions {
+        animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+      }
+
+      .nf__dots {
+        animation: nv-fade-in 700ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      nv-page-grid:not(.is-entering),
+      nv-page-grid.is-entering {
+        .nf__kicker,
+        .nf__line,
+        .nf__body,
+        .nf__path,
+        .nf__actions,
+        .nf__dots {
+          animation: none;
+          opacity: 1;
+        }
+      }
+    }
+
     // ------------------------------------------------------------------ stacked
 
     @media (max-width: 900px) {
@@ -241,7 +305,15 @@ const TEXT_ROWS = 7;
 })
 export class NotFound {
   protected readonly i18n = inject(I18nService);
+  private readonly appReady = inject(AppReadyService);
   private readonly router = inject(Router);
+
+  /** True on arrival by navigation; on a deep-linked refresh, once the first-load screen clears. */
+  protected readonly entering = this.appReady.revealed;
+
+  protected delay(beat: keyof typeof ENTRANCE): string {
+    return `${ENTRANCE[beat]}ms`;
+  }
 
   /**
    * The address that missed.

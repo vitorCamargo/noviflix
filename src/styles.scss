@@ -256,6 +256,82 @@ body,
   }
 }
 
+/*
+ * Arriving on the lattice: a fade with a little scale, for a block that lands rather than slides.
+ * Ends at its own size, so nothing is left transformed once the entrance is over.
+ */
+@keyframes nv-pop {
+  from {
+    opacity: 0;
+    scale: 0.7;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/*
+ * Scale alone.
+ *
+ * For anything whose opacity is already meaningful — the badge's trail dots are graded, so animating
+ * opacity would end them all at full strength and then snap them back to their own.
+ */
+@keyframes nv-pop-in {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/*
+ * A card opening from its own top-left corner, the way the reference reveals its hero.
+ *
+ * The clip is deliberately not held at the end: the fill mode is `backwards`, so once the animation
+ * is over the element goes back to having no clip at all. Held forwards, a 160% circle would stay a
+ * clip forever and cut off the card's corner glow, which escapes outside the box.
+ */
+@keyframes nv-corner-open {
+  from {
+    clip-path: circle(0% at 0 0);
+    opacity: 0.45;
+  }
+  to {
+    clip-path: circle(160% at 0 0);
+    opacity: 1;
+  }
+}
+
+/*
+ * Twins of nv-corner-open and nv-swipe-up, identical in every frame.
+ *
+ * A CSS animation only restarts when its name changes, so anything that replays — the hero swapping
+ * to the next film — alternates between a keyframe and its twin. Two names, one motion.
+ */
+@keyframes nv-corner-open-b {
+  from {
+    clip-path: circle(0% at 0 0);
+    opacity: 0.45;
+  }
+  to {
+    clip-path: circle(160% at 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes nv-swipe-up-b {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes nv-rise {
   from {
     opacity: 0;

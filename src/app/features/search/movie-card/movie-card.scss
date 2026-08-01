@@ -100,6 +100,10 @@
   block-size: var(--nv-grid-cell);
   flex: none;
   padding-inline: var(--nv-space-4);
+  /* The worst case — a two-line title over a year — fills the strip almost exactly, so centring
+     alone leaves the title touching the artwork above. A little top padding buys the air, and the
+     spare pixels sit at the bottom where nothing borders them. */
+  padding-block-start: var(--nv-space-2);
   /*
    * Room for one control, because only one sits here now.
    *

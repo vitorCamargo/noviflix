@@ -326,7 +326,10 @@ export class BootScreen implements OnDestroy {
 
     // The longest the sequence can possibly last, measured off the animation clock so that a tab
     // which never gets a frame still finishes.
-    this.deadline = setTimeout(() => this.expired.set(true), bootDuration(null));
+    this.deadline = setTimeout(() => {
+      this.expired.set(true);
+      this.app.markRevealed();
+    }, bootDuration(null));
   }
 
   ngOnDestroy(): void {
@@ -337,6 +340,16 @@ export class BootScreen implements OnDestroy {
     const elapsed = now - this.started;
     this.elapsed.set(elapsed);
 
+    /*
+     * The page behind may start its entrance as this screen begins to leave.
+     *
+     * At `clearing`, not at `blooming`: the screen is still fully opaque while the lattice blooms,
+     * and an entrance released then plays out behind the cover — which is why the headline never
+     * animated on a refresh. It only ever showed when navigating, where the screen is long gone.
+     */
+    const phase = phaseAt(elapsed, this.readyAt());
+    if (phase === 'clearing' || phase === 'done') this.app.markRevealed();
+
     if (elapsed >= bootDuration(this.readyAt())) {
       this.stop();
       return;
@@ -346,6 +359,9 @@ export class BootScreen implements OnDestroy {
   };
 
   private stop(): void {
+    // Whatever the frame loop managed, the page behind is on its own now.
+    this.app.markRevealed();
+
     if (this.frame !== null) cancelAnimationFrame(this.frame);
     this.frame = null;
 

@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { AppReadyService } from '../../core/app-ready.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import type { UserCollection } from '../../core/models/user-collection.models';
 import {
@@ -30,6 +31,24 @@ import {
 } from './collections-layout';
 
 /**
+ * The page's entrance, in reading order: the headline, the copy, the count, the filter, then the
+ * field — create card first, cards after it in turn. Milliseconds from the moment the page may
+ * animate, bound to CSS as one custom property per block.
+ */
+const ENTRANCE = {
+  title: 0,
+  accent: 90,
+  body: 200,
+  kicker: 280,
+  find: 340,
+  create: 400,
+  cards: 460,
+} as const;
+
+/** Between one collection card and the next. */
+const CARD_STEP_MS = 90;
+
+/**
  * The collections page: a headline block, and a field of collections beside it.
  *
  * Built like the home page rather than like a list. The blurb and the filter hold the left of the
@@ -49,11 +68,29 @@ import {
 })
 export class Collections {
   protected readonly i18n = inject(I18nService);
+  private readonly appReady = inject(AppReadyService);
   private readonly collections = inject(CollectionsService);
   private readonly form = inject(CollectionCreateService);
   private readonly view = inject(CollectionViewService);
 
   protected readonly list = this.collections.recent;
+
+  /**
+   * Whether the page may assemble itself.
+   *
+   * True already when this page is navigated to — the first-load screen flips it once and never
+   * back — so the entrance plays on arrival, and on a deep-linked refresh it waits for the screen
+   * to start clearing rather than playing behind it.
+   */
+  protected readonly entering = this.appReady.revealed;
+
+  protected delay(beat: keyof typeof ENTRANCE): string {
+    return `${ENTRANCE[beat]}ms`;
+  }
+
+  protected cardDelay(index: number): string {
+    return `${ENTRANCE.cards + Math.max(0, index) * CARD_STEP_MS}ms`;
+  }
 
   protected readonly isEmpty = this.collections.isEmpty;
 

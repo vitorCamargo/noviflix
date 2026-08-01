@@ -37,6 +37,13 @@ import {
   homeResultsColumns,
 } from './home-layout';
 import { resultGridWidth, resultRowCount } from '../search/results-metrics';
+import {
+  AVATAR_STEP_MS,
+  TRAIL_STEP_MS,
+  type HomeBeat,
+  beatDelay,
+  stepDelay,
+} from './home-entrance';
 
 /** Drum rows the results grid gives up at the top, for the floating header. */
 const RESULTS_TOP_ROWS = 1;
@@ -83,6 +90,42 @@ export class Home implements OnDestroy {
 
   /** Results replace the featured composition while a search is running. */
   protected readonly searching = this.search.active;
+
+  // --------------------------------------------------------------- entrance
+
+  /**
+   * Whether the composition may assemble itself.
+   *
+   * Flipped by the first-load screen as it starts to clear, so the blocks arrive into the space it
+   * leaves. Read straight through rather than copied, so a page reached by navigating — where the
+   * screen is long gone and this is already true — renders finished instead of animating in.
+   */
+  protected readonly entering = this.appReady.revealed;
+
+  /** The delay for one block, as a CSS duration. */
+  protected delay(beat: HomeBeat): string {
+    return `${beatDelay(beat)}ms`;
+  }
+
+  /** The badge's trail, drawn one dot at a time so the arc reads as being traced. */
+  protected trailDelay(index: number): string {
+    return `${stepDelay('badge', index, TRAIL_STEP_MS)}ms`;
+  }
+
+  protected avatarDelay(index: number): string {
+    return `${stepDelay('carousel', index, AVATAR_STEP_MS)}ms`;
+  }
+
+  /**
+   * Which of the two swap keyframe twins the next change plays.
+   *
+   * A CSS animation only restarts when its name changes, so each film change flips this between two
+   * classes whose animations are identical — the flip is what retriggers them. Empty until the first
+   * change: the arrival is the entrance's job, and a swap on top of it would play the reveal twice.
+   */
+  protected readonly swapSide = signal<'' | 'a' | 'b'>('');
+
+  private lastSwapIndex: number | null = null;
 
   protected readonly ringRadius = RING_RADIUS;
   protected readonly ringCircumference = RING_CIRCUMFERENCE;
@@ -388,6 +431,23 @@ export class Home implements OnDestroy {
   private lastFrameAt = 0;
 
   constructor() {
+    /*
+     * Replay the hero's reveal whenever the featured film changes.
+     *
+     * However it changed — the countdown, an avatar, the arrows — the new film should arrive the
+     * way the first one did: opening from the card's corner, with its texts following.
+     */
+    effect(() => {
+      const index = this.index();
+
+      untracked(() => {
+        if (this.lastSwapIndex !== null && index !== this.lastSwapIndex) {
+          this.swapSide.set(this.swapSide() === 'a' ? 'b' : 'a');
+        }
+        this.lastSwapIndex = index;
+      });
+    });
+
     /*
      * Tell the first-load screen it can go.
      *

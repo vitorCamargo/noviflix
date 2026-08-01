@@ -689,3 +689,194 @@
     inset: auto;
   }
 }
+
+// ---------------------------------------------------------------- entrance
+
+/*
+ * The composition assembles itself, in reading order.
+ *
+ * `is-entering` lands on the grid when the first-load screen begins to clear, and each block carries
+ * its own delay in `--enter` from the entrance table. Everything here is CSS: the table decides when,
+ * the stylesheet decides how, and neither has to know about the other beyond that one property.
+ *
+ * Held invisible until the flag arrives, because until then the screen is over the top of it — a
+ * block that faded in behind the cover would simply be there when the cover came off.
+ *
+ * Every fill mode here is `backwards`, never `both`. The two are identical during the delay, but
+ * `both` keeps the final keyframe applied forever — and a kept `transform: translateY(0)` is a
+ * stacking context, which trapped the search field's corner glow above the pads as four white
+ * blobs. Each animation ends at the element's natural state, so dropping the styles changes
+ * nothing visible.
+ */
+nv-page-grid:not(.is-entering) {
+  .caption__dots,
+  .caption__line,
+  .caption__body,
+  .action,
+  .hero,
+  .hero__text,
+  .poster,
+  .stats,
+  .badge__dot,
+  .carousel__nav,
+  .carousel__slot {
+    opacity: 0;
+  }
+
+  /* Scale, not opacity: each trail dot carries its own opacity as an inline style, which no rule
+     here can outrank. Scaled to nothing it is just as hidden. */
+  .badge__trail {
+    scale: 0;
+  }
+}
+
+nv-page-grid.is-entering {
+  /* The workhorse: a line of type or a small block, rising as it fades. */
+  .caption__line,
+  .caption__body,
+  .action,
+  .hero__text,
+  .stats {
+    /* Shorter than the panel swipe it borrows: a dozen blocks arriving in turn cannot each take
+       the better part of a second. */
+    animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  /* Behind the type, so it fades rather than moves — a matrix that slid would fight the words. */
+  .caption__dots {
+    animation: nv-fade-in 700ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  /*
+   * The film, opening from its top-left corner.
+   *
+   * `backwards` rather than `both`: the corner clip must not outlive the animation, or it would keep
+   * cutting off the card's glow. Before the delay is up the first frame holds, which is what keeps
+   * the card hidden until its turn.
+   */
+  .hero {
+    animation: nv-corner-open 780ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+
+  .poster {
+    animation: nv-rise 620ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  .badge__dot {
+    animation: nv-pop 420ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  /*
+   * The trail, traced one dot at a time.
+   *
+   * Scale only, and `backwards`, so each dot keeps the graded opacity it was given — animating that
+   * would end them all at full strength and snap them back.
+   */
+  .badge__trail {
+    animation: nv-pop-in 300ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  .carousel__nav {
+    animation: nv-fade-in 420ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+
+  .carousel__slot {
+    animation: nv-pop 420ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
+  }
+}
+
+/*
+ * Nothing arrives for anyone who asked for that — it is simply already there.
+ *
+ * Both blocks are reset, including the not-entering one: with no animation to bring them in, an
+ * invisible block would stay invisible.
+ */
+@media (prefers-reduced-motion: reduce) {
+  nv-page-grid:not(.is-entering),
+  nv-page-grid.is-entering {
+    .caption__dots,
+    .caption__line,
+    .caption__body,
+    .action,
+    .hero,
+    .hero__text,
+    .poster,
+    .stats,
+    .badge__dot,
+    .carousel__nav,
+    .carousel__slot {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  /* The trail keeps the graded opacity it was given; only its scale had to be put back. */
+  nv-page-grid .badge__trail {
+    animation: none;
+    scale: 1;
+  }
+}
+
+// ------------------------------------------------------------------ the swap
+
+/*
+ * The next film arrives the way the first one did.
+ *
+ * Whenever the featured movie changes, the hero replays its corner reveal and the texts and cards
+ * hanging off it follow with short rises — a compressed version of the entrance, since a swap is a
+ * repetition and a repetition at full length would wear thin by the third film.
+ *
+ * `swap-a` and `swap-b` are the two keyframe twins; the component alternates them because a CSS
+ * animation only restarts when its name changes. Written after (and prefixed to outweigh) the
+ * entrance rules, so a swap always wins the `animation` property from them.
+ *
+ * `backwards`, never `both`: held forwards, the corner clip would outlive the animation and keep
+ * cutting off the card's glow.
+ */
+nv-page-grid .hero.swap-a {
+  animation: nv-corner-open 620ms var(--nv-ease-panel) backwards;
+}
+
+nv-page-grid .hero.swap-b {
+  animation: nv-corner-open-b 620ms var(--nv-ease-panel) backwards;
+}
+
+/* The title and tags follow once the image is most of the way open. */
+.hero.swap-a .hero__text {
+  animation: nv-swipe-up 420ms var(--nv-ease-panel) 260ms backwards;
+}
+
+.hero.swap-b .hero__text {
+  animation: nv-swipe-up-b 420ms var(--nv-ease-panel) 260ms backwards;
+}
+
+nv-page-grid .poster.swap-a {
+  animation: nv-swipe-up 480ms var(--nv-ease-panel) 120ms backwards;
+}
+
+nv-page-grid .poster.swap-b {
+  animation: nv-swipe-up-b 480ms var(--nv-ease-panel) 120ms backwards;
+}
+
+nv-page-grid .stats.swap-a {
+  animation: nv-swipe-up 420ms var(--nv-ease-panel) 200ms backwards;
+}
+
+nv-page-grid .stats.swap-b {
+  animation: nv-swipe-up-b 420ms var(--nv-ease-panel) 200ms backwards;
+}
+
+/* The swap is repetition by definition, so under reduced motion the film simply changes. */
+@media (prefers-reduced-motion: reduce) {
+  nv-page-grid .hero.swap-a,
+  nv-page-grid .hero.swap-b,
+  .hero.swap-a .hero__text,
+  .hero.swap-b .hero__text,
+  nv-page-grid .poster.swap-a,
+  nv-page-grid .poster.swap-b,
+  nv-page-grid .stats.swap-a,
+  nv-page-grid .stats.swap-b {
+    animation: none;
+  }
+}
