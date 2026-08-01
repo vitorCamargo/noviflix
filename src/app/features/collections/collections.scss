@@ -350,10 +350,10 @@ $create-rows: 2;
     grid-column: 1 / -1;
   }
 
+  /* The same air under the nav as the home page's headline gets, so the two pages start alike. */
   .cl {
-    /* No top padding: the header already sits a row above, and adding more leaves a band of nothing
-       between the nav and the first thing on the page. */
-    padding-block: 0;
+    gap: var(--nv-space-3);
+    padding-block: var(--nv-space-6) 0;
     padding-inline-end: 0;
   }
 

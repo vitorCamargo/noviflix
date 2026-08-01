@@ -193,6 +193,13 @@ export const ptBR: Dictionary = {
   'common.forward': 'Avançar',
   'common.share': 'Compartilhar',
 
+  'error.kicker': 'Erro 404',
+  'error.titleLead': 'Não há nada',
+  'error.titleAccent': 'neste endereço.',
+  'error.body':
+    'O link pode estar velho, ou o endereço foi digitado errado. Todos os filmes continuam aqui — comece do topo, ou abra uma das suas coleções.',
+  'error.path': 'Você pediu',
   'error.notFound': 'Não encontramos essa página.',
   'error.goHome': 'Voltar ao início',
+  'error.toCollections': 'Minhas coleções',
 };

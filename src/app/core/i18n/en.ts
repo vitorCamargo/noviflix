@@ -209,8 +209,15 @@ export const en = {
   'common.forward': 'Forward',
   'common.share': 'Share this',
 
+  'error.kicker': 'Error 404',
+  'error.titleLead': 'Nothing at',
+  'error.titleAccent': 'this address.',
+  'error.body':
+    'The link may be old, or the address mistyped. Every film is still here — start from the top, or open one of your collections.',
+  'error.path': 'You asked for',
   'error.notFound': 'We could not find that page.',
   'error.goHome': 'Back to home',
+  'error.toCollections': 'My collections',
 } as const;
 
 export type TranslationKey = keyof typeof en;
