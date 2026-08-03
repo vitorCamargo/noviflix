@@ -5,17 +5,6 @@
   block-size: 100%;
 }
 
-/*
- * Positioned, because the pad layer is pinned to the viewport when stacked and pinning
- * makes it paint after ordinary in-flow blocks. Without this the whole page sat behind
- * the drums — visible only where the seams let it through.
- */
-/*
- * No gap between the back link and the row below it. Every band here is a whole number
- * of drums so the tile grids start on a seam — an arbitrary gap pushes them off the
- * lattice by however many pixels it happens to be, which is what left the cards
- * visibly unaligned with the grid behind them.
- */
 .mp {
   position: relative;
   display: flex;
@@ -24,7 +13,6 @@
   min-inline-size: 0;
 }
 
-/* Exactly one drum, so the row beneath begins on the next seam. */
 .mp__back {
   display: inline-flex;
   align-items: center;
@@ -64,11 +52,6 @@
   font-weight: 800;
 }
 
-/*
- * Sections in a row, in the direction the page moves. A column-major layout is what
- * makes the page readable as "keep going right", and the track scrolls to whatever the
- * row needs — its width is declared by the component so nothing lands past the clip.
- */
 .mp__row {
   display: flex;
   align-items: stretch;
@@ -89,7 +72,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--nv-space-5);
-  /* Four drums, so the poster and the rating below it sit on the lattice. */
   inline-size: calc(var(--nv-grid-cell) * 4);
   flex: none;
   min-block-size: 0;
@@ -131,11 +113,6 @@
   min-inline-size: 0;
 }
 
-/*
- * Also a whole drum, for the same reason as the back link: the tile grid below it has to
- * begin on a seam. Only the grid sections need this — prose is not laid on the lattice,
- * so its headings space themselves normally.
- */
 .mp__heading--band {
   display: flex;
   align-items: center;
@@ -143,11 +120,6 @@
   flex: none;
 }
 
-/*
- * The one section with a declared width. Cast and related size themselves from their
- * tile counts, but prose has no natural width — left to flex it would either squeeze to
- * its longest word or run to a line nobody can track back from.
- */
 .mp__section--facts {
   inline-size: calc(var(--nv-grid-cell) * 7);
   gap: var(--nv-space-3);
@@ -215,30 +187,12 @@
   color: var(--nv-text-faint);
 }
 
-// ------------------------------------------------------------------ stacked
-
-/*
- * Below this the page is an ordinary vertical one: sections stack, tabs choose between
- * them, and nothing takes a drum-derived width because the column is whatever the
- * viewport gives.
- */
 @media (max-width: 900px) {
-  /*
-   * Spans both columns of the stacked grid.
-   *
-   * PageGrid becomes a two-column grid at this width so a page can pair blocks side by
-   * side. Without saying otherwise this landed in one of those columns and rendered at
-   * half the viewport — a page of prose in a 170px gutter.
-   */
   .mp {
     grid-column: 1 / -1;
-    /* No top padding: the header already sits a row above, and adding more left a band of
-       nothing between the nav and the first thing on the page. */
     padding-block: 0 var(--nv-space-7);
   }
 
-  /* A drum tall exists to land the tile grid on a seam, which the stacked layout has no need of —
-     here it is just height between the nav and the content. */
   .mp__back {
     block-size: auto;
     padding-block: var(--nv-space-3);
@@ -256,11 +210,6 @@
     overflow: visible;
   }
 
-  /*
-   * Stacked by default. The star row and its score have a min-content width of roughly
-   * 200px, and flex items refuse to shrink below that — beside a poster on a 390px screen
-   * the control simply ran off the edge.
-   */
   .mp__aside {
     display: flex;
     flex-direction: column;
@@ -269,16 +218,12 @@
     margin-block-end: var(--nv-space-6);
   }
 
-  /* Matches the pop-up's proportion — smaller than this and the artwork stops being
-     recognisable, which is the only reason it is here. */
   .mp__poster {
     inline-size: min(190px, 55%);
     flex: none;
   }
 
   nv-rating-form {
-    /* Overrides the flex default of auto, which is what let the content set a floor the
-       column could not honour. */
     min-inline-size: 0;
     inline-size: 100%;
   }
@@ -287,13 +232,6 @@
     font-size: clamp(1.7rem, 7vw, 2.2rem);
   }
 
-  /*
-   * No rule under the tabs. The active tab's own underline already marks the row, and a full-width
-   * border on top of it read as two lines doing one job.
-   *
-   * The margin replaces what the border was incidentally providing: a little air before the panel,
-   * so the content does not start flush against the labels.
-   */
   .tabs {
     display: flex;
     align-items: center;
@@ -313,8 +251,6 @@
     letter-spacing: var(--nv-tracking-wide);
     text-transform: uppercase;
 
-    /* Selection follows focus in a roving tablist, so the accent and the underline
-       already show which tab is current — a ring is a second mark for one state. */
     &:focus,
     &:focus-visible {
       outline: none;
@@ -324,7 +260,6 @@
   .tabs__btn.is-active {
     color: var(--nv-accent);
 
-    /* Sat on the border before; with that gone it sits on the label's own baseline edge. */
     &::after {
       content: '';
       position: absolute;
@@ -336,13 +271,6 @@
   }
 }
 
-/*
- * Wide enough for the poster and the rating to sit together: the artwork at its capped
- * width, a gutter, and the control at its own minimum. Below this they stack.
- *
- * A narrow override on top of the block above, deliberately placed after it rather than
- * nested inside — the stacked rules are the baseline for every width up to 900px.
- */
 @media (min-width: 480px) and (max-width: 900px) {
   .mp__aside {
     flex-direction: row;

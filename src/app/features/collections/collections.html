@@ -1,6 +1,4 @@
-<!-- `is-entering` starts the page assembling; each block carries its own delay in --enter. -->
 <nv-page-grid [minColumns]="minColumns()" [class.is-entering]="entering()">
-  <!-- Headline. Dots sit behind it, bleeding left off the text block, as on the home page. -->
   <div class="cl" [style.gridArea]="captionArea()">
     <div class="cl__dots">
       <nv-dot-field [columns]="4" [rows]="5" />
@@ -19,13 +17,6 @@
       {{ i18n.t('collections.headlineBody') }}
     </p>
 
-    <!--
-      Under the copy, not over the headline.
-
-      Above it the dots would have to clear a line of type the home page does not have there, and
-      moving them up to do that broke the one thing being copied — where the matrix sits relative to
-      the words.
-    -->
     <p class="cl__kicker" [style.--enter]="delay('kicker')">
       @if (isEmpty()) {
         {{ i18n.t('collections.none') }}
@@ -35,15 +26,6 @@
     </p>
   </div>
 
-  <!--
-    The filter, in a block of its own.
-
-    Outside the headline block on two counts: it has to begin on a seam, which only a grid placement
-    guarantees, and its card lights the lattice from a negative layer — inside the headline's
-    stacking context that light was trapped above the pads and read as a halo.
-
-    Only worth its drum once there is a list to narrow.
-  -->
   @if (!isEmpty()) {
     <div class="cq" [style.gridArea]="findArea()" [style.--enter]="delay('find')">
       <nv-drum-card [interactive]="true">
@@ -82,13 +64,7 @@
     </div>
   }
 
-  <!-- The field of collections. -->
   <div class="cf" [style.gridArea]="fieldArea()">
-    <!--
-      First, not last, and smaller than the rest. A collection is made before it holds anything, so
-      the action that makes one belongs where the eye starts — but it holds a plus and two words, not
-      four posters, so it does not need a poster's worth of room.
-    -->
     <button
       type="button"
       class="cf__new"
@@ -114,11 +90,6 @@
       </div>
     }
 
-    <!--
-      Said here rather than under the field that caused it: a message appearing beneath a drum-tall
-      input pushes the input off its seam every time it shows. It takes a card's place, so the field
-      reads as having been narrowed to nothing rather than as having broken.
-    -->
     @if (noMatch()) {
       <div class="cf__state" role="status">
         <svg class="cf__state-icon" viewBox="0 0 24 24" aria-hidden="true">

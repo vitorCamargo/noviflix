@@ -1,24 +1,12 @@
 @use '../../../styles/mixins' as *;
 
 :host {
-  /*
-   * Larger than the popover's default icon, since this one carries information rather
-   * than decorating a label — see the property's definition in Popover.
-   */
   --nv-popover-icon-size: 34px;
-  /* The trigger is the ring; a text label beside it would only repeat the panel. */
   --nv-popover-label-display: none;
 
   display: block;
 }
 
-/*
- * Smaller on a phone, where the ring shares one drum of bar with everything else.
- *
- * The row cannot shrink — every item in it is flex: none — so its width is the sum of its parts,
- * and each part has to earn its size. A little under the desktop diameter still reads as a
- * progress ring at arm's length.
- */
 @media (max-width: 560px) {
   :host {
     --nv-popover-icon-size: 30px;
@@ -27,7 +15,6 @@
 
 .gs__ring {
   display: block;
-  /* Rotated so the arc starts at twelve o'clock rather than three. */
   rotate: -90deg;
 }
 
@@ -42,23 +29,15 @@
   stroke: var(--nv-accent);
   stroke-width: 2.5;
   stroke-linecap: round;
-  /* Only the offset animates: the countdown moves once a second, and a jump between
-     two positions reads as a stutter where a slide reads as time passing. */
   transition:
     stroke-dashoffset var(--nv-normal) linear,
     stroke var(--nv-normal) var(--nv-ease);
 }
 
-/* The last minutes, in the colour the app uses for everything else that needs
-   attention. */
 .gs__ring.is-low .gs__arc {
   stroke: var(--nv-danger);
 }
 
-/*
- * Counter-rotated, because the ring itself is turned a quarter turn to move the arc's
- * start point — without this the figure inside would lie on its side.
- */
 .gs__person {
   rotate: 90deg;
   transform-origin: center;
@@ -72,8 +51,6 @@
 .gs__ring.is-empty .gs__person {
   stroke: var(--nv-text-faint);
 }
-
-// ------------------------------------------------------------------- panel
 
 .gs {
   display: flex;
@@ -131,8 +108,6 @@
   line-height: 1.5;
 }
 
-/* Matches the rating form's submit exactly — both are the one action of a small panel,
-   and they should not read as different weights of control. */
 .gs__extend {
   inline-size: 100%;
   padding: var(--nv-space-3) var(--nv-space-5);
@@ -146,7 +121,6 @@
     background var(--nv-fast) var(--nv-ease),
     color var(--nv-fast) var(--nv-ease);
 
-  /* A muted surface rather than a faded one, so the lattice cannot show through it. */
   &:disabled {
     background: var(--nv-surface-2);
     color: var(--nv-text-faint);

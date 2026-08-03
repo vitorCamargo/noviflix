@@ -7,10 +7,6 @@
 .cp {
   position: fixed;
   inset: 0;
-  /*
-   * Above the selection bar that opens it, which in turn sits above the details overlay. The four
-   * layers are ordered deliberately: overlay, bar, this panel, then the toasts.
-   */
   z-index: calc(var(--nv-z-modal) + 2);
   display: grid;
   place-items: center;
@@ -25,10 +21,6 @@
   animation: nv-fade-in var(--nv-fast) var(--nv-ease);
 }
 
-/*
- * Small on purpose. This is a pick-one-and-go step, not a page — sized like the overlay it
- * interrupts, it would be a heavier interruption than the decision deserves.
- */
 .cp__panel {
   position: relative;
   display: flex;
@@ -56,7 +48,6 @@
   font-size: var(--nv-text-sm);
 }
 
-/* Overlapped, so five posters take the room of about three. */
 .cp__posters {
   display: flex;
 
@@ -65,7 +56,6 @@
     aspect-ratio: 2 / 3;
     object-fit: cover;
     border-radius: var(--nv-radius-sm);
-    /* A ring in the panel's own colour separates the overlaps without drawing a border. */
     box-shadow: 0 0 0 2px var(--nv-panel);
 
     &:not(:first-child) {
@@ -74,10 +64,6 @@
   }
 }
 
-/*
- * A sheet on small screens. A centred panel on a phone leaves strips of scrim above and below and
- * puts the list further from the thumb than it needs to be.
- */
 @media (max-width: 640px) {
   .cp {
     place-items: end stretch;

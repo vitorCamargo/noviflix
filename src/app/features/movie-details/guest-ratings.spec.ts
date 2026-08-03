@@ -12,10 +12,7 @@ function rated(id: number, rating: number): RatedMovie {
   return { id, rating } as RatedMovie;
 }
 
-function page(
-  results: RatedMovie[],
-  totalPages = 1,
-): Paginated<RatedMovie> {
+function page(results: RatedMovie[], totalPages = 1): Paginated<RatedMovie> {
   return { page: 1, results, total_pages: totalPages, total_results: results.length };
 }
 
@@ -33,10 +30,6 @@ describe('toRatingMap', () => {
     expect(toRatingMap(undefined).size).toBe(0);
   });
 
-  /**
-   * Scores arrive as TMDB stored them. One the control cannot represent would leave the
-   * stars showing a different value from the one the form would submit.
-   */
   it('snaps a score to the nearest half step', () => {
     expect(toRatingMap([rated(1, 7.3)]).get(1)).toBe(7.5);
   });
@@ -47,11 +40,7 @@ describe('toRatingMap', () => {
   });
 
   it('ignores records missing an id or a score', () => {
-    const map = toRatingMap([
-      { rating: 7 } as RatedMovie,
-      { id: 2 } as RatedMovie,
-      rated(3, 8),
-    ]);
+    const map = toRatingMap([{ rating: 7 } as RatedMovie, { id: 2 } as RatedMovie, rated(3, 8)]);
 
     expect([...map.keys()]).toEqual([3]);
   });
@@ -59,16 +48,12 @@ describe('toRatingMap', () => {
 
 describe('mergeRatingPages', () => {
   it('folds several pages into one lookup', () => {
-    const merged = mergeRatingPages([
-      page([rated(1, 7)]),
-      page([rated(2, 8)]),
-    ]);
+    const merged = mergeRatingPages([page([rated(1, 7)]), page([rated(2, 8)])]);
 
     expect(merged.size).toBe(2);
     expect(merged.get(2)).toBe(8);
   });
 
-  /** A film repeated across pages should settle on one score, not two. */
   it('lets a later page win a repeat', () => {
     const merged = mergeRatingPages([page([rated(1, 7)]), page([rated(1, 9)])]);
 
@@ -98,10 +83,6 @@ describe('serialiseRatings / readStoredRatings', () => {
     expect(readStoredRatings(raw, 'sess-a')).toEqual(map);
   });
 
-  /**
-   * The point of storing the session id. Extending swaps it, and those ratings stay on
-   * TMDB under the old one — inheriting them would show scores this session does not have.
-   */
   it('refuses a lookup belonging to a different session', () => {
     const raw = serialiseRatings('sess-a', map);
     expect(readStoredRatings(raw, 'sess-b').size).toBe(0);
@@ -112,7 +93,6 @@ describe('serialiseRatings / readStoredRatings', () => {
     expect(readStoredRatings(serialiseRatings('sess-a', map), '').size).toBe(0);
   });
 
-  /** Storage is shared with the visitor's own devtools; nothing in it is trusted. */
   it('treats malformed storage as absent rather than throwing', () => {
     expect(readStoredRatings('not json', 'sess-a').size).toBe(0);
     expect(readStoredRatings('null', 'sess-a').size).toBe(0);
@@ -135,7 +115,6 @@ describe('serialiseRatings / readStoredRatings', () => {
 });
 
 describe('remainingPages', () => {
-  /** The common case: a guest session with a handful of ratings costs one request. */
   it('asks for nothing more when one page was the whole list', () => {
     expect(remainingPages(1)).toEqual([]);
     expect(remainingPages(0)).toEqual([]);
@@ -145,7 +124,6 @@ describe('remainingPages', () => {
     expect(remainingPages(3)).toEqual([2, 3]);
   });
 
-  /** The list has no upper bound, so the number of requests needs one. */
   it('stops at the cap', () => {
     expect(remainingPages(500)).toHaveLength(MAX_RATED_PAGES - 1);
     expect(remainingPages(500).at(-1)).toBe(MAX_RATED_PAGES);

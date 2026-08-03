@@ -1,12 +1,5 @@
 # Design notes
 
-Observations from the cruuunchify.com screenshots, to be implemented as original
-work — matching the visual language, not copying their code.
-
-> One note on approach: their bundle is readable in devtools, but lifting source
-> from it would put someone else's copyrighted code in this repo. Everything here
-> is described as behaviour to build from scratch.
-
 ## Palette
 
 Accent is used sparingly and with intent: one word in the headline, the primary

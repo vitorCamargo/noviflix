@@ -1,22 +1,12 @@
-// ---------------------------------------------------------------------------
-// Noviflix design tokens
-//
-// The whole visual identity funnels through these custom properties, so the
-// cruuunchify-inspired pass only has to touch this file plus _mixins.scss.
-// Accent is Novibet-leaning cyan (#33c5cf).
-// ---------------------------------------------------------------------------
-
 :root {
-  // Brand ------------------------------------------------------------------
   --nv-accent: #33c5cf;
   --nv-accent-strong: #5ce0e9;
   --nv-accent-dim: #1c8a92;
-  --nv-accent-ink: #04191b; // text placed on top of an accent fill
+  --nv-accent-ink: #04191b;
   --nv-accent-soft: rgba(51, 197, 207, 0.14);
   --nv-accent-line: rgba(51, 197, 207, 0.32);
   --nv-accent-glow: rgba(51, 197, 207, 0.45);
 
-  // Surfaces ---------------------------------------------------------------
   --nv-bg: #000000;
   --nv-bg-raised: #0a0c0d;
   --nv-surface: #101416;
@@ -24,34 +14,23 @@
   --nv-surface-3: #1f272a;
   --nv-overlay: rgba(0, 0, 0, 0.78);
 
-  // Overlays ---------------------------------------------------------------
-  // Panels sit slightly lighter than the page so they read as lifted without
-  // needing a hard border.
   --nv-panel: #17191a;
   --nv-panel-2: #1f2223;
   --nv-panel-tile: #232729;
-  /* Dismiss actions stay red so they read apart from the cyan accent. */
   --nv-close: #ff3b5c;
   --nv-close-soft: rgba(255, 59, 92, 0.14);
 
-  // Text -------------------------------------------------------------------
   --nv-text: #f2f6f7;
   --nv-text-muted: #9aa8ac;
   --nv-text-faint: #647175;
 
-  // Lines ------------------------------------------------------------------
   --nv-border: rgba(255, 255, 255, 0.09);
   --nv-border-strong: rgba(255, 255, 255, 0.18);
 
-  // Feedback ---------------------------------------------------------------
   --nv-danger: #ff5c72;
   --nv-warning: #ffc861;
   --nv-success: #4ade80;
 
-  // Popularity tiers -------------------------------------------------------
-  // Each status gets its own hue so the badge is legible at a glance, before
-  // the label is read. Deliberately outside the brand palette: these describe
-  // the film, not the product.
   --nv-tier-blazing: #ff6b3d;
   --nv-tier-trending: #f2f6f7;
   --nv-tier-acclaimed: #ff5c8a;
@@ -60,9 +39,8 @@
   --nv-tier-divisive: #ffa94d;
   --nv-tier-lowkey: #33c5cf;
 
-  // Typography -------------------------------------------------------------
-  --nv-font: 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', roboto, sans-serif;
+  --nv-font:
+    'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', roboto, sans-serif;
   --nv-font-display: 'Inter', 'Helvetica Neue', sans-serif;
 
   --nv-text-xs: 0.75rem;
@@ -77,7 +55,6 @@
   --nv-tracking-tight: -0.02em;
   --nv-tracking-wide: 0.08em;
 
-  // Spacing ----------------------------------------------------------------
   --nv-space-1: 0.25rem;
   --nv-space-2: 0.5rem;
   --nv-space-3: 0.75rem;
@@ -91,42 +68,25 @@
   --nv-max-width: 1440px;
   --nv-header-height: var(--nv-grid-cell);
 
-  // Shape ------------------------------------------------------------------
   --nv-radius-sm: 6px;
   --nv-radius: 12px;
   --nv-radius-lg: 20px;
   --nv-radius-pill: 999px;
 
-  // Depth ------------------------------------------------------------------
   --nv-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.55);
   --nv-shadow-pop: 0 32px 80px rgba(0, 0, 0, 0.7);
-  --nv-shadow-accent: 0 0 0 1px var(--nv-accent-line),
-    0 8px 32px var(--nv-accent-glow);
+  --nv-shadow-accent: 0 0 0 1px var(--nv-accent-line), 0 8px 32px var(--nv-accent-glow);
 
-  // Motion -----------------------------------------------------------------
   --nv-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nv-fast: 140ms;
   --nv-normal: 240ms;
   --nv-slow: 420ms;
 
-  /*
-   * Panel motion, matching the reference's curve and timings.
-   *
-   * A long, heavily decelerated ease: fast off the mark, then a slow settle.
-   * That's what makes a half-second reveal feel unhurried rather than sluggish.
-   */
   --nv-ease-panel: cubic-bezier(0.2, 0.6, 0.35, 1);
-  /* Panel unmasking. */
   --nv-dur-mask: 500ms;
-  /* Content rising inside the panel. */
   --nv-dur-swipe: 700ms;
-  /* Content waits for the mask to be underway before it rises. */
   --nv-delay-swipe: 200ms;
 
-  // Grid backdrop ----------------------------------------------------------
-  // The grid is a field of opaque pads separated by 1px seams. The seam colour
-  // is whatever sits behind them, so the "lines" are really gaps, and the glow
-  // layered underneath shines through only where those gaps are.
   --nv-grid-cell: 64px;
   --nv-grid-gap: 1px;
   --nv-grid-radius: 8px;
@@ -134,37 +94,14 @@
   --nv-grid-pad: var(--nv-bg-raised);
   --nv-glow-size: 30vh;
 
-  /*
-   * How far the trailer embed is scaled past the card it fills.
-   *
-   * YouTube offers no parameter to hide the video title or the control bar —
-   * `modestbranding` no longer does anything, and `controls=0` leaves the title
-   * overlay behind. Overscanning pushes those bands, which live at the very top
-   * and bottom of the frame, outside the visible area.
-   *
-   * The cost is real: roughly this much of the picture is cropped off each edge.
-   * Lower it if trailers start losing their subject, raise it if chrome peeks in.
-   */
   --nv-trailer-overscan: 1.42;
 
-  // Layering ---------------------------------------------------------------
-  // Bottom to top. The glow deliberately sits *below* the pads: it's visible
-  // only through the seams, which is what makes the grid light up near the
-  // pointer instead of a blob floating over the UI.
   --nv-z-glow: 5;
   --nv-z-grid: 10;
   --nv-z-content: 20;
   --nv-z-header: 100;
   --nv-z-modal: 200;
-  /* Swallows pointer events mid-scroll so hover states don't flicker. */
   --nv-z-scroll-overlay: 800;
-  /* Above everything — the pointer must never be occluded. */
   --nv-z-cursor: 900;
-  /*
-   * The first-load screen, over every other layer but the pointer's.
-   *
-   * Under the cursor deliberately: the custom cursor replaces the native one, so covering it would
-   * leave the mouse invisible for the length of the introduction.
-   */
   --nv-z-boot: 850;
 }

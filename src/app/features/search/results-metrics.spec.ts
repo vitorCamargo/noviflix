@@ -1,13 +1,6 @@
-import {
-  CARD_COLS,
-  CARD_GAP,
-  CARD_ROWS,
-  resultGridWidth,
-  resultRowCount,
-} from './results-metrics';
+import { CARD_COLS, CARD_GAP, CARD_ROWS, resultGridWidth, resultRowCount } from './results-metrics';
 
 describe('resultRowCount', () => {
-  /** Gaps sit between rows, not after the last one, so this isn't a division. */
   it('fits one card row before there is room for a gap', () => {
     expect(resultRowCount(CARD_ROWS)).toBe(1);
   });
@@ -21,7 +14,6 @@ describe('resultRowCount', () => {
     expect(resultRowCount(CARD_ROWS * 3 + CARD_GAP * 2)).toBe(3);
   });
 
-  /** A viewport too short for a card shows a clipped row, not an empty page. */
   it('never returns zero rows', () => {
     expect(resultRowCount(0)).toBe(1);
     expect(resultRowCount(-5)).toBe(1);
@@ -42,7 +34,6 @@ describe('resultGridWidth', () => {
     expect(resultGridWidth(6, 2)).toBe(CARD_COLS * 3 + CARD_GAP * 2);
   });
 
-  /** A part-filled last column still occupies a full column's width. */
   it('rounds a partial column up', () => {
     expect(resultGridWidth(3, 2)).toBe(resultGridWidth(4, 2));
   });

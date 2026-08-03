@@ -13,10 +13,6 @@ import {
   staggerDrops,
 } from './collections-layout';
 
-/**
- * Heights worth checking, in drum rows. Short enough that the wave has to flatten, tall enough for
- * the whole of it, and the awkward sizes in between.
- */
 const HEIGHTS = [4, 6, 7, 8, 9, 12, 14, 18, 24];
 
 describe('staggerDrops', () => {
@@ -65,13 +61,10 @@ describe('staggerDrops', () => {
 describe('collectionsLayout', () => {
   it('keeps the whole arrangement inside the rows below the header', () => {
     for (const rows of HEIGHTS) {
-      // A window with no room for even one card is the exception below, not this rule: there the
-      // card is kept and clipped, on the grounds that a cut poster beats an empty page.
       if (rows - 1 < CARD_ROWS) continue;
 
       const { bandRowEnd } = collectionsLayout(rows, 6);
 
-      // The last line the field occupies must not be past the grid's own last line.
       expect(bandRowEnd, `${rows} drum rows`).toBeLessThanOrEqual(rows + 1);
     }
   });
@@ -97,7 +90,6 @@ describe('collectionsLayout', () => {
   });
 
   it('only makes room for the depths the field actually reaches', () => {
-    // Two cards, so the wave has not got to its deepest point yet.
     const two = collectionsLayout(30, 2);
 
     expect(two.bandRows).toBe(CARD_ROWS + Math.max(...two.drops));

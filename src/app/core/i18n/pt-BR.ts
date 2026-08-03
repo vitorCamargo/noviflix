@@ -3,15 +3,12 @@ import type { Dictionary } from './en';
 export const ptBR: Dictionary = {
   'app.name': 'Noviflix',
   'boot.loading': 'Iniciando o Noviflix',
-  'app.tagline': 'Descubra como você assiste.',
 
   'nav.home': 'Início',
   'nav.collections': 'Coleções',
   'nav.language': 'Idioma',
 
   'page.home.title': 'Início',
-  'page.home.body': 'A busca e os filmes em destaque entram aqui.',
-  'page.home.demoModal': 'Abrir o pop-up de detalhes',
 
   'home.headlineLead': 'Descubra como',
   'home.headlineTailBefore': 'você',
@@ -39,7 +36,6 @@ export const ptBR: Dictionary = {
 
   'movie.overview': 'Sinopse',
   'movie.noOverview': 'Ainda não há sinopse escrita neste idioma.',
-  'movie.facts': 'Detalhes',
   'movie.budget': 'Orçamento',
   'movie.revenue': 'Receita',
   'movie.runtime': 'Duração',
@@ -48,7 +44,6 @@ export const ptBR: Dictionary = {
   'movie.voteCountLabel': 'Total de votos',
   'movie.voteCount': 'de {count} votos',
 
-  // Avaliação
   'movie.rate': 'Avaliar',
   'movie.addToCollection': 'Adicionar à coleção',
   'movie.rateHeading': 'Avalie este filme',
@@ -85,17 +80,8 @@ export const ptBR: Dictionary = {
   'home.tier.divisive': 'Controverso',
   'home.tier.lowkey': 'Discreto',
 
-  'page.search.title': 'Resultados da busca',
-  'page.search.body': 'Os resultados da busca atual entram aqui.',
-
-  'page.movie.title': 'Detalhes do filme',
-  'page.movie.body': 'Os detalhes completos de um filme entram aqui.',
-
   'page.movieModal.title': 'Detalhes do filme (pop-up)',
-  'page.movieModal.body': 'Os mesmos detalhes, sobrepostos à página de trás.',
 
-
-  // Coleções
   'collections.headlineLead': 'Todas as suas coleções,',
   'collections.headlineAccent': 'salvas.',
   'collections.headlineBody':
@@ -106,8 +92,7 @@ export const ptBR: Dictionary = {
   'collections.open': 'Abrir {name}',
   'collections.new': 'Nova coleção',
   'collections.createTitle': 'Nova coleção',
-  'collections.createLead':
-    'Dê um nome e diga o que entra nela. Os dois são obrigatórios.',
+  'collections.createLead': 'Dê um nome e diga o que entra nela. Os dois são obrigatórios.',
   'collections.fieldTitle': 'Título',
   'collections.fieldTitlePlaceholder': 'Noites de sábado',
   'collections.fieldDescription': 'Descrição',
@@ -117,42 +102,36 @@ export const ptBR: Dictionary = {
   'collections.errorRequired': 'Campo obrigatório.',
   'collections.errorTooLong': 'Use menos de {max} caracteres.',
   'collections.emptyTitle': 'Esta coleção está vazia',
-  'collections.emptyDetail':
-    'Nada aqui ainda. Busque filmes e adicione a partir dos resultados.',
+  'collections.emptyDetail': 'Nada aqui ainda. Busque filmes e adicione a partir dos resultados.',
   'collections.noDescription': 'Nenhuma descrição foi escrita para esta.',
   'collections.tabMovies': 'Filmes',
   'collections.createdAt': 'Criada em',
   'collections.updatedAt': 'Última alteração',
   'collections.removeMovie': 'Remover {title} desta coleção',
 
-  // Editar e excluir uma coleção
   'collections.edit': 'Editar',
   'collections.editOne': 'Editar {name}',
   'collections.editTitle': 'Editar coleção',
-  'collections.editLead':
-    'Mude o nome ou para que ela serve. Os dois continuam obrigatórios.',
+  'collections.editLead': 'Mude o nome ou para que ela serve. Os dois continuam obrigatórios.',
   'collections.editSubmit': 'Salvar alterações',
   'collections.delete': 'Excluir',
   'collections.removeOne': 'Excluir {name}',
   'collections.deleted': '{name} excluída.',
 
-  // Adicionar a uma coleção
   'collections.select': 'Selecionar {title}',
   'collections.selected': '{count} selecionados',
   'collections.addSelected': 'Adicionar à coleção',
   'collections.clearSelection': 'Limpar',
   'collections.pickerTitle': 'Adicionar a uma coleção',
   'collections.pickerLead': 'Escolha onde estes {count} filmes devem entrar.',
-  'collections.pickerEmpty':
-    'Nenhuma coleção ainda. Crie uma e eles vão para lá.',
+  'collections.pickerEmpty': 'Nenhuma coleção ainda. Crie uma e eles vão para lá.',
   'collections.find': 'Encontrar uma coleção',
   'collections.noMatch': 'Nenhuma coleção corresponde a isso.',
   'collections.noMatchTitle': 'Nada chamado “{query}”',
   'collections.noMatchBody':
     'Confira a grafia, ou tente parte de um nome — o filtro procura em qualquer posição, não só no começo.',
   'collections.showAll': 'Ver todas as {count}',
-  'collections.createWithFilms':
-    'Dê um nome e os {count} filmes escolhidos entram direto nela.',
+  'collections.createWithFilms': 'Dê um nome e os {count} filmes escolhidos entram direto nela.',
   'collections.generatedName': 'Coleção',
   'collections.generatedDescription': 'Começou com um filme que você gostou.',
   'collections.createdWith': '{name} criada com {count} filmes.',
@@ -191,7 +170,6 @@ export const ptBR: Dictionary = {
   'common.openFull': 'Abrir página completa',
   'common.back': 'Voltar',
   'common.forward': 'Avançar',
-  'common.share': 'Compartilhar',
 
   'error.kicker': 'Erro 404',
   'error.titleLead': 'Não há nada',
@@ -199,7 +177,6 @@ export const ptBR: Dictionary = {
   'error.body':
     'O link pode estar velho, ou o endereço foi digitado errado. Todos os filmes continuam aqui — comece do topo, ou abra uma das suas coleções.',
   'error.path': 'Você pediu',
-  'error.notFound': 'Não encontramos essa página.',
   'error.goHome': 'Voltar ao início',
   'error.toCollections': 'Minhas coleções',
 };

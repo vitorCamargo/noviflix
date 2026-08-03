@@ -1,11 +1,6 @@
 @let film = movie();
 
 <nv-drum-card [interactive]="true">
-  <!--
-    The card itself toggles selection, which is what it is most often used for. A checkbox rather
-    than a button, because that is what it is: a thing with two states, announced as such. It was
-    a link to the details before, and the two swapped — opening a film now lives on the icon.
-  -->
   <button
     type="button"
     class="mc"
@@ -19,7 +14,6 @@
       @if (poster(); as src) {
         <img class="mc__img" [src]="src" [alt]="" loading="lazy" />
       } @else {
-        <!-- Not every record has artwork, and an empty frame reads as broken. -->
         <span class="mc__fallback" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <rect x="2" y="4" width="20" height="16" rx="2.5" />
@@ -28,10 +22,6 @@
         </span>
       }
 
-      <!--
-        The tick is now only a mark, not a control — the card around it is the checkbox, so this
-        is hidden from assistive tech and takes no pointer events of its own.
-      -->
       <span class="mc__pick" [class.is-on]="selected()" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <path d="M5 12.5l5 5 9-11" />
@@ -63,11 +53,6 @@
     </span>
   </button>
 
-  <!--
-    Opens the details pop-up — the job the card body used to do. Still a link, so keyboard focus,
-    middle-click and open-in-new-tab keep working; it sits outside the card's control because one
-    interactive element cannot contain another.
-  -->
   <a
     class="mc__full"
     [href]="modalHref()"
@@ -80,5 +65,4 @@
       <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
     </svg>
   </a>
-
 </nv-drum-card>

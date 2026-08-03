@@ -20,10 +20,6 @@ describe('normaliseSearchTerm', () => {
 });
 
 describe('validateSearchTerm', () => {
-  /**
-   * Emptiness is deliberately not an error: nothing has been attempted yet, so
-   * there is nothing to complain about while the user is still typing.
-   */
   it('accepts an empty term without complaint', () => {
     expect(validateSearchTerm('')).toBeNull();
     expect(validateSearchTerm('   ')).toBeNull();
@@ -43,7 +39,6 @@ describe('validateSearchTerm', () => {
     });
   });
 
-  /** Trimming happens before measuring, so padding cannot buy length. */
   it('does not let surrounding spaces satisfy the length rule', () => {
     expect(validateSearchTerm(' up ')?.[SEARCH_ERROR.tooShort]).toBeTruthy();
   });
@@ -54,7 +49,6 @@ describe('validateSearchTerm', () => {
     }
   });
 
-  /** Multi-word titles have to be typable, so spaces pass the character rule. */
   it('allows spaces between words', () => {
     expect(validateSearchTerm('blade runner')).toBeNull();
   });
@@ -75,10 +69,6 @@ describe('isSearchable', () => {
   });
 });
 
-/**
- * The spec requires the rules to be reachable as a directive, so this checks the
- * validator contract rather than re-testing the rules themselves.
- */
 describe('SearchTermValidator', () => {
   const directive = new SearchTermValidator();
 

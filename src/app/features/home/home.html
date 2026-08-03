@@ -1,10 +1,4 @@
-<!--
-  `is-entering` is what starts the composition assembling. It lands when the first-load screen begins
-  to clear, so the blocks arrive into the space it leaves rather than behind it — and each one carries
-  its own delay from the entrance table.
--->
 <nv-page-grid [minColumns]="minColumns()" [class.is-entering]="entering()">
-  <!-- Headline. Dots sit behind it, bleeding left off the text block. -->
   <div class="caption" [style.gridArea]="area('caption')">
     <div class="caption__dots" [style.--enter]="delay('dots')">
       <nv-dot-field [columns]="4" [rows]="5" />
@@ -25,244 +19,209 @@
     </p>
   </div>
 
-  <!-- Search, in the slot the dashed placeholder was reserving. -->
   <div class="action" [style.gridArea]="area('action')" [style.--enter]="delay('search')">
     <nv-search-field />
   </div>
 
   @if (searching()) {
-    <!--
-      Results take the card stack's space. The featured blocks are removed rather
-      than hidden, so their images stop loading and the trailer's hover machinery
-      isn't sitting behind the grid waiting to fire.
-    -->
     <div class="results" [style.gridArea]="resultsArea()">
       <nv-search-results-grid [rows]="cardRows()" />
     </div>
   } @else {
+    <div class="badge" [style.gridArea]="area('badge')" [style.--enter]="delay('badge')">
+      <span class="badge__dot">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="2" y="6" width="13" height="12" rx="2.5" />
+          <path d="m15 11 6-3.2v8.4L15 13z" />
+        </svg>
+      </span>
 
-  <!-- Camera badge, floating above the card stack, with its dot trail. -->
-  <div class="badge" [style.gridArea]="area('badge')" [style.--enter]="delay('badge')">
-    <span class="badge__dot">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="2" y="6" width="13" height="12" rx="2.5" />
-        <path d="m15 11 6-3.2v8.4L15 13z" />
-      </svg>
-    </span>
-
-    @for (dot of trail; track $index) {
-      <span
-        class="badge__trail"
-        aria-hidden="true"
-        [style.translate]="dot.x + 'px ' + dot.y + 'px'"
-        [style.width.px]="dot.size"
-        [style.height.px]="dot.size"
-        [style.opacity]="dot.opacity"
-        [style.--enter]="trailDelay($index)"
-      ></span>
-    }
-  </div>
-
-  <!--
-    Hero: backdrop, trailer, title, genre tags.
-
-    Hover is tracked on this wrapper rather than on the trailer itself, so moving
-    the pointer onto the title doesn't count as leaving the card.
-  -->
-  <div
-    class="hero"
-    [class.is-playing]="trailerPlaying()"
-    [class.swap-a]="swapSide() === 'a'"
-    [class.swap-b]="swapSide() === 'b'"
-    [style.gridArea]="area('hero')"
-    [style.--enter]="delay('hero')"
-    (pointerenter)="onHeroEnter($event)"
-    (pointerleave)="onHeroLeave()"
-  >
-    <nv-drum-card [flat]="true" [interactive]="true">
-      @if (backdrop(); as src) {
-        <img class="hero__img" [src]="src" [alt]="active()?.title ?? ''" />
+      @for (dot of trail; track $index) {
+        <span
+          class="badge__trail"
+          aria-hidden="true"
+          [style.translate]="dot.x + 'px ' + dot.y + 'px'"
+          [style.width.px]="dot.size"
+          [style.height.px]="dot.size"
+          [style.opacity]="dot.opacity"
+          [style.--enter]="trailDelay($index)"
+        ></span>
       }
+    </div>
 
-      <nv-hero-trailer
-        [movieId]="active()?.id ?? null"
-        [hovered]="heroHovered()"
-        (stateChange)="onTrailerState($event)"
-      />
-
-      <div class="hero__scrim"></div>
-
-      <div class="hero__text" [style.--enter]="delay('heroText')">
-        <h2 class="hero__title">{{ active()?.title }}</h2>
-        @if (genres().length) {
-          <ul class="tags">
-            @for (genre of genres(); track genre) {
-              <li class="tag">{{ genre }}</li>
-            }
-            @if (extraGenres(); as extra) {
-              <li class="tag tag--more">+{{ extra }}</li>
-            }
-          </ul>
+    <div
+      class="hero"
+      [class.is-playing]="trailerPlaying()"
+      [class.swap-a]="swapSide() === 'a'"
+      [class.swap-b]="swapSide() === 'b'"
+      [style.gridArea]="area('hero')"
+      [style.--enter]="delay('hero')"
+      (pointerenter)="onHeroEnter($event)"
+      (pointerleave)="onHeroLeave()"
+    >
+      <nv-drum-card [flat]="true" [interactive]="true">
+        @if (backdrop(); as src) {
+          <img class="hero__img" [src]="src" [alt]="active()?.title ?? ''" />
         }
-      </div>
-    </nv-drum-card>
-  </div>
 
-  <!-- Poster with featured cast underneath. Half-drum nudge interlocks it
-       with the hero rather than sitting flush against it. -->
-  <div
-    class="poster"
-    [class.swap-a]="swapSide() === 'a'"
-    [class.swap-b]="swapSide() === 'b'"
-    [style.gridArea]="area('poster')"
-    [style.translate]="posterNudge()"
-    [style.--enter]="delay('poster')"
-  >
-    <!--
-      Interactive like a result card — reveals the rating and opens the same
-      details pop-up — but without the corner glow. Here the card overlaps the
-      hero, so light escaping around its edges falls on another card rather than
-      on the lattice, and reads as a smudge instead of a lift.
-    -->
-    <nv-drum-card [interactive]="true" [glow]="false">
-      <a
-        class="poster__link"
-        [routerLink]="modalLink()"
-        [attr.aria-label]="
-          i18n.t('movie.openDetails', { title: active()?.title ?? '' })
-        "
-      >
-        <span class="poster__art">
-          @if (poster(); as src) {
-            <img class="poster__img" [src]="src" [alt]="" />
+        <nv-hero-trailer
+          [movieId]="active()?.id ?? null"
+          [hovered]="heroHovered()"
+          (stateChange)="onTrailerState($event)"
+        />
+
+        <div class="hero__scrim"></div>
+
+        <div class="hero__text" [style.--enter]="delay('heroText')">
+          <h2 class="hero__title">{{ active()?.title }}</h2>
+          @if (genres().length) {
+            <ul class="tags">
+              @for (genre of genres(); track genre) {
+                <li class="tag">{{ genre }}</li>
+              }
+              @if (extraGenres(); as extra) {
+                <li class="tag tag--more">+{{ extra }}</li>
+              }
+            </ul>
           }
+        </div>
+      </nv-drum-card>
+    </div>
 
-          <span class="poster__score">
-            @if (score(); as value) {
-              <svg class="poster__star" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
-                />
-              </svg>
-              <span>{{ value }}</span>
-              <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
-            } @else {
-              <span>{{ i18n.t('movie.unrated') }}</span>
+    <div
+      class="poster"
+      [class.swap-a]="swapSide() === 'a'"
+      [class.swap-b]="swapSide() === 'b'"
+      [style.gridArea]="area('poster')"
+      [style.translate]="posterNudge()"
+      [style.--enter]="delay('poster')"
+    >
+      <nv-drum-card [interactive]="true" [glow]="false">
+        <a
+          class="poster__link"
+          [routerLink]="modalLink()"
+          [attr.aria-label]="i18n.t('movie.openDetails', { title: active()?.title ?? '' })"
+        >
+          <span class="poster__art">
+            @if (poster(); as src) {
+              <img class="poster__img" [src]="src" [alt]="" />
             }
-          </span>
-        </span>
 
-        <span class="poster__meta">
-          <span class="poster__label">{{ i18n.t('home.featuredCast') }}</span>
-          @if (cast().length) {
-            <span class="poster__names">
-              @for (person of cast(); track person.id) {
-                <span>{{ person.name }}</span>
+            <span class="poster__score">
+              @if (score(); as value) {
+                <svg class="poster__star" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 2.8l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2-5.6-3.1-5.6 3.1 1.2-6.2L3 9.4l6.3-.8L12 2.8Z"
+                  />
+                </svg>
+                <span>{{ value }}</span>
+                <span class="nv-sr">{{ i18n.t('movie.voteAverage') }}</span>
+              } @else {
+                <span>{{ i18n.t('movie.unrated') }}</span>
               }
             </span>
-          } @else {
-            <span class="poster__names poster__names--empty">—</span>
-          }
-        </span>
-      </a>
+          </span>
 
-    </nv-drum-card>
-  </div>
-
-  <!-- Popularity. One drum tall, so label and tier only — no room for tags. -->
-  <div
-    class="stats"
-    [class.swap-a]="swapSide() === 'a'"
-    [class.swap-b]="swapSide() === 'b'"
-    [style.gridArea]="area('stats')"
-    [style.--enter]="delay('stats')"
-  >
-    <nv-drum-card>
-      <div class="stats__body">
-        <nv-popularity-badge [tier]="tier()" />
-
-        <div class="stats__text">
-          <p class="stats__label">{{ i18n.t('home.popularity') }}</p>
-          <p class="stats__value">{{ tierLabel() }}</p>
-        </div>
-      </div>
-    </nv-drum-card>
-  </div>
-
-  <!--
-    Avatar strip. Hovering anywhere in here pauses the countdown, so a movie
-    can be studied without it sliding away mid-read.
-  -->
-  <div
-    class="carousel"
-    [style.gridArea]="area('carousel')"
-    [style.translate]="carouselNudge()"
-    [style.--enter]="delay('carousel')"
-    (pointerenter)="pause()"
-    (pointerleave)="resume()"
-    (focusin)="pause()"
-    (focusout)="resume()"
-  >
-    <button
-      type="button"
-      class="carousel__nav carousel__nav--prev"
-      [attr.aria-label]="i18n.t('common.back')"
-      (click)="prev()"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
-    </button>
-
-    <ul class="carousel__list">
-      @for (item of strip(); track item.index) {
-        <li class="carousel__slot" [style.--enter]="avatarDelay($index)">
-          <button
-            type="button"
-            class="carousel__item"
-            [class.is-active]="item.isActive"
-            [attr.aria-label]="item.movie.title"
-            [attr.aria-current]="item.isActive"
-            (click)="select(item.index)"
-          >
-            @if (avatarUrl(item.movie); as src) {
-              <img [src]="src" [alt]="" />
+          <span class="poster__meta">
+            <span class="poster__label">{{ i18n.t('home.featuredCast') }}</span>
+            @if (cast().length) {
+              <span class="poster__names">
+                @for (person of cast(); track person.id) {
+                  <span>{{ person.name }}</span>
+                }
+              </span>
+            } @else {
+              <span class="poster__names poster__names--empty">—</span>
             }
-          </button>
+          </span>
+        </a>
+      </nv-drum-card>
+    </div>
 
-          @if (item.isActive) {
-            <!--
-              Countdown ring. Sits outside the button so the avatar can stay
-              circular and clipped while the stroke draws around it.
-            -->
-            <svg class="carousel__ring" viewBox="0 0 100 100" aria-hidden="true">
-              <circle
-                class="carousel__ring-track"
-                [attr.cx]="50"
-                [attr.cy]="50"
-                [attr.r]="ringRadius"
-              />
-              <circle
-                class="carousel__ring-fill"
-                [attr.cx]="50"
-                [attr.cy]="50"
-                [attr.r]="ringRadius"
-                [attr.stroke-dasharray]="ringCircumference"
-                [attr.stroke-dashoffset]="ringDashOffset()"
-              />
-            </svg>
-          }
-        </li>
-      }
-    </ul>
-
-    <button
-      type="button"
-      class="carousel__nav carousel__nav--next"
-      [attr.aria-label]="i18n.t('common.forward')"
-      (click)="next()"
+    <div
+      class="stats"
+      [class.swap-a]="swapSide() === 'a'"
+      [class.swap-b]="swapSide() === 'b'"
+      [style.gridArea]="area('stats')"
+      [style.--enter]="delay('stats')"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-    </button>
-  </div>
+      <nv-drum-card>
+        <div class="stats__body">
+          <nv-popularity-badge [tier]="tier()" />
 
+          <div class="stats__text">
+            <p class="stats__label">{{ i18n.t('home.popularity') }}</p>
+            <p class="stats__value">{{ tierLabel() }}</p>
+          </div>
+        </div>
+      </nv-drum-card>
+    </div>
+
+    <div
+      class="carousel"
+      [style.gridArea]="area('carousel')"
+      [style.translate]="carouselNudge()"
+      [style.--enter]="delay('carousel')"
+      (pointerenter)="pause()"
+      (pointerleave)="resume()"
+      (focusin)="pause()"
+      (focusout)="resume()"
+    >
+      <button
+        type="button"
+        class="carousel__nav carousel__nav--prev"
+        [attr.aria-label]="i18n.t('common.back')"
+        (click)="prev()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+      </button>
+
+      <ul class="carousel__list">
+        @for (item of strip(); track item.index) {
+          <li class="carousel__slot" [style.--enter]="avatarDelay($index)">
+            <button
+              type="button"
+              class="carousel__item"
+              [class.is-active]="item.isActive"
+              [attr.aria-label]="item.movie.title"
+              [attr.aria-current]="item.isActive"
+              (click)="select(item.index)"
+            >
+              @if (avatarUrl(item.movie); as src) {
+                <img [src]="src" [alt]="" />
+              }
+            </button>
+
+            @if (item.isActive) {
+              <svg class="carousel__ring" viewBox="0 0 100 100" aria-hidden="true">
+                <circle
+                  class="carousel__ring-track"
+                  [attr.cx]="50"
+                  [attr.cy]="50"
+                  [attr.r]="ringRadius"
+                />
+                <circle
+                  class="carousel__ring-fill"
+                  [attr.cx]="50"
+                  [attr.cy]="50"
+                  [attr.r]="ringRadius"
+                  [attr.stroke-dasharray]="ringCircumference"
+                  [attr.stroke-dashoffset]="ringDashOffset()"
+                />
+              </svg>
+            }
+          </li>
+        }
+      </ul>
+
+      <button
+        type="button"
+        class="carousel__nav carousel__nav--next"
+        [attr.aria-label]="i18n.t('common.forward')"
+        (click)="next()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+      </button>
+    </div>
   }
 </nv-page-grid>

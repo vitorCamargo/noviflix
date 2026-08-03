@@ -60,33 +60,13 @@ export function clampOffset(offset: number, scrollWidth: number, clientWidth: nu
   return Math.max(0, Math.min(scrollWidth - clientWidth, offset));
 }
 
-/**
- * Whether the track is currently a horizontal scroll container.
- *
- * `scrollWidth > clientWidth` alone is not enough to decide this. It reports
- * overflowing content even when `overflow-x` is `visible`, so in stacked mode a
- * single wide descendant made the directive believe it was in charge: it then
- * called `preventDefault()` on every wheel event and wrote to `scrollLeft`,
- * which does nothing on a non-scrolling box. The result was a page that simply
- * refused to scroll. The mode has to come from the computed overflow, which is
- * what the breakpoint actually changes.
- */
 export function isHorizontalTrack(overflowX: string): boolean {
   return overflowX === 'auto' || overflowX === 'scroll';
 }
 
-/**
- * Pointer travel before a press counts as a drag rather than a click.
- *
- * Without a threshold, the tiny movement between mousedown and mouseup would
- * swallow every click on a card or button.
- */
 export const DRAG_THRESHOLD_PX = 6;
 
-export function exceedsDragThreshold(
-  totalTravel: number,
-  threshold = DRAG_THRESHOLD_PX,
-): boolean {
+export function exceedsDragThreshold(totalTravel: number, threshold = DRAG_THRESHOLD_PX): boolean {
   return Math.abs(totalTravel) > threshold;
 }
 
@@ -105,32 +85,15 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
   private target = 0;
   private frame: number | null = null;
 
-  /** Pointer id of an in-flight drag, or null. */
   private dragPointer: number | null = null;
   private dragLastX = 0;
   private dragTravel = 0;
 
-  /**
-   * True once a press has become a drag, which suppresses text selection.
-   *
-   * Selection can't be prevented on pointerdown — that would also stop the press
-   * focusing an input or reaching a control — so it is allowed to begin and then
-   * cancelled at the moment the gesture turns out to be a drag.
-   */
   protected readonly dragging = signal(false);
 
   private resizeObserver: ResizeObserver | null = null;
   private mutationObserver: MutationObserver | null = null;
 
-  /**
-   * Watches the track and its contents for size changes.
-   *
-   * Measuring once after view init isn't enough: the routed page is lazy, so at
-   * that moment the track is still empty and always measures as fitting. That's
-   * why the hint only appeared after a manual resize. Observing the children
-   * catches the page arriving, its images loading, and any later route change,
-   * without needing to know about the router at all.
-   */
   ngAfterViewInit(): void {
     if (typeof ResizeObserver === 'undefined') {
       this.measure();
@@ -165,13 +128,6 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     this.trackState.offset.set(0);
   }
 
-  /**
-   * Eases the track back to its start.
-   *
-   * Bound as a field so the identity is stable — the same reference registers and
-   * unregisters, which is what lets TrackState tell a stale teardown apart from
-   * the current track's.
-   */
   private readonly returnToStart = (): void => {
     const el = this.host.nativeElement;
     if (!this.canScroll(el)) return;
@@ -187,28 +143,21 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     this.start();
   };
 
-  /** Publishes the position so the return control knows whether it has a job. */
   @HostListener('scroll')
   protected onScroll(): void {
     this.trackState.offset.set(this.host.nativeElement.scrollLeft);
   }
 
-  /** Re-observing an element already under observation is a no-op. */
   private observeChildren(): void {
     for (const child of Array.from(this.host.nativeElement.children)) {
       this.resizeObserver?.observe(child);
     }
   }
 
-  /** True only while the track is a scroll rail with somewhere to go. */
   private canScroll(el: HTMLElement): boolean {
-    return (
-      isHorizontalTrack(getComputedStyle(el).overflowX) &&
-      el.scrollWidth > el.clientWidth + 1
-    );
+    return isHorizontalTrack(getComputedStyle(el).overflowX) && el.scrollWidth > el.clientWidth + 1;
   }
 
-  /** Publishes whether there is anything to navigate to, for the hint. */
   private measure(): void {
     const el = this.host.nativeElement;
     this.trackState.overflowing.set(this.canScroll(el));
@@ -249,16 +198,10 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     this.start();
   }
 
-  // ------------------------------------------------------------ drag to scroll
-
   @HostListener('pointerdown', ['$event'])
   protected onPointerDown(event: PointerEvent): void {
-    // Touch already pans a horizontally-scrollable element natively; taking it
-    // over here would only fight the browser's own momentum.
     if (event.pointerType === 'touch') return;
 
-    // Primary button only. A right-click opens the context menu and a
-    // middle-click is autoscroll — neither should drag the page.
     if (event.button !== 0) return;
 
     const el = this.host.nativeElement;
@@ -281,23 +224,14 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
 
     const el = this.host.nativeElement;
 
-    // Capture only once the gesture is definitely a drag, so a plain click on a
-    // card still reaches it.
     if (!el.hasPointerCapture(event.pointerId)) {
       el.setPointerCapture(event.pointerId);
       this.dragging.set(true);
-      // Anything highlighted before the threshold was crossed is discarded, so a
-      // drag never leaves a trail of selected titles behind it.
       window.getSelection?.()?.removeAllRanges();
     }
 
     this.stop();
-    // Content follows the hand, so the track moves opposite the pointer.
-    el.scrollLeft = clampOffset(
-      el.scrollLeft - dx,
-      el.scrollWidth,
-      el.clientWidth,
-    );
+    el.scrollLeft = clampOffset(el.scrollLeft - dx, el.scrollWidth, el.clientWidth);
   }
 
   @HostListener('pointerup', ['$event'])
@@ -313,12 +247,6 @@ export class HorizontalScroll implements AfterViewInit, OnDestroy {
     this.dragging.set(false);
   }
 
-  /**
-   * Swallows the click that ends a drag.
-   *
-   * A drag over a poster would otherwise both scroll the track and open the
-   * movie, since the browser still fires a click on release.
-   */
   @HostListener('click', ['$event'])
   protected onClick(event: MouseEvent): void {
     if (exceedsDragThreshold(this.dragTravel)) {

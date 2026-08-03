@@ -27,7 +27,6 @@ describe('validateTitle', () => {
     expect(validateTitle('')?.[COLLECTION_ERROR.required]).toBe(true);
   });
 
-  /** The case a required rule exists to catch: it looks filled and holds nothing. */
   it('rejects a title of only spaces', () => {
     expect(validateTitle('   ')?.[COLLECTION_ERROR.required]).toBe(true);
   });
@@ -47,7 +46,6 @@ describe('validateTitle', () => {
 });
 
 describe('validateDescription', () => {
-  /** The spec makes this required too, not optional. */
   it('rejects an empty description', () => {
     expect(validateDescription('')?.[COLLECTION_ERROR.required]).toBe(true);
   });

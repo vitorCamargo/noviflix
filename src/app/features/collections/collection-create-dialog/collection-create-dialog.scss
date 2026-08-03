@@ -4,10 +4,6 @@
   display: contents;
 }
 
-/*
- * Above the add panel, because it is opened from it. Without the extra step the dialog would
- * appear behind the thing that asked for it.
- */
 .cd {
   position: fixed;
   inset: 0;
@@ -105,8 +101,6 @@
   line-height: 1.6;
 }
 
-/* Holds its line whether or not there is a message, so the dialog does not resize as one
-   appears — a panel that jumps while being typed into is hard to aim at. */
 .cd__error {
   margin: 0;
   min-block-size: var(--nv-space-4);
@@ -131,7 +125,6 @@
   font-size: var(--nv-text-sm);
   font-weight: 700;
 
-  /* A muted surface rather than a faded one, so nothing shows through it. */
   &:disabled {
     background: var(--nv-surface-2);
     color: var(--nv-text-faint);

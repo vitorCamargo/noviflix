@@ -47,8 +47,6 @@
   font-style: italic;
 }
 
-/* A row of chips rather than the tiles that were here: two profile links don't
-   need a subtitle each, and the tiles gave them more weight than the prose. */
 .ab__links {
   display: flex;
   flex-wrap: wrap;

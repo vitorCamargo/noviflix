@@ -17,17 +17,8 @@
         <p>{{ i18n.t('movie.failedBody') }}</p>
       </div>
     } @else {
-      <!--
-        Tabs only where the page scrolls downward. On desktop the sections sit side by
-        side and the track scrolls to them, so hiding two behind a control would be
-        hiding content the layout already has room for.
-      -->
       @if (stacked()) {
-        <div
-          class="tabs"
-          role="tablist"
-          [attr.aria-label]="i18n.t('movie.sections')"
-        >
+        <div class="tabs" role="tablist" [attr.aria-label]="i18n.t('movie.sections')">
           @for (item of tabs; track item.id) {
             <button
               type="button"
@@ -47,7 +38,6 @@
       }
 
       <div class="mp__row">
-        <!-- Poster and the one thing the visitor can contribute. -->
         <section class="mp__aside">
           <div class="mp__poster">
             @if (poster(); as src) {
@@ -104,22 +94,14 @@
           @if (shows('cast')) {
             <section class="mp__section">
               <h2 class="mp__heading mp__heading--band">{{ i18n.t('movie.tab.cast') }}</h2>
-              <nv-cast-grid
-                [cast]="cast()"
-                [horizontal]="!stacked()"
-                [rows]="cardRows()"
-              />
+              <nv-cast-grid [cast]="cast()" [horizontal]="!stacked()" [rows]="cardRows()" />
             </section>
           }
 
           @if (shows('related')) {
             <section class="mp__section">
               <h2 class="mp__heading mp__heading--band">{{ i18n.t('movie.tab.related') }}</h2>
-              <nv-related-grid
-                [movies]="related()"
-                [horizontal]="!stacked()"
-                [rows]="cardRows()"
-              />
+              <nv-related-grid [movies]="related()" [horizontal]="!stacked()" [rows]="cardRows()" />
             </section>
           }
         </div>

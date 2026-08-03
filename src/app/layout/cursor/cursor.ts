@@ -7,16 +7,9 @@ import {
   viewChild,
 } from '@angular/core';
 
-/** Selector for things the pointer should visibly react to. */
 const INTERACTIVE =
   'a[href], button, [role="button"], input, select, textarea, summary, [data-cursor="focus"]';
 
-/**
- * True when the event target is, or sits inside, something clickable.
- *
- * `closest` rather than a direct match because the pointer usually lands on an
- * icon or label nested inside the control, not the control itself.
- */
 export function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
   return target.closest(INTERACTIVE) !== null;
@@ -26,18 +19,8 @@ export function isInteractiveTarget(target: EventTarget | null): boolean {
   selector: 'nv-cursor',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div
-      #dot
-      class="dot"
-      [class.is-focus]="pressed() || hovering()"
-      aria-hidden="true"
-    ></div>
-    <div
-      #ring
-      class="ring"
-      [class.is-focus]="pressed() || hovering()"
-      aria-hidden="true"
-    ></div>
+    <div #dot class="dot" [class.is-focus]="pressed() || hovering()" aria-hidden="true"></div>
+    <div #ring class="ring" [class.is-focus]="pressed() || hovering()" aria-hidden="true"></div>
   `,
   styles: `
     :host {
@@ -70,7 +53,9 @@ export function isInteractiveTarget(target: EventTarget | null): boolean {
       border: 2px solid transparent;
       box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.5);
       transform: scale(0.5);
-      transition: transform 0.2s linear, background 0.2s linear;
+      transition:
+        transform 0.2s linear,
+        background 0.2s linear;
     }
 
     .ring {
@@ -91,22 +76,15 @@ export function isInteractiveTarget(target: EventTarget | null): boolean {
       transition: transform 0.2s linear;
     }
 
-    /*
-     * Over something clickable — or while pressed — the dot swells into a
-     * translucent disc with a white edge, and the ring draws in to meet it.
-     */
     .dot.is-focus::before {
       background: hsla(0, 0%, 100%, 0.3);
       border-color: var(--nv-text);
       transform: scale(1);
-      transition: transform 0.3s linear, background 0.3s linear;
+      transition:
+        transform 0.3s linear,
+        background 0.3s linear;
     }
 
-    /*
-     * Over a control the ring gets out of the way entirely — the dot has grown
-     * into a clear target of its own, and a large ring around a small button
-     * only obscures what you're about to click.
-     */
     .ring.is-focus {
       opacity: 0;
     }
@@ -157,11 +135,6 @@ export class Cursor {
     this.pressed.set(false);
   }
 
-  /**
-   * `pointerover` rather than `mouseenter` on each control: one delegated
-   * listener covers everything on the page, including controls added later,
-   * with nothing to wire up per component.
-   */
   @HostListener('window:pointerover', ['$event'])
   protected onOver(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') return;
@@ -171,8 +144,6 @@ export class Cursor {
   @HostListener('window:pointerout', ['$event'])
   protected onOut(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') return;
-    // relatedTarget is where the pointer is heading; null means it left the
-    // window entirely.
     this.hovering.set(isInteractiveTarget(event.relatedTarget));
   }
 }

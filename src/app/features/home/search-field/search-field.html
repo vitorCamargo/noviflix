@@ -1,15 +1,6 @@
 @let error = message();
 
-<!-- The invalid flag sits here rather than on the row: it also has to reach the
-     card's glow, and a custom property only inherits downward. -->
 <div class="sf" role="search" [class.is-invalid]="error">
-  <!--
-    A card, so the field is the same kind of surface as everything else on the
-    lattice: panel fill, matching radius, and the hero's corner glow — pinned on
-    while focused rather than on hover, since focus is what a field responds to.
-  -->
-  <!-- Pinned while invalid as well as while focused, so leaving the field does
-       not take the error's glow with it. -->
   <nv-drum-card [active]="focused() || !!error">
     <div class="sf__row">
       <span class="sf__icon" [class.is-busy]="busy()">
@@ -25,10 +16,6 @@
         }
       </span>
 
-      <!--
-        The validator is attached here as an attribute, so the rules travel with
-        the input rather than with this component.
-      -->
       <input
         #field
         class="sf__input"
@@ -44,11 +31,6 @@
         (blur)="onBlur()"
       />
 
-      <!--
-        Only rendered when there is something to clear, so the field doesn't carry
-        a permanently dead control. type=button matters: inside a form a bare
-        button submits.
-      -->
       @if (hasValue()) {
         <button
           type="button"
@@ -62,8 +44,6 @@
         </button>
       }
 
-      <!-- Announces the wait to screen readers, which the icon swap alone
-           does not. -->
       <span class="sf__status" role="status">
         @if (busy()) {
           {{ i18n.t('search.searching') }}
@@ -72,11 +52,6 @@
     </div>
   </nv-drum-card>
 
-  <!--
-    Taken out of the flow so a message can never change the field's height — the
-    box has to stay exactly one drum. role=alert announces it without pulling
-    focus away from the input being corrected.
-  -->
   <p class="sf__error" id="nv-search-error" role="alert">
     @if (error) {
       {{ error }}

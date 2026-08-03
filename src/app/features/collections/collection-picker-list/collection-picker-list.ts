@@ -17,12 +17,6 @@ import { CollectionsService } from '../collections.service';
 import { countPresent } from '../collection-store';
 import { filterByName } from '../collection-filter';
 
-/**
- * The contents of the add-to-collection panel: a filter, a create row, then the collections.
- *
- * Its own component because two places show the same list — a selection of films, and a single film
- * from its own details pop-up. The frame differs; the list does not.
- */
 @Component({
   selector: 'nv-collection-picker-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,10 +29,8 @@ export class CollectionPickerList {
   private readonly collections = inject(CollectionsService);
   private readonly toast = inject(ToastService);
 
-  /** Films this menu will place. */
   readonly movies = input<readonly MovieSummary[]>([]);
 
-  /** Raised once something has been added, so the frame can dismiss itself. */
   readonly done = output<void>();
 
   private readonly search = viewChild<ElementRef<HTMLInputElement>>('search');
@@ -51,7 +43,6 @@ export class CollectionPickerList {
 
   protected readonly hasAny = computed(() => this.collections.count() > 0);
 
-  /** Focused by the frame once it has rendered, so typing narrows a long list straight away. */
   focusSearch(): void {
     this.search()?.nativeElement.focus();
   }
@@ -60,12 +51,6 @@ export class CollectionPickerList {
     this.query.set((event.target as HTMLInputElement).value);
   }
 
-  /**
-   * How many of these films the collection already holds.
-   *
-   * Shown per row so the result is never a surprise: adding four films to a collection holding
-   * three of them would otherwise report "1 added" with no explanation.
-   */
   protected present(collection: UserCollection): number {
     return countPresent(collection, this.movies());
   }
@@ -85,12 +70,6 @@ export class CollectionPickerList {
     this.done.emit();
   }
 
-  /**
-   * Creates a collection and drops the films in, without asking for a name.
-   *
-   * One press, as the menu implies. The generated name is reported in the toast so it is not a
-   * mystery where the film went.
-   */
   protected createNew(): void {
     const { collection, added } = this.collections.createFor(
       this.movies(),

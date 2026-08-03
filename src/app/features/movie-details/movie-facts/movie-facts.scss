@@ -32,7 +32,6 @@
   stroke-linejoin: round;
 }
 
-/* The star is a solid shape, unlike the outlined calendar beside it. */
 .mf__icon--star {
   fill: var(--nv-accent);
   stroke: none;
@@ -94,7 +93,6 @@
   }
 }
 
-/* Languages run long, so this one takes the full row where the grid allows. */
 .mf__fact--wide {
   grid-column: 1 / -1;
 
@@ -103,7 +101,6 @@
   }
 }
 
-/* Dimmed, so a dash reads as "not reported" rather than as a value. */
 .mf__fact dd.is-empty {
   color: var(--nv-text-faint);
   font-weight: 600;

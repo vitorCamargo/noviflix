@@ -30,12 +30,6 @@ describe('areaCells', () => {
 });
 
 describe('totalCells', () => {
-  /**
-   * Content covers pads rather than replacing them, so the field is always
-   * complete — subtracting placed areas would leave holes in the lattice.
-   * The extra row and column cover a viewport that isn't a whole number of
-   * cells; the overhang is clipped rather than scrolled.
-   */
   it('is one pad per cell plus an overhang row and column', () => {
     expect(totalCells(10, 4)).toBe(11 * 5);
   });
@@ -53,11 +47,6 @@ describe('fitColumns', () => {
     expect(fitColumns(1728, cell, 10)).toBe(27);
   });
 
-  /**
-   * The bug this exists for: rounding up gave one extra column, making the page
-   * a sliver wider than the viewport and leaving it scrollable with nothing to
-   * reveal.
-   */
   it('floors a partial trailing column rather than rounding up', () => {
     expect(fitColumns(1729, cell, 10)).toBe(27);
     expect(fitColumns(1790, cell, 10)).toBe(27);

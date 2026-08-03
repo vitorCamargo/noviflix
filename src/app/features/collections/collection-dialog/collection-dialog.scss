@@ -1,23 +1,9 @@
 @use '../../../../styles/mixins' as *;
 
-/*
- * Top padding of OverlayPanel's bar. Referenced, not guessed: the tab indicator has to reach from
- * the tab button up to the panel's top edge, and that distance *is* the bar's padding. If the panel
- * changes its padding this must change with it.
- */
 $bar-inset-block: var(--nv-space-5);
 
-/** Size of OverlayPanel's close button, which sets the bar's content height. */
 $bar-control-size: 34px;
 
-/*
- * A step *below* the film pop-up, so opening a film from in here layers over this rather than under
- * it — and closing that film comes back to the collection instead of the bare page.
- *
- * The panel inside is `position: fixed` at the modal layer; giving this host a lower one makes it a
- * stacking context and takes the whole subtree with it. Pointer events pass straight through, since
- * the host covers the viewport whether or not anything is open.
- */
 :host {
   position: fixed;
   inset: 0;
@@ -28,8 +14,6 @@ $bar-control-size: 34px;
 nv-overlay-panel {
   pointer-events: auto;
 }
-
-// ------------------------------------------------------------------------- bar
 
 .bar {
   display: flex;
@@ -73,21 +57,11 @@ nv-overlay-panel {
   }
 }
 
-/* Red only on hover: the two sit side by side, and a permanently red one would pull the eye towards
-   deleting when the common act is opening a film. */
 .bar__btn--danger:hover {
   border-color: var(--nv-danger);
   color: var(--nv-danger);
 }
 
-// ------------------------------------------------------------------------ tabs
-
-/*
- * Filling the bar's content height is what makes the indicator placement deterministic. The bar
- * centres its groups, so a short strip sits partway down and an offset measured from the button
- * lands short of the panel edge. At the bar's full height the button's top edge *is* the bar's
- * content top, so the panel's top edge is exactly one bar-padding above.
- */
 .tabs {
   display: flex;
   align-items: stretch;
@@ -120,8 +94,6 @@ nv-overlay-panel {
 .tabs__btn.is-active {
   color: var(--nv-accent);
 
-  /* Reaches up to the panel's own edge, so the mark reads as the panel belonging to this tab rather
-     than as decoration under a word. */
   &::before {
     content: '';
     position: absolute;
@@ -134,14 +106,10 @@ nv-overlay-panel {
   }
 }
 
-// ------------------------------------------------------------- what it is
-
 .meta {
   min-inline-size: 0;
 }
 
-/* Title and count are one block: they describe the same thing, so they sit closer to each other
-   than to the description below. */
 .meta__head {
   display: flex;
   flex-direction: column;
@@ -201,17 +169,7 @@ nv-overlay-panel {
   font-weight: 600;
 }
 
-// -------------------------------------------------------- what it contains
-
-/*
- * Ordinary wrapping rows, not the lattice.
- *
- * Inside a panel there are no pads to align to — the drum grid is behind the scrim — so the tiles
- * are sized by the column's width and the column scrolls when there are more than fit.
- */
 .films {
-  /* A step lighter than the panel behind it, matching the cast and related tiles — on the default
-     fill a card's meta strip is the same colour as the panel it sits on. */
   --nv-card-surface: var(--nv-panel-2);
 
   display: grid;
@@ -256,8 +214,6 @@ nv-overlay-panel {
   line-height: 1.6;
 }
 
-// --------------------------------------------------------------------- one film
-
 .cm {
   display: flex;
   flex-direction: column;
@@ -295,12 +251,6 @@ nv-overlay-panel {
   }
 }
 
-/*
- * Shown outright rather than on hover, unlike the search card.
- *
- * These are films the visitor chose to keep, so the score is a reason they are here rather than a
- * detail to go looking for — and there is no hover at all on touch.
- */
 .cm__score {
   @include score-pill;
 
@@ -320,14 +270,10 @@ nv-overlay-panel {
   flex-direction: column;
   gap: 1px;
   justify-content: center;
-  /* Nine tenths of a drum, not eight: the worst case — a two-line title over a year — filled the
-     shorter strip to its edges, and the title sat against the artwork. Not lattice-bound in here;
-     inside a panel the tiles are sized by the column, not the drums. */
   block-size: calc(var(--nv-grid-cell) * 0.9);
   flex: none;
   padding-block-start: var(--nv-space-1);
   padding-inline: var(--nv-space-3);
-  /* Room for the remove control, which sits over this strip. */
   padding-inline-end: calc(var(--nv-space-3) + 26px);
 }
 
@@ -344,11 +290,6 @@ nv-overlay-panel {
   font-variant-numeric: tabular-nums;
 }
 
-/*
- * Removal, over the meta strip. Always visible: with the collection's own controls up in the bar,
- * this is the only per-film action here, and hiding it behind hover would make it both hard to find
- * and unreachable on touch.
- */
 .cm__remove {
   position: absolute;
   inset-block-end: calc((var(--nv-grid-cell) * 0.9 - 24px) / 2);
@@ -360,7 +301,6 @@ nv-overlay-panel {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  /* A step up from the tile it sits on, which is itself a step up from the panel. */
   background: var(--nv-panel-tile);
   color: var(--nv-text-muted);
   transition:
@@ -382,8 +322,6 @@ nv-overlay-panel {
     color: #fff;
   }
 }
-
-// ---------------------------------------------------------------------- stacked
 
 @media (max-width: 900px) {
   .films {

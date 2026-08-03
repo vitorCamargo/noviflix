@@ -17,13 +17,6 @@ import { TmdbService } from '../../../core/tmdb/tmdb.service';
 import type { Video } from '../../../core/models/tmdb.models';
 import { HOVER_INTENT_MS, embedUrl, pickTrailer } from './trailer';
 
-/**
- * `loading` covers both fetching the video list and waiting for the embed to be
- * ready — from the viewer's side those are one wait, so they are one state.
- *
- * `unavailable` is distinct from `idle`: it means we asked and there is nothing
- * to play, so the control should stop offering.
- */
 export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
 
 @Component({
@@ -80,11 +73,6 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       display: contents;
     }
 
-    /*
-     * Sits over the backdrop rather than replacing it. Nothing has to coordinate
-     * hiding the image — the video simply covers it, and removing the video
-     * reveals it again, so the reset is just an unmount.
-     */
     .video {
       position: absolute;
       inset: 0;
@@ -92,7 +80,6 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       overflow: hidden;
       opacity: 0;
       transition: opacity var(--nv-slow) var(--nv-ease-panel);
-      /* Keeps the card authoritative over hover and clicks, not the embed. */
       pointer-events: none;
     }
 
@@ -100,15 +87,6 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       opacity: 1;
     }
 
-    /*
-     * Cover behaviour for a fixed-ratio iframe: the aspect ratio holds while
-     * both minimums force it past the card's bounds, so it crops rather than
-     * letterboxes. object-fit does not apply to iframes.
-     *
-     * The scale on top is overscan — see the token for why it is the only way
-     * to be rid of YouTube's title and control bands. Individual transform
-     * properties compose translate before scale, so the element stays centred.
-     */
     .video iframe {
       position: absolute;
       inset-block-start: 50%;
@@ -123,17 +101,10 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       border: 0;
     }
 
-    /*
-     * Top-left, because every other corner of the hero is claimed: the poster
-     * overlaps top-right, the popularity card bottom-right, and the title and
-     * genre chips occupy the bottom-left. Offsets are exposed as properties so
-     * the caller can move it if the composition changes again.
-     */
     .btn {
       position: absolute;
       inset-block-start: var(--btn-inset-block, var(--nv-space-5));
       inset-inline-start: var(--btn-inset-inline, var(--nv-space-5));
-      /* Above the scrim and the title block, both of which cover the video. */
       z-index: 4;
       display: grid;
       place-items: center;
@@ -158,7 +129,6 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       fill: currentColor;
     }
 
-    /* An arc rather than a full ring, so rotation is legible as progress. */
     .btn__spinner {
       inline-size: 26px;
       block-size: 26px;
@@ -171,7 +141,6 @@ export type TrailerState = 'idle' | 'loading' | 'playing' | 'unavailable';
       stroke: currentColor;
       stroke-width: 3;
       stroke-linecap: round;
-      /* Roughly a third of the circumference, leaving the rest open. */
       stroke-dasharray: 26 75;
     }
 
@@ -188,7 +157,6 @@ export class HeroTrailer implements OnDestroy {
   protected readonly i18n = inject(I18nService);
 
   readonly movieId = input<number | null>(null);
-  /** Pointer resting anywhere on the card. */
   readonly hovered = input(false);
 
   readonly stateChange = output<TrailerState>();
@@ -200,7 +168,6 @@ export class HeroTrailer implements OnDestroy {
   protected readonly embed = computed(() => {
     const key = this.trailerKey();
     if (!key) return null;
-    // The URL is built here from a TMDB video key, never from user input.
     return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl(key));
   });
 
@@ -215,46 +182,27 @@ export class HeroTrailer implements OnDestroy {
     }
   });
 
-  /**
-   * Video lists already fetched, so re-hovering the same card is free.
-   * `null` records "asked, nothing playable" — worth remembering too.
-   */
   private readonly cache = new Map<number, Video | null>();
 
   private intentTimer: ReturnType<typeof setTimeout> | null = null;
-  /** Guards against a resolved fetch for a card the pointer has since left. */
   private requestToken = 0;
 
   constructor() {
-    // Changing card always returns to the backdrop; the previous trailer has
-    // nothing to do with the film now on screen.
     effect(() => {
       this.movieId();
       this.reset();
     });
 
-    /*
-     * Reacts to hover changing, and *only* to hover changing.
-     *
-     * The state reads have to be untracked. Left tracked, they made this effect
-     * depend on the very state it tears down: pressing the button set `loading`,
-     * which re-ran the effect, which saw no hover and reset — so click-to-play
-     * cancelled itself the instant it started. That made the button dead on
-     * touch, where hover never becomes true at all.
-     */
     effect(() => {
       const hovered = this.hovered();
 
       untracked(() => {
         if (!hovered) {
           this.clearIntent();
-          // Leaving cancels an in-flight load as well as stopping playback.
           if (this.state() !== 'idle') this.reset();
           return;
         }
 
-        // Motion-triggered video is exactly what this setting asks us not to do,
-        // so hover does nothing and the button remains the way in.
         if (prefersReducedMotion()) return;
         if (this.state() !== 'idle') return;
 
@@ -273,7 +221,6 @@ export class HeroTrailer implements OnDestroy {
     this.clearIntent();
   }
 
-  /** Click is deliberate, so it skips the hover-intent delay entirely. */
   protected toggle(): void {
     if (this.state() === 'idle') {
       void this.start();
@@ -283,8 +230,6 @@ export class HeroTrailer implements OnDestroy {
   }
 
   protected onEmbedReady(): void {
-    // Only promote if still loading — a late load event after the pointer left
-    // must not restart playback.
     if (this.state() === 'loading') this.state.set('playing');
   }
 
@@ -314,7 +259,6 @@ export class HeroTrailer implements OnDestroy {
   }
 
   private apply(trailer: Video | null, token: number): void {
-    // A newer request, or a reset, happened while this was resolving.
     if (token !== this.requestToken) return;
 
     if (!trailer) {
@@ -322,14 +266,11 @@ export class HeroTrailer implements OnDestroy {
       return;
     }
 
-    // Stays in `loading` until the iframe reports ready, so the spinner covers
-    // the embed handshake and not just the fetch.
     this.trailerKey.set(trailer.key);
   }
 
   private reset(): void {
     this.clearIntent();
-    // Invalidates any in-flight request.
     this.requestToken++;
     this.trailerKey.set(null);
     this.state.set('idle');

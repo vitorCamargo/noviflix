@@ -22,19 +22,6 @@ import {
   normaliseSearchTerm,
 } from '../../../shared/search-term/search-term';
 
-/**
- * The search input.
- *
- * Validation is not implemented here — it lives in `SearchTermValidator`, applied
- * as an attribute on the input. This component only decides *when* a complaint is
- * worth showing, which is a presentation question and a different one from
- * whether the value is valid.
- *
- * Searching is driven by typing rather than by a button. There is deliberately no
- * submit control: with a debounce there is nothing for it to do that waiting a
- * moment doesn't already do, and offering both invites the reading that the
- * button is what actually commits the search.
- */
 @Component({
   selector: 'nv-search-field',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,52 +35,28 @@ export class SearchField {
 
   protected readonly minLength = SEARCH_MIN_LENGTH;
 
-  /**
-   * Seeded from the store rather than starting empty.
-   *
-   * The store outlives this component, so navigating away and back rebuilt the field
-   * while the results were still there — an empty box above a page of results for a
-   * query with nothing on screen naming it. Reading the current query back means the
-   * two always agree.
-   *
-   * Set through the constructor argument, not `setValue`, so no change event fires
-   * and the debounced pipeline doesn't re-run the search that is already loaded.
-   */
   protected readonly term = new FormControl(this.store.query(), {
     nonNullable: true,
   });
 
-  /** Returned to after clearing, so the next term can be typed straight away. */
   private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
 
-  /** Mirrors the control into a signal so the template can react to it. */
   private readonly value = toSignal(this.term.valueChanges, {
     initialValue: this.term.value,
   });
 
-  /** Drives the card's corner glow, matching the hero's. */
   protected readonly focused = signal(false);
 
-  /** Taken from the store, so the spinner tracks the actual request. */
   protected readonly busy = computed(() => this.store.state() === 'loading');
 
-  /**
-   * Errors wait for the typing to settle, or for the field to be left.
-   *
-   * Validating on every keystroke would mark the field invalid at one and two
-   * characters — while the user is still typing a perfectly good term — so the
-   * message would be an accusation about unfinished input.
-   */
   private readonly settled = signal(false);
 
   protected readonly errors = computed(() => {
     if (!this.settled()) return null;
-    // Read the value so this recomputes as typing continues once shown.
     this.value();
     return this.term.errors;
   });
 
-  /** Character rule first: it explains what the length message cannot. */
   protected readonly message = computed(() => {
     const errors = this.errors();
     if (!errors) return null;
@@ -112,44 +75,26 @@ export class SearchField {
       .pipe(
         debounceTime(SEARCH_DEBOUNCE_MS),
         map(normaliseSearchTerm),
-        // Collapses no-op edits — adding a trailing space, or retyping the same
-        // word — so they don't each cost a request.
         distinctUntilChanged(),
         tap((term) => this.settled.set(term.length > 0)),
         takeUntilDestroyed(),
       )
       .subscribe((term) => {
-        /*
-         * Empty is an instruction, not a no-op: it tells the store to stop, which
-         * is what brings the page's own content back. A non-empty invalid term
-         * does nothing at all — it neither searches nor discards what is already
-         * on screen, since half-typed input shouldn't clear the page.
-         */
         if (!term || isSearchable(term)) this.store.search(term);
       });
   }
 
   protected onBlur(): void {
     this.focused.set(false);
-    // Nothing to complain about if they never typed anything.
     if (normaliseSearchTerm(this.value())) this.settled.set(true);
   }
 
-  /** Whether there is anything to clear, ignoring whitespace. */
-  protected readonly hasValue = computed(
-    () => normaliseSearchTerm(this.value()).length > 0,
-  );
+  protected readonly hasValue = computed(() => normaliseSearchTerm(this.value()).length > 0);
 
   protected clear(): void {
     this.term.setValue('');
     this.settled.set(false);
 
-    /*
-     * Cleared immediately rather than waiting for the debounce to deliver the
-     * empty term. Pressing clear is an explicit instruction, and half a second of
-     * stale results after it would look like the button had failed. The debounced
-     * empty value still arrives and is a no-op by then.
-     */
     this.store.clear();
     this.field()?.nativeElement.focus();
   }

@@ -1,6 +1,5 @@
 @use '../../../styles/mixins' as *;
 
-/* Card footprint, in drums. Kept in step with collections-layout.ts, which sizes the page. */
 $card-cols: 5;
 $card-rows: 5;
 $create-cols: 2;
@@ -11,19 +10,6 @@ $create-rows: 2;
   block-size: 100%;
 }
 
-// ---------------------------------------------------------------- the headline
-
-/*
- * The headline block: five drums, with the text settled at the foot of them.
- *
- * Bottom-aligned rather than centred so the last line sits directly above the filter whatever the
- * type does at that width — the two read as one block, and the filter's own drum is fixed.
- *
- * `isolation` makes this a stacking context so the dots can sit behind the text while the block as a
- * whole still paints above the pad field. Without it a negative z-index would escape and land under
- * the pads, hiding the dots. The filter is deliberately *not* in here: its card lights the lattice
- * from a negative layer, which this context would trap.
- */
 .cl {
   position: relative;
   isolation: isolate;
@@ -36,15 +22,9 @@ $create-rows: 2;
   min-inline-size: 0;
 }
 
-/*
- * A 4x5 matrix to the left of the headline, echoing the drum lattice. Sized by its own content, so
- * only the anchor point is set here — pinning both axes would stretch the pitch.
- */
 .cl__dots {
   position: absolute;
-  /* Exactly the home page's offset: a drum and a half above the block, bleeding off its left. */
   inset-block-start: calc(4% - var(--nv-grid-cell) * 1.5);
-  /* Measured from this block's right edge, so a larger value moves the matrix left. */
   inset-inline-end: calc(100% - var(--nv-grid-cell) * 1.5);
   z-index: 0;
 }
@@ -86,17 +66,6 @@ $create-rows: 2;
   line-height: 1.6;
 }
 
-/*
- * The filter, in a block of its own.
- *
- * The same field as the home page's search, down to the numbers: a drum-tall card with its border
- * inside that height, an 18px glyph and the input at the base size. Not the same component, though —
- * that one carries the spec's validation, its debounce, a spinner and an error line, none of which
- * apply to narrowing a list of seven names. What the two share is the shell.
- *
- * Positioned so it paints above the pad layer, but with no z-index and no isolation: either would
- * make it a stacking context and trap the card's glow above the pads instead of under them.
- */
 .cq {
   position: relative;
   min-inline-size: 0;
@@ -157,7 +126,6 @@ $create-rows: 2;
     outline: none;
   }
 
-  /* The clear control is ours, so the one the browser adds would be a second of the same. */
   &::-webkit-search-cancel-button {
     appearance: none;
   }
@@ -189,18 +157,6 @@ $create-rows: 2;
   }
 }
 
-// -------------------------------------------------------------------- the field
-
-/*
- * A row of squares, every other one dropped by a whole number of drums.
- *
- * Positioned, because the pad layer is pinned when stacked and pinning makes it paint after
- * ordinary in-flow blocks — without this the field would sit behind the drums.
- *
- * Items are aligned to the top of the band rather than centred in it, because the band is exactly
- * as tall as a card plus the stagger: the offset cards fill the rest of it, and centring would
- * split the difference and put both halves off the lattice.
- */
 .cf {
   position: relative;
   display: flex;
@@ -209,14 +165,6 @@ $create-rows: 2;
   min-inline-size: 0;
 }
 
-/*
- * The stagger arrives as a per-card custom property and is spent as a margin.
- *
- * A margin, deliberately, not `translate`: transforms create a stacking context, and DrumCard's
- * corner glow works by escaping to the page grid on a negative z-index to sit *under* the pads.
- * Trapped in the card's own context it painted on top of them instead — a halo round the card
- * rather than light leaking through the seams, which is exactly how the dropped cards looked.
- */
 .cf__card {
   inline-size: calc(var(--nv-grid-cell) * #{$card-cols});
   block-size: calc(var(--nv-grid-cell) * #{$card-rows});
@@ -233,8 +181,6 @@ $create-rows: 2;
   inline-size: calc(var(--nv-grid-cell) * #{$create-cols});
   block-size: calc(var(--nv-grid-cell) * #{$create-rows});
   flex: none;
-  /* Its foot level with the first card's, where the eye lands after reading the headline. The first
-     card never drops, so this is a constant rather than something the wave has to be asked about. */
   margin-block-start: calc(var(--nv-grid-cell) * #{$card-rows - $create-rows});
   padding: var(--nv-space-2);
   border: 1px dashed var(--nv-accent-line);
@@ -271,7 +217,6 @@ $create-rows: 2;
   }
 }
 
-/* Two drums wide leaves room for two short lines, which is what the label needs. */
 .cf__new-text {
   font-size: var(--nv-text-xs);
   font-weight: 700;
@@ -280,14 +225,6 @@ $create-rows: 2;
   text-wrap: balance;
 }
 
-/*
- * Nothing matched.
- *
- * In the field, where the cards would have been, rather than under the input that caused it: a
- * message below a drum-tall field pushes it off its seam every time it appears. Sized like the
- * search grid's own empty state — six drums wide and a card tall, so it takes a card's place rather
- * than floating in the gap.
- */
 .cf__state {
   display: flex;
   flex-direction: column;
@@ -339,18 +276,13 @@ $create-rows: 2;
   }
 }
 
-// --------------------------------------------------------------------- stacked
-
 @media (max-width: 900px) {
-  /* Both blocks span the two columns PageGrid pairs at this width; otherwise each renders at half
-     the viewport. */
   .cl,
   .cq,
   .cf {
     grid-column: 1 / -1;
   }
 
-  /* The same air under the nav as the home page's headline gets, so the two pages start alike. */
   .cl {
     gap: var(--nv-space-3);
     padding-block: var(--nv-space-6) 0;
@@ -361,18 +293,11 @@ $create-rows: 2;
     display: none;
   }
 
-  /* Still a drum tall — the field's proportions are not what the narrow layout changes. */
   .cq {
     block-size: var(--nv-grid-cell);
     margin-block: var(--nv-space-4) var(--nv-space-5);
   }
 
-  /*
-   * The stagger goes with the row.
-   *
-   * It reads as a scatter across a lattice; stacked, there is no lattice to scatter over and it
-   * would just be cards that don't line up. Two to a row, as every other grid does here.
-   */
   .cf {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -387,8 +312,6 @@ $create-rows: 2;
     aspect-ratio: 1;
   }
 
-  /* The wave is a scatter across a lattice; stacked there is no lattice to scatter over, so the
-     per-card drop is dropped. */
   .cf__card {
     margin-block-start: 0;
   }
@@ -405,12 +328,8 @@ $create-rows: 2;
     inline-size: auto;
     block-size: auto;
     aspect-ratio: 2;
-    /* The three drums that put its foot level with the first card belong to the row layout. Stacked
-       there is no row, and they were left as a band of nothing under the filter. */
     margin-block-start: 0;
     align-self: stretch;
-    /* Spans the row, so it reads as the action above the field rather than a half-sized card in
-       it. */
     grid-column: 1 / -1;
   }
 }
@@ -422,16 +341,6 @@ $create-rows: 2;
   }
 }
 
-// ----------------------------------------------------------------- entrance
-
-/*
- * The page assembles in reading order — headline, copy, count, filter, then the field, card by card
- * — with the same machinery as the home page: `is-entering` lands when the app may animate, and each
- * block carries its delay in `--enter`.
- *
- * Held invisible until then, because on a deep-linked refresh the first-load screen is still over
- * the top — a block that faded in behind it would simply be there when the cover came off.
- */
 nv-page-grid:not(.is-entering) {
   .cl__line,
   .cl__body,
@@ -451,8 +360,6 @@ nv-page-grid.is-entering {
     animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
 
-  /* Behind the type, so it fades rather than moves. Follows the kicker's beat: it has no row of its
-     own in the table because it belongs to the block, not the sequence. */
   .cl__dots {
     animation: nv-fade-in 700ms var(--nv-ease-panel) var(--enter, 240ms) backwards;
   }
@@ -470,7 +377,6 @@ nv-page-grid.is-entering {
   }
 }
 
-/* Nothing arrives for anyone who asked for that — it is simply already there. */
 @media (prefers-reduced-motion: reduce) {
   nv-page-grid:not(.is-entering),
   nv-page-grid.is-entering {

@@ -1,18 +1,8 @@
-import {
-  HOME_CONTENT_ROWS,
-  homeAreas,
-  homeMinColumns,
-} from './home-layout';
+import { HOME_CONTENT_ROWS, homeAreas, homeMinColumns } from './home-layout';
 
 describe('homeAreas', () => {
   const rows = 14;
 
-  /**
-   * The real invariant, asserted instead of a hand-computed row number — the
-   * previous test agreed with the arithmetic while the arithmetic was wrong.
-   * Off-by-one is allowed because an odd number of spare tracks cannot split
-   * evenly, and the header's reserved row is excluded from the space above.
-   */
   function gaps(rowCount: number) {
     const areas = homeAreas(rowCount);
     const values = Object.values(areas);
@@ -29,14 +19,12 @@ describe('homeAreas', () => {
     },
   );
 
-  /** A viewport with no room to spare keeps the composition on screen. */
   it('does not push content off a short viewport', () => {
     const areas = homeAreas(9);
     const last = Math.max(...Object.values(areas).map((a) => a.rowEnd));
     expect(last - 1).toBeLessThanOrEqual(9);
   });
 
-  /** Row 0 placements exist in the base, and grid lines start at 1. */
   it('never places anything on row zero', () => {
     for (const area of Object.values(homeAreas(HOME_CONTENT_ROWS))) {
       expect(area.row).toBeGreaterThanOrEqual(1);
@@ -47,10 +35,6 @@ describe('homeAreas', () => {
     expect(homeAreas(rows).hero.col).toBe(13);
   });
 
-  /**
-   * The gap this closes: the headline scales with viewport width, so a narrow
-   * window shrinks the type while the hero stays pinned, leaving dead space.
-   */
   it('pulls the whole stack left when compact', () => {
     const wide = homeAreas(rows);
     const compact = homeAreas(rows, true);
@@ -65,16 +49,10 @@ describe('homeAreas', () => {
     const compact = homeAreas(rows, true);
 
     for (const key of Object.keys(wide) as (keyof typeof wide)[]) {
-      expect(compact[key].colEnd - compact[key].col).toBe(
-        wide[key].colEnd - wide[key].col,
-      );
+      expect(compact[key].colEnd - compact[key].col).toBe(wide[key].colEnd - wide[key].col);
     }
   });
 
-  /**
-   * The headline block anchors the page. Moving it too would shove it against
-   * the viewport edge and relocate the gap rather than close it.
-   */
   it('leaves the headline block where it is when compact', () => {
     const wide = homeAreas(rows);
     const compact = homeAreas(rows, true);
@@ -91,9 +69,7 @@ describe('homeAreas', () => {
 describe('homeMinColumns', () => {
   it('reaches the rightmost edge of the composition', () => {
     const areas = homeAreas(HOME_CONTENT_ROWS);
-    const rightmost = Math.max(
-      ...Object.values(areas).map((area) => area.colEnd),
-    );
+    const rightmost = Math.max(...Object.values(areas).map((area) => area.colEnd));
     expect(homeMinColumns()).toBe(rightmost);
   });
 

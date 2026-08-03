@@ -91,8 +91,6 @@ import {
       inline-size: min(var(--panel-width), 100%);
       max-block-size: min(86dvh, 940px);
       background: var(--nv-panel);
-      /* Borderless, like the popover — the shadow lifts it off the grid on its
-         own, and a drawn edge competes with the lattice behind it. */
       border: 0;
       border-radius: var(--nv-radius-lg);
       box-shadow: var(--nv-shadow-pop);
@@ -100,14 +98,6 @@ import {
       overflow: hidden;
     }
 
-    /*
-     * No focus ring on the panel itself.
-     *
-     * It takes focus on open so screen readers and the keyboard land inside the
-     * dialog, but it is a container rather than a control — and a ring around the
-     * whole overlay reads as a drawn border, which is exactly what was asked to go.
-     * The controls within it keep their own indicators.
-     */
     .panel:focus,
     .panel:focus-visible {
       outline: none;
@@ -196,18 +186,8 @@ import {
       min-block-size: 0;
     }
 
-    /*
-     * The one place in the app that shows its scrollbar. Elsewhere the lattice and
-     * the scroll hint make movement obvious; inside a panel the content just stops
-     * at an edge, with nothing to say there is more below it.
-     */
     .panel__body {
       overflow-y: auto;
-      /*
-       * Explicit, because it isn't the default: setting overflow-y alone computes
-       * overflow-x from visible to auto, so a grid a pixel too wide grew a second
-       * scrollbar along the bottom. This column scrolls one way only.
-       */
       overflow-x: hidden;
       overscroll-behavior: contain;
       min-block-size: 0;
@@ -216,23 +196,11 @@ import {
     }
 
     @media (max-width: 900px) {
-      /* The bar carries a toolbar, tabs and a close button. On a narrow screen those
-         cannot share one line, and without wrapping they simply overlapped. */
       .panel__bar {
         flex-wrap: wrap;
         row-gap: var(--nv-space-3);
       }
 
-      /*
-       * A plain scrolling column, not a one-column grid.
-       *
-       * Each side is its own scroll region on desktop, which needs a zero block-size
-       * minimum to work. Carried into a stacked layout that rule let the body shrink below
-       * its content, and with overflow visible the content spilled out of its row and
-       * painted over the column above it — the cast grid landing on top of the title.
-       * Resetting the minimum is the actual fix; flex just removes any question about
-       * which cell things are in.
-       */
       .panel__cols {
         display: flex;
         flex-direction: column;

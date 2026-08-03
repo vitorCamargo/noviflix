@@ -1,8 +1,3 @@
-<!--
-  Glow sits at the very bottom. The drum pads now live inside each page's grid
-  (see PageGrid), so the glow shows through the seams of whatever page is on
-  screen and travels with it as the track scrolls.
--->
 <nv-mouse-glow />
 
 <div class="shell">
@@ -11,34 +6,14 @@
   <main class="shell__main nv-track" nvHorizontalScroll>
     <router-outlet />
 
-    <!--
-      Inside the track, not beside it. The overlay swallows pointer events while
-      scrolling, and wheel events are pointer events: sitting outside the track
-      it became the wheel target and the track stopped receiving any. As a
-      descendant, wheel still bubbles up to the track while hover stays blocked.
-    -->
     <nv-scroll-overlay />
   </main>
 </div>
 
-<!-- Details pop-up renders above the shell, driven by the `modal` outlet. -->
 <router-outlet name="modal" />
 
-<!--
-  Rendered once here rather than per page: the picker is opened from the search results and
-  from a film's own pop-up, and a second copy would let two overlays open at once.
--->
-<!--
-  Selection is global — a film can be marked on the results grid, in a related strip inside the
-  details pop-up, or on a details page — so the bar acting on it lives here rather than in any one
-  of them.
--->
 <nv-selection-bar />
 
-<!--
-  A collection's films. Here rather than on the collections page so it can layer under the movie
-  pop-up above and over the page behind, which a child of the page could not.
--->
 <nv-collection-dialog />
 
 <nv-collection-picker />
@@ -49,8 +24,4 @@
 <nv-scroll-top />
 <nv-cursor />
 
-<!--
-  The first-load screen, last in the file and above everything but the pointer. It covers a page that
-  is already being built rather than standing in for one, which is why it can leave on a fade.
--->
 <nv-boot />

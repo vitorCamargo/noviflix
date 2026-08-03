@@ -1,45 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-/**
- * A surface that occupies whole drums.
- *
- * Two rules make cards feel part of the grid rather than dropped on top of it:
- * the card's box is a whole number of cells, and its corner radius matches the
- * pads'. Since the card sits in the same grid, its edges land on the seams, and
- * matching the radius means the rounded corners read as continuing the lattice
- * instead of interrupting it.
- *
- * Hover lights the grid *behind* the card at its four corners, using the same
- * radial glow the pointer casts. It's the same trick as MouseGlow: the light
- * sits under the pads, so it only escapes through the 1px seams and reads as
- * the lattice illuminating around the card — not as a shape drawn on top of it.
- */
 @Component({
   selector: 'nv-drum-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    /*
-     * Declared on the host rather than by each caller, so the two pointer
-     * behaviours travel with the card:
-     *  - the cursor takes its focused form, as it does over any control;
-     *  - the pointer's own glow steps aside, since the card is already lighting
-     *    the grid and two overlapping glows just muddy each other.
-     */
     '[attr.data-cursor]': "interactive() ? 'focus' : null",
-    /*
-     * Tied to whether the card actually lights the grid, not merely to being
-     * interactive. With the corner glow off there is no competing light, so the
-     * pointer keeps its own — stepping aside for a glow that isn't there would
-     * just leave a dead patch following the cursor.
-     */
     '[attr.data-glow]': "lit() ? 'card' : null",
   },
   template: `
-    <div
-      class="card"
-      [class.card--flat]="flat()"
-      [class.is-active]="active()"
-    >
+    <div class="card" [class.card--flat]="flat()" [class.is-active]="active()">
       <ng-content />
     </div>
 
@@ -48,14 +17,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
     }
   `,
   styles: `
-    /*
-     * The height chain matters. A card's children are usually absolutely
-     * positioned (cover images, scrims), so nothing inside gives the box a
-     * height — without an explicit 100% here the host collapses to zero and the
-     * card vanishes, or a percentage-sized image falls back to its intrinsic
-     * size and overflows its drums. The grid item above has a definite height
-     * from the row tracks, so 100% resolves all the way down.
-     */
     :host {
       position: relative;
       display: block;
@@ -69,21 +30,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       position: relative;
       block-size: 100%;
       inline-size: 100%;
-      /* Matches the pads so corners continue the lattice. */
       border-radius: var(--nv-grid-radius);
-      /*
-       * Same seam the pads leave, so gaps read as one system. Overridable because
-       * a card is only ever a pixel short of its box to meet a neighbour — where
-       * a real gap already separates cards, as in the results grid, the seam is
-       * a pixel of nothing.
-       */
-      margin: 0 var(--nv-card-seam, var(--nv-grid-gap))
-        var(--nv-card-seam, var(--nv-grid-gap)) 0;
-      /*
-       * Overridable, because a card is only legible against a surface it differs
-       * from. On the lattice the panel fill is right; inside a panel of the same
-       * colour the card's meta strip vanishes into its background.
-       */
+      margin: 0 var(--nv-card-seam, var(--nv-grid-gap)) var(--nv-card-seam, var(--nv-grid-gap)) 0;
       background: var(--nv-card-surface, var(--nv-panel));
       overflow: hidden;
       isolation: isolate;
@@ -93,22 +41,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       background: transparent;
     }
 
-    /*
-     * Four soft lights, one per corner, on a box that overhangs the card by the
-     * glow's reach so each circle is centred on a corner.
-     *
-     * A negative z-index is what puts it under the pads. The host is positioned but
-     * has no z-index of its own, so it isn't a stacking context and a negative
-     * child escapes to the page grid's — where negative layers paint before the
-     * pads' backgrounds. The card itself stays opaque above, so the only light
-     * that survives is what leaks through the seams around the corners.
-     */
-    /*
-     * Colour comes from --nv-card-glow, read with a fallback rather than declared
-     * here: declaring it locally would shadow whatever an ancestor sets, and the
-     * point is that a caller can tint the light — the search field turns it red
-     * while the term is invalid.
-     */
     .glow {
       --reach: 104px;
       --core: color-mix(in srgb, var(--nv-card-glow, #ffffff) 50%, transparent);
@@ -156,18 +88,6 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       opacity: 1;
     }
 
-    /*
-     * Stacked layouts drop both grid behaviours.
-     *
-     * The seam margin exists so a card's edge meets its neighbour the way two
-     * pads do; with cards stacked as standalone blocks there is no neighbour, and
-     * it just holds them a pixel off the edge they are meant to be flush with.
-     *
-     * The corner glow goes because it depends on light escaping through the pad
-     * seams behind the card. Below this width the pads are a fixed backdrop
-     * rather than the layer the card is set into, so there is nothing for the
-     * light to leak through and it reads as a halo instead.
-     */
     @media (max-width: 900px) {
       .card {
         margin: 0;
@@ -180,23 +100,10 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   `,
 })
 export class DrumCard {
-  /** No surface fill — for cards that are pure imagery. */
   readonly flat = input(false);
-  /** Enables the corner glow on hover, and the focused cursor. */
   readonly interactive = input(false);
-  /** Pins the glow on, for the selected item in a set. */
   readonly active = input(false);
-  /**
-   * Opt out of the corner glow while staying interactive.
-   *
-   * For cards set into a composition rather than a field of their own, where four
-   * lights escaping around the edges compete with the cards overlapping them
-   * instead of reading as the lattice lifting.
-   */
   readonly glow = input(true);
 
-  /** Whether this card lights the grid behind it. */
-  protected readonly lit = computed(
-    () => this.glow() && (this.interactive() || this.active()),
-  );
+  protected readonly lit = computed(() => this.glow() && (this.interactive() || this.active()));
 }

@@ -13,10 +13,8 @@ describe('badgeTrail', () => {
     expect(left).toHaveLength(right.length);
   });
 
-  /** A full ring, not an arc — dots wrap round past the widest point. */
   it('completes the circle', () => {
     const deepest = Math.max(...dots.map((d) => d.y));
-    // The far side sits two radii below the badge.
     expect(deepest).toBeGreaterThan(TRAIL_RADIUS * 1.9);
   });
 
@@ -33,9 +31,7 @@ describe('badgeTrail', () => {
   });
 
   it('is brightest near the badge and dims round the back', () => {
-    const nearest = dots.reduce((a, b) =>
-      Math.hypot(a.x, a.y) < Math.hypot(b.x, b.y) ? a : b,
-    );
+    const nearest = dots.reduce((a, b) => (Math.hypot(a.x, a.y) < Math.hypot(b.x, b.y) ? a : b));
     const farthest = dots.reduce((a, b) => (a.y > b.y ? a : b));
 
     expect(nearest.opacity).toBeGreaterThan(farthest.opacity);

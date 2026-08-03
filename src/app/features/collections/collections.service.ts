@@ -13,16 +13,6 @@ import {
   serialiseStore,
 } from './collection-store';
 
-/**
- * The visitor's collections, held in a signal and mirrored to localStorage.
- *
- * Local by design, per the spec — there is no account to attach them to. That also makes
- * them the one thing that survives a guest session being swapped, since nothing here is
- * keyed by the session id.
- *
- * Every mutation goes through `update`, so there is exactly one place that writes to storage
- * and no path that changes the signal without persisting.
- */
 @Injectable({ providedIn: 'root' })
 export class CollectionsService {
   private readonly store = signal<readonly UserCollection[]>(readInitial());
@@ -33,7 +23,6 @@ export class CollectionsService {
 
   readonly isEmpty = computed(() => this.store().length === 0);
 
-  /** Newest first, which is the order the list page shows. */
   readonly recent = computed(() =>
     [...this.store()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
   );
@@ -43,21 +32,12 @@ export class CollectionsService {
     return this.store().find((collection) => collection.id === id) ?? null;
   }
 
-  /** Creates a collection and returns it, so the caller can show it. */
   create(name: string, description: string): UserCollection {
     const collection = createCollection(name, description);
     this.update([...this.store(), collection]);
     return collection;
   }
 
-  /**
-   * Creates a collection with a generated name and puts these films straight in.
-   *
-   * The quick path from the add menu: naming it there would mean a form on top of a menu, and the
-   * point of that button is to get the film somewhere in one press. The name and description can
-   * be edited afterwards — the form on the collections page is still where a deliberate one gets
-   * made, with both fields required as the spec asks.
-   */
   createFor(
     movies: readonly MovieSummary[],
     baseName: string,
@@ -84,12 +64,6 @@ export class CollectionsService {
     }));
   }
 
-  /**
-   * Adds films to one collection, skipping any it already holds.
-   *
-   * Returns how many were actually added, so the caller can say "3 added" rather than
-   * implying it saved films that were already there.
-   */
   addTo(id: string, movies: readonly MovieSummary[]): number {
     const before = this.byId(id);
     if (!before) return 0;
@@ -105,13 +79,6 @@ export class CollectionsService {
     this.replace(id, (collection) => removeMovie(collection, movieId));
   }
 
-  /**
-   * Deletes a collection and hands it back, so the caller can offer it again.
-   *
-   * Returning the whole thing rather than nothing is what makes the undo possible without a
-   * separate bin to keep it in: whoever asked for the deletion holds the only copy, and drops it
-   * when the offer expires.
-   */
   remove(id: string): UserCollection | null {
     const removed = this.byId(id);
     if (!removed) return null;
@@ -120,21 +87,12 @@ export class CollectionsService {
     return removed;
   }
 
-  /**
-   * Puts a deleted collection back, untouched.
-   *
-   * Position is not restored because there is none to restore: the list is ordered by when each
-   * was last changed, and this one has not changed — so it lands where it was.
-   */
   restore(collection: UserCollection): void {
     if (this.byId(collection.id)) return;
     this.update([...this.store(), collection]);
   }
 
-  private replace(
-    id: string,
-    change: (collection: UserCollection) => UserCollection,
-  ): void {
+  private replace(id: string, change: (collection: UserCollection) => UserCollection): void {
     let touched = false;
 
     const next = this.store().map((collection) => {
@@ -145,8 +103,6 @@ export class CollectionsService {
       return updated;
     });
 
-    // Skipped when nothing changed, so a no-op does not rewrite storage or wake every
-    // computed reading the list.
     if (touched) this.update(next);
   }
 
@@ -155,10 +111,7 @@ export class CollectionsService {
 
     try {
       localStorage.setItem(COLLECTION_STORAGE_KEY, serialiseStore(next));
-    } catch {
-      // Storage can be unavailable in private modes, or full. The collections still work
-      // for this visit; losing them on reload beats losing the interaction now.
-    }
+    } catch {}
   }
 }
 

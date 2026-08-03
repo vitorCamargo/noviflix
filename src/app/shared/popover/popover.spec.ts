@@ -20,9 +20,7 @@ describe('Popover', () => {
     return {
       fixture,
       el: fixture.nativeElement as HTMLElement,
-      trigger: (fixture.nativeElement as HTMLElement).querySelector(
-        'button',
-      ) as HTMLButtonElement,
+      trigger: (fixture.nativeElement as HTMLElement).querySelector('button') as HTMLButtonElement,
     };
   }
 

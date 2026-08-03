@@ -16,13 +16,12 @@ npm test           # Vitest unit tests
 ```
 
 TMDB calls route through a Cloudflare Worker that holds the token server-side, so
-no credential lives in this repo. Point `src/environments/environment.ts` at your
-deployed Worker URL — see [DEPLOY.md](./DEPLOY.md). Nothing calls the API yet.
+no credential lives in this repo.
 
 ## Deployment
 
 GitHub Pages, published by `.github/workflows/deploy.yml` on every push to
-`master`. Full setup and troubleshooting in [DEPLOY.md](./DEPLOY.md).
+`master`.
 
 ## What exists
 
@@ -229,24 +228,3 @@ Dictionaries are intentionally small — grow them per feature.
   (title, poster, year, score) so a collection renders without refetching, with
   the TMDB `id` kept for pulling full details on demand. The store is versioned
   for future migration.
-
-## Removed on purpose
-
-`TmdbService`, the auth/language HTTP interceptor, the `signalQuery` helper and all
-presentational components (movie card/grid/rail, collection card, search bar,
-rating ring) were stripped so the structure could be committed on its own. They
-come back feature by feature. `provideHttpClient` is still registered, so the data
-layer is a one-line addition.
-
-## Next steps
-
-1. Grid-overlay background and the loading sequence — the design foundation.
-2. `TmdbService` + interceptor, keyed off `i18n.lang()` so language changes refetch.
-3. Home: hero search and featured rails.
-4. Search results.
-5. Movie details, shared between page and pop-up.
-6. Collections on top of localStorage.
-
-## Notes
-
-- This product uses the TMDB API but is not endorsed or certified by TMDB.

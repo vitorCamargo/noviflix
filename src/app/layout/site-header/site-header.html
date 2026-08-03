@@ -1,12 +1,5 @@
 <header class="hdr">
   <nav class="hdr__row" [attr.aria-label]="i18n.t('app.name')">
-    <!--
-      Mark only, no wordmark. Doubles as the home link.
-
-      Inlined rather than an <img>: currentColor inside a referenced SVG resolves
-      against that file's own document, not this one, so an external asset can't
-      be tinted from here.
-    -->
     <a class="hdr__logo" routerLink="/" [attr.aria-label]="i18n.t('nav.home')">
       <svg viewBox="0 0 26 26" aria-hidden="true">
         <path
@@ -17,12 +10,7 @@
       </svg>
     </a>
 
-    <a
-      class="hdr__item"
-      routerLink="/collections"
-      routerLinkActive="is-active"
-    >
-      <!-- Film strip: body, frame divisions, and perforations either side. -->
+    <a class="hdr__item" routerLink="/collections" routerLinkActive="is-active">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="2" y="4" width="20" height="16" rx="2.5" />
         <path d="M7 4v16M17 4v16" />
@@ -33,14 +21,8 @@
 
     <nv-about-popover class="hdr__item hdr__item--popover" />
 
-    <!-- A full drum of air sets the selector apart from the nav proper. -->
     <nv-language-switcher class="hdr__lang" />
 
-    <!--
-      Guest session countdown, at the far right. Hidden on small screens by its own
-      stylesheet — the bar has no room for it there, where the nav labels are already
-      dropped to fit.
-    -->
     <nv-guest-session-badge class="hdr__guest" />
   </nav>
 </header>

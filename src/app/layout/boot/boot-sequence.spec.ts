@@ -105,9 +105,7 @@ describe('phaseAt', () => {
   });
 
   it('lasts the minimum even when readiness is immediate', () => {
-    expect(bootDuration(0)).toBe(
-      BOOT_MIN_MS + BOOT_FINISH_MS + BOOT_BLOOM_MS + BOOT_CLEAR_MS,
-    );
+    expect(bootDuration(0)).toBe(BOOT_MIN_MS + BOOT_FINISH_MS + BOOT_BLOOM_MS + BOOT_CLEAR_MS);
   });
 
   it('cannot be held past the cap', () => {

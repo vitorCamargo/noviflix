@@ -35,12 +35,6 @@ describe('App', () => {
     expect(track?.getAttribute('tabindex')).toBe('0');
   });
 
-  /**
-   * The mark is the only branding in the header, and it links home.
-   *
-   * Inline SVG rather than an image: an external SVG can't inherit colour from
-   * this document, so the mark could never be tinted white.
-   */
   it('renders the mark in the header as the home link', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
@@ -58,7 +52,6 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    // Structure only — the drum values themselves live in the stylesheet.
     expect(compiled.querySelector('.hdr__row')).not.toBeNull();
     expect(compiled.querySelector('.hdr__lang')).not.toBeNull();
   });

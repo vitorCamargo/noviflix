@@ -1,7 +1,3 @@
-<!--
-  Order matters here: filter, create, rule, list. Searching and making one are the two things that
-  are always available, so they sit above the rule; everything below it depends on what exists.
--->
 <div class="pl">
   <div class="pl__search">
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -47,7 +43,6 @@
       }
     </ul>
   } @else if (hasAny()) {
-    <!-- Filtered to nothing, which is a different state from having none at all. -->
     <p class="pl__empty">{{ i18n.t('collections.noMatch') }}</p>
   } @else {
     <p class="pl__empty">{{ i18n.t('collections.pickerEmpty') }}</p>

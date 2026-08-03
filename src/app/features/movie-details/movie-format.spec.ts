@@ -9,11 +9,6 @@ import {
 
 const EN = 'en-US';
 
-/**
- * The theme running through all of these: TMDB reports "unknown" as zero, an empty
- * string or an empty array rather than null. Formatted naively, missing data becomes
- * a confident claim — a film with a $0 budget, or a rating of 0.0.
- */
 describe('formatMoney', () => {
   it('formats a reported figure without cents', () => {
     expect(formatMoney(200_000_000, EN)).toBe('$200,000,000');
@@ -69,11 +64,10 @@ describe('formatLanguages', () => {
     expect(formatLanguages([{ iso_639_1: 'en', name: 'English' }], EN)).toBe('English');
   });
 
-  /** TMDB returns an empty `name` for some languages but still gives the English one. */
   it('falls back to the English name when the localised one is blank', () => {
-    expect(
-      formatLanguages([{ iso_639_1: 'yo', name: '', english_name: 'Yoruba' }], EN),
-    ).toBe('Yoruba');
+    expect(formatLanguages([{ iso_639_1: 'yo', name: '', english_name: 'Yoruba' }], EN)).toBe(
+      'Yoruba',
+    );
   });
 
   it('is null when there is nothing usable', () => {
@@ -100,18 +94,10 @@ describe('formatVoteAverage', () => {
     expect(formatVoteAverage(6.84)).toBe('6.8');
   });
 
-  /**
-   * Recorded rather than asserted as desirable: 6.85 has no exact binary
-   * representation and lands just below the true value, so toFixed rounds it down.
-   * It matters only in that a displayed score can differ by a tenth from a
-   * hand-rounded one — not worth correcting for a figure TMDB itself derives from
-   * an average.
-   */
   it('rounds a decimal midpoint down, per binary floating point', () => {
     expect(formatVoteAverage(6.85)).toBe('6.8');
   });
 
-  /** Zero means unrated, and "0.0" would read as a damning score. */
   it('treats zero as unrated', () => {
     expect(formatVoteAverage(0)).toBeNull();
   });

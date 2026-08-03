@@ -7,7 +7,6 @@
     width="1040px"
     (closed)="close()"
   >
-    <!-- Left of the bar: what can be done to the collection itself. -->
     <div nvPanelToolbar class="bar">
       <button
         type="button"
@@ -36,14 +35,6 @@
       </button>
     </div>
 
-    <!--
-      One tab, and still a tab.
-
-      There is only one section here, but the bar is the same bar as the film pop-up's — a lone
-      label where that one has a strip would read as a heading that happens to be in the corner.
-      Marked as selected because it is, and the mark at the panel's top edge is what says the panel
-      below belongs to it.
-    -->
     <div nvPanelFilters class="tabs" role="tablist" [attr.aria-label]="list.name">
       <button
         type="button"
@@ -57,7 +48,6 @@
       </button>
     </div>
 
-    <!-- Left column: what the collection is. -->
     <div nvPanelAside class="meta">
       <div class="meta__head">
         <h1 class="meta__title">{{ list.name }}</h1>
@@ -76,7 +66,6 @@
           <dd class="meta__value">{{ created() }}</dd>
         </div>
 
-        <!-- Only when it says something the created date does not. -->
         @if (updated(); as when) {
           <div class="meta__fact">
             <dt class="meta__label">{{ i18n.t('collections.updatedAt') }}</dt>
@@ -86,7 +75,6 @@
       </dl>
     </div>
 
-    <!-- Right column: the films. -->
     <div
       nvPanelBody
       id="nv-collection-panel"
@@ -108,8 +96,6 @@
           @for (film of films(); track film.id) {
             <div class="films__tile">
               <nv-drum-card [interactive]="true" [glow]="false">
-                <!-- The tile opens the film. A link, so keyboard focus, middle-click and
-                     open-in-new-tab all work without being reimplemented. -->
                 <a
                   class="cm"
                   [href]="filmHref(film)"
@@ -149,8 +135,6 @@
                   </span>
                 </a>
 
-                <!-- Outside the link, because a link cannot contain a button that means
-                     something else. Always focusable, so it is reachable without a pointer. -->
                 <button
                   type="button"
                   class="cm__remove"

@@ -33,8 +33,6 @@
   <ul class="ab__links">
     @for (link of links; track link.key) {
       <li>
-        <!-- noopener with a new tab: without it the opened page can reach back
-             through window.opener and navigate this one. -->
         <a class="ab__chip" [href]="link.url" target="_blank" rel="noopener noreferrer">
           <svg class="ab__chip-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M14 4h6v6" />
@@ -48,9 +46,7 @@
   </ul>
 
   <div class="ab__foot">
-    <span class="ab__built">
-      {{ i18n.t('about.madeWith') }}<span class="ab__dot">.</span>
-    </span>
+    <span class="ab__built"> {{ i18n.t('about.madeWith') }}<span class="ab__dot">.</span> </span>
     <span class="ab__version">
       {{ i18n.t('about.version', { version: info.version }) }}
     </span>

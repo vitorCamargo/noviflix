@@ -3,38 +3,20 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { TmdbService } from '../../../core/tmdb/tmdb.service';
 import type { CastMember } from '../../../core/models/tmdb.models';
 
-/**
- * Names shown before the list is cut. A full cast can run to hundreds.
- *
- * Exported because the page sizes itself from this: computing its width from the raw
- * count while the grid renders a capped one leaves a stretch of empty page nobody can
- * fill.
- */
 export const CAST_LIMIT = 18;
 
-/**
- * Cast as a grid of portraits with the role beneath each.
- *
- * Ordered as TMDB returns it, which is billing order — the people the production
- * itself considered principal, rather than anything this app decides.
- */
 @Component({
   selector: 'nv-cast-grid',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (people().length) {
-      <ul
-        class="cg"
-        [class.is-horizontal]="horizontal()"
-        [style.--cg-rows]="rows()"
-      >
+      <ul class="cg" [class.is-horizontal]="horizontal()" [style.--cg-rows]="rows()">
         @for (person of people(); track person.id) {
           <li class="cg__item">
             <span class="cg__art">
               @if (portrait(person); as src) {
                 <img [src]="src" [alt]="" loading="lazy" />
               } @else {
-                <!-- Initials rather than an empty frame, which reads as broken. -->
                 <span class="cg__initials" aria-hidden="true">
                   {{ initials(person.name) }}
                 </span>
@@ -69,11 +51,6 @@ export const CAST_LIMIT = 18;
       list-style: none;
     }
 
-    /*
-     * Column-major, for the page that scrolls sideways. Tiles take the same drum
-     * footprint as a result card, so a strip of cast reads as the same kind of thing
-     * as a strip of films and the page can compute one width for both.
-     */
     .cg.is-horizontal {
       grid-auto-flow: column;
       grid-template-columns: none;
@@ -81,17 +58,9 @@ export const CAST_LIMIT = 18;
       grid-auto-columns: calc(var(--nv-grid-cell) * 3);
       gap: var(--nv-grid-cell);
       block-size: 100%;
-      /* Centred, so a window with room to spare distributes it above and below the
-         rows rather than leaving it all at the bottom. */
       align-content: center;
     }
 
-    /*
-     * The tile is a fixed five drums tall here, so the portrait has to give way to the
-     * name rather than the other way round. With the art holding a 2:3 ratio it took
-     * almost the whole tile and left the name a sliver — a role of any length was cut
-     * mid-word.
-     */
     .cg.is-horizontal .cg__item {
       block-size: 100%;
     }
@@ -179,10 +148,8 @@ export class CastGrid {
 
   readonly cast = input<readonly CastMember[]>([]);
 
-  /** Column-major, for the page that scrolls sideways rather than down. */
   readonly horizontal = input(false);
 
-  /** Tile rows when horizontal. Decided by the page, which needs it for its width. */
   readonly rows = input(2);
 
   protected readonly people = computed(() => this.cast().slice(0, CAST_LIMIT));
@@ -191,12 +158,6 @@ export class CastGrid {
     return this.tmdb.imageUrl(person.profile_path, 'w185');
   }
 
-  /**
-   * First letters of the first and last name.
-   *
-   * Built from the ends rather than the first two words, so a middle name doesn't
-   * produce initials that look like someone else's.
-   */
   protected initials(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
     if (!parts.length) return '?';

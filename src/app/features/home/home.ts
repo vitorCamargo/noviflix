@@ -17,12 +17,7 @@ import { AppReadyService } from '../../core/app-ready.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { TmdbService } from '../../core/tmdb/tmdb.service';
 import type { MovieDetails, MovieSummary } from '../../core/models/tmdb.models';
-import {
-  PageGrid,
-  readCellSize,
-  readViewport,
-  toGridArea,
-} from '../../layout/page-grid/page-grid';
+import { PageGrid, readCellSize, readViewport, toGridArea } from '../../layout/page-grid/page-grid';
 import { DrumCard } from '../../shared/drum-card/drum-card';
 import { DotField } from './dot-field/dot-field';
 import { badgeTrail } from './badge-trail';
@@ -45,7 +40,6 @@ import {
   stepDelay,
 } from './home-entrance';
 
-/** Drum rows the results grid gives up at the top, for the floating header. */
 const RESULTS_TOP_ROWS = 1;
 import { HeroTrailer, type TrailerState } from './hero-trailer/hero-trailer';
 import { SearchField } from './search-field/search-field';
@@ -53,17 +47,10 @@ import { SearchResultsGrid } from '../search/search-results-grid/search-results-
 import { SearchStore } from '../search/search-store';
 import { assignTiers, tierLabelKey, type PopularityTier } from './popularity';
 import { PopularityBadge } from './popularity-badge/popularity-badge';
-import {
-  RING_CIRCUMFERENCE,
-  RING_RADIUS,
-  advanceProgress,
-  ringOffset,
-} from './slide-timer';
+import { RING_CIRCUMFERENCE, RING_RADIUS, advanceProgress, ringOffset } from './slide-timer';
 
-/** How many cast members the poster card lists. */
 const CAST_LIMIT = 3;
 
-/** Genre chips shown before the rest collapse into a `+N`. */
 const GENRE_LIMIT = 3;
 
 @Component({
@@ -88,26 +75,14 @@ export class Home implements OnDestroy {
   private readonly search = inject(SearchStore);
   protected readonly i18n = inject(I18nService);
 
-  /** Results replace the featured composition while a search is running. */
   protected readonly searching = this.search.active;
 
-  // --------------------------------------------------------------- entrance
-
-  /**
-   * Whether the composition may assemble itself.
-   *
-   * Flipped by the first-load screen as it starts to clear, so the blocks arrive into the space it
-   * leaves. Read straight through rather than copied, so a page reached by navigating — where the
-   * screen is long gone and this is already true — renders finished instead of animating in.
-   */
   protected readonly entering = this.appReady.revealed;
 
-  /** The delay for one block, as a CSS duration. */
   protected delay(beat: HomeBeat): string {
     return `${beatDelay(beat)}ms`;
   }
 
-  /** The badge's trail, drawn one dot at a time so the arc reads as being traced. */
   protected trailDelay(index: number): string {
     return `${stepDelay('badge', index, TRAIL_STEP_MS)}ms`;
   }
@@ -116,13 +91,6 @@ export class Home implements OnDestroy {
     return `${stepDelay('carousel', index, AVATAR_STEP_MS)}ms`;
   }
 
-  /**
-   * Which of the two swap keyframe twins the next change plays.
-   *
-   * A CSS animation only restarts when its name changes, so each film change flips this between two
-   * classes whose animations are identical — the flip is what retriggers them. Empty until the first
-   * change: the arrival is the entrance's job, and a swap on top of it would play the reveal twice.
-   */
   protected readonly swapSide = signal<'' | 'a' | 'b'>('');
 
   private lastSwapIndex: number | null = null;
@@ -130,71 +98,32 @@ export class Home implements OnDestroy {
   protected readonly ringRadius = RING_RADIUS;
   protected readonly ringCircumference = RING_CIRCUMFERENCE;
 
-  /** Static geometry — built once, never recomputed. */
   protected readonly trail = badgeTrail();
 
-  /**
-   * Row count is derived here rather than read back off the grid: the grid's
-   * pad-fill needs `areas`, and `areas` needs the row count, so taking it from
-   * the child would be circular. Both sides compute it from the same viewport
-   * and cell size, so they agree.
-   */
   private readonly viewport = signal(readViewport());
 
   protected readonly rows = computed(() =>
     Math.max(1, Math.ceil(this.viewport().height / readCellSize())),
   );
 
-  /** Narrow enough that the full-width arrangement leaves a dead gap. */
-  protected readonly compact = computed(
-    () => this.viewport().width <= HOME_COMPACT_MAX,
-  );
+  protected readonly compact = computed(() => this.viewport().width <= HOME_COMPACT_MAX);
 
-  /** Narrow enough to give up the composition for a vertical stack. */
-  protected readonly stacked = computed(
-    () => this.viewport().width <= HOME_STACK_MAX,
-  );
+  protected readonly stacked = computed(() => this.viewport().width <= HOME_STACK_MAX);
 
-  protected readonly areas = computed(() =>
-    homeAreas(this.rows(), this.compact()),
-  );
+  protected readonly areas = computed(() => homeAreas(this.rows(), this.compact()));
 
-  /**
-   * Card rows the results grid gets, from the height actually available.
-   *
-   * Computed here rather than in the grid because the page needs the same number
-   * to work out how wide it has to be — the grid flows in columns, so its width
-   * depends on how many cards each column holds.
-   */
-  /**
-   * Whole drum rows the viewport contains, floored.
-   *
-   * Distinct from `rows`, which rounds up: that figure is right for the pad field, whose
-   * overhang is clipped and free, but content placed to that last partial line runs past
-   * the bottom edge and the final row of cards is cut.
-   */
   private readonly wholeRows = computed(() =>
     Math.max(1, Math.floor(this.viewport().height / readCellSize())),
   );
 
-  protected readonly cardRows = computed(() =>
-    resultRowCount(this.wholeRows() - RESULTS_TOP_ROWS),
-  );
+  protected readonly cardRows = computed(() => resultRowCount(this.wholeRows() - RESULTS_TOP_ROWS));
 
-  /** Width of the results grid in drums, zero when it isn't showing. */
   private readonly resultsWidth = computed(() =>
     this.searching() && !this.stacked()
       ? resultGridWidth(this.search.slotCount(), this.cardRows())
       : 0,
   );
 
-  /**
-   * The page spans whichever is wider: the featured composition, or the results.
-   *
-   * This is what makes the track scrollable. Without it the page stays viewport
-   * width, and since it clips horizontal overflow, every card past the first screen
-   * exists but cannot be reached.
-   */
   protected readonly minColumns = computed(() =>
     Math.max(
       homeMinColumns(this.compact()),
@@ -204,31 +133,15 @@ export class Home implements OnDestroy {
     ),
   );
 
-  /**
-   * Full-height slot for the results grid, kept apart from `areas` because it is
-   * viewport-sized rather than part of the centred composition.
-   */
   protected readonly resultsArea = computed(() =>
     this.stacked()
       ? null
-      : toGridArea(
-          homeResultsArea(this.rows(), this.compact(), this.resultsWidth()),
-        ),
+      : toGridArea(homeResultsArea(this.rows(), this.compact(), this.resultsWidth())),
   );
 
-  /*
-   * The half-drum nudges have to be cleared here rather than in the stylesheet.
-   * They are bound as inline styles, which outrank any rule in a media query, so
-   * a `translate: none` in the mobile block was silently losing — which is why
-   * the poster still overlapped the hero when stacked.
-   */
-  protected readonly posterNudge = computed(() =>
-    this.stacked() ? null : POSTER_NUDGE,
-  );
+  protected readonly posterNudge = computed(() => (this.stacked() ? null : POSTER_NUDGE));
 
-  protected readonly carouselNudge = computed(() =>
-    this.stacked() ? null : CAROUSEL_NUDGE,
-  );
+  protected readonly carouselNudge = computed(() => (this.stacked() ? null : CAROUSEL_NUDGE));
 
   protected resizeFrame: number | null = null;
 
@@ -241,19 +154,9 @@ export class Home implements OnDestroy {
     });
   }
 
-  /**
-   * Drum placement, or nothing at all when stacked.
-   *
-   * Returning null there matters: `grid-area` is bound inline, and an inline
-   * style outranks any rule in a media query — so leaving these in place would
-   * pin blocks to desktop drum coordinates inside the stacked two-column grid.
-   */
   protected readonly area = (key: keyof ReturnType<typeof homeAreas>) =>
     this.stacked() ? null : toGridArea(this.areas()[key]);
 
-  // ------------------------------------------------------------------- data
-
-  /** Language is part of the key so switching locale refetches translated copy. */
   private readonly lang = computed(() => this.i18n.lang());
 
   private readonly nowPlaying = toSignal(
@@ -271,23 +174,12 @@ export class Home implements OnDestroy {
     () => this.movies()[this.index()] ?? null,
   );
 
-  /**
-   * Details are fetched only for the movie on screen. The list endpoint gives
-   * genre *ids* and no cast, so the visible card needs a second call — but
-   * doing it for all twelve up front would be a dozen requests for one card.
-   */
   private readonly details = toSignal(
     toObservable(computed(() => ({ id: this.active()?.id, lang: this.lang() }))).pipe(
-      switchMap(({ id }) =>
-        id
-          ? this.tmdb.movie(id).pipe(catchError(() => of(null)))
-          : of(null),
-      ),
+      switchMap(({ id }) => (id ? this.tmdb.movie(id).pipe(catchError(() => of(null))) : of(null))),
     ),
     { initialValue: null as MovieDetails | null },
   );
-
-  // ---------------------------------------------------------------- display
 
   protected readonly backdrop = computed(() =>
     this.tmdb.imageUrl(this.active()?.backdrop_path ?? null, 'w1280'),
@@ -297,18 +189,10 @@ export class Home implements OnDestroy {
     this.tmdb.imageUrl(this.active()?.poster_path ?? null, 'w500'),
   );
 
-  private readonly allGenres = computed(
-    () => this.details()?.genres?.map((g) => g.name) ?? [],
-  );
+  private readonly allGenres = computed(() => this.details()?.genres?.map((g) => g.name) ?? []);
 
   protected readonly genres = computed(() => this.allGenres().slice(0, GENRE_LIMIT));
 
-  /**
-   * Genres beyond the visible ones, surfaced as a `+N` chip.
-   *
-   * Truncating silently would misrepresent the film — a `+2` says there is more
-   * without letting the row grow past the card.
-   */
   protected readonly extraGenres = computed(() =>
     Math.max(0, this.allGenres().length - GENRE_LIMIT),
   );
@@ -317,27 +201,16 @@ export class Home implements OnDestroy {
     () => this.details()?.credits?.cast?.slice(0, CAST_LIMIT) ?? [],
   );
 
-  /**
-   * Rating for the poster card, or null when TMDB has no score.
-   *
-   * An unrated film reports 0, which would render as a confident "0.0" — a bad
-   * review rather than the absence of one.
-   */
   protected readonly score = computed(() => {
     const value = this.active()?.vote_average;
     return value ? value.toFixed(1) : null;
   });
 
-  /** Named-outlet link, so the pop-up is a URL rather than component state. */
   protected readonly modalLink = computed(() => {
     const id = this.active()?.id;
     return id == null ? null : [{ outlets: { modal: ['movie', id] } }];
   });
 
-  /**
-   * Tiers are assigned per batch, not per movie: attention is measured against
-   * the other films on offer, so the set is the unit of comparison.
-   */
   private readonly tiers = computed(() => assignTiers(this.movies()));
 
   protected readonly tier = computed<PopularityTier>(() => {
@@ -345,15 +218,11 @@ export class Home implements OnDestroy {
     return (id != null ? this.tiers().get(id) : undefined) ?? 'lowkey';
   });
 
-  protected readonly tierLabel = computed(() =>
-    this.i18n.t(tierLabelKey(this.tier())),
-  );
+  protected readonly tierLabel = computed(() => this.i18n.t(tierLabelKey(this.tier())));
 
   protected avatarUrl(movie: MovieSummary): string | null {
     return this.tmdb.imageUrl(movie.poster_path, 'w185');
   }
-
-  // ------------------------------------------------------------- navigation
 
   protected prev(): void {
     const total = this.movies().length;
@@ -371,7 +240,6 @@ export class Home implements OnDestroy {
     this.index.set(i);
   }
 
-  /** Three avatars centred on the active one, wrapping at both ends. */
   protected readonly strip = computed(() => {
     const list = this.movies();
     if (list.length === 0) return [];
@@ -383,28 +251,16 @@ export class Home implements OnDestroy {
     });
   });
 
-  // ---------------------------------------------------------------- trailer
-
   protected readonly heroHovered = signal(false);
   private readonly trailerState = signal<TrailerState>('idle');
 
-  /** Loading counts as engaged: playback is imminent, so hold the carousel. */
   private readonly trailerEngaged = computed(
     () => this.trailerState() === 'loading' || this.trailerState() === 'playing',
   );
 
-  /**
-   * Drives clearing the title and chips off the card while the trailer runs.
-   *
-   * Only once playback has actually begun — hiding them during `loading` would
-   * blank the card for the length of the fetch and read as a glitch.
-   */
-  protected readonly trailerPlaying = computed(
-    () => this.trailerState() === 'playing',
-  );
+  protected readonly trailerPlaying = computed(() => this.trailerState() === 'playing');
 
   protected onHeroEnter(event: PointerEvent): void {
-    // Touch has no hover; there the button is the only way in.
     if (event.pointerType !== 'mouse') return;
     this.heroHovered.set(true);
   }
@@ -417,26 +273,16 @@ export class Home implements OnDestroy {
     this.trailerState.set(state);
   }
 
-  // ------------------------------------------------------------ slide timer
-
-  /** 0 → 1 across one slide's dwell time. Drives the ring around the avatar. */
   protected readonly progress = signal(0);
 
   protected readonly ringDashOffset = computed(() => ringOffset(this.progress()));
 
-  /** Hovering the strip holds the current movie so it can be studied. */
   private readonly hovering = signal(false);
 
   private frame: number | null = null;
   private lastFrameAt = 0;
 
   constructor() {
-    /*
-     * Replay the hero's reveal whenever the featured film changes.
-     *
-     * However it changed — the countdown, an avatar, the arrows — the new film should arrive the
-     * way the first one did: opening from the card's corner, with its texts following.
-     */
     effect(() => {
       const index = this.index();
 
@@ -448,17 +294,6 @@ export class Home implements OnDestroy {
       });
     });
 
-    /*
-     * Tell the first-load screen it can go.
-     *
-     * This page is the one thing in the app with something worth waiting for — a batch of films from
-     * TMDB — so it is the one that reports. Once, on the first batch: the screen only exists at the
-     * start, and later refetches have nothing to announce.
-     *
-     * Nothing is reported when the request fails, because an empty batch is also what the signal
-     * starts as and the two cannot be told apart here. The screen carries its own cap for that: it
-     * finishes on its own rather than waiting to be told by a page that never will.
-     */
     effect(() => {
       const arrived = this.nowPlaying();
 
@@ -467,8 +302,6 @@ export class Home implements OnDestroy {
       });
     });
 
-    // Restart the countdown whenever the movie changes, however it changed —
-    // clicking an avatar shouldn't leave a half-elapsed ring behind.
     effect(() => {
       this.index();
       this.progress.set(0);
@@ -476,15 +309,8 @@ export class Home implements OnDestroy {
     });
 
     effect(() => {
-      /*
-       * Held while a trailer is engaged as well as while the strip is hovered.
-       * Advancing the carousel out from under a playing trailer would discard
-       * something the viewer explicitly asked to watch.
-       */
       const canRun =
         this.movies().length > 1 &&
-        // Nothing to advance while the results are showing — the carousel it
-        // drives isn't on screen.
         !this.searching() &&
         !this.hovering() &&
         !this.trailerEngaged() &&
@@ -516,8 +342,6 @@ export class Home implements OnDestroy {
     this.lastFrameAt = 0;
 
     const step = (now: number) => {
-      // First frame after a pause establishes the baseline; counting from a
-      // stale timestamp would jump the ring forward by the paused duration.
       const elapsed = this.lastFrameAt ? now - this.lastFrameAt : 0;
       this.lastFrameAt = now;
 
@@ -545,10 +369,6 @@ export class Home implements OnDestroy {
   }
 }
 
-/**
- * Auto-advancing carousels are a WCAG 2.2.2 concern, so motion-sensitive users
- * get a static one they drive themselves.
- */
 function prefersReducedMotion(): boolean {
   return (
     typeof window !== 'undefined' &&

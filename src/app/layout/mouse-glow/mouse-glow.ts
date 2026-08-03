@@ -7,12 +7,6 @@ import {
   viewChild,
 } from '@angular/core';
 
-/**
- * True when the pointer is over something that casts its own glow.
- *
- * `closest` rather than a direct match, because the pointer lands on the
- * artwork or text inside the card, not the card element itself.
- */
 export function isGlowSuppressed(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
   return target.closest('[data-glow="card"]') !== null;
@@ -21,14 +15,7 @@ export function isGlowSuppressed(target: EventTarget | null): boolean {
 @Component({
   selector: 'nv-mouse-glow',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div
-      #glow
-      class="glow"
-      [class.is-hidden]="suppressed()"
-      aria-hidden="true"
-    ></div>
-  `,
+  template: ` <div #glow class="glow" [class.is-hidden]="suppressed()" aria-hidden="true"></div> `,
   styles: `
     :host {
       display: contents;
@@ -55,7 +42,6 @@ export function isGlowSuppressed(target: EventTarget | null): boolean {
       transition: opacity var(--nv-normal) var(--nv-ease);
     }
 
-    /* Yields to a card that is casting its own corner glow. */
     .glow.is-hidden {
       opacity: 0;
     }
@@ -79,10 +65,6 @@ export class MouseGlow {
     el.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
   }
 
-  /**
-   * One delegated listener rather than per-card wiring, matching how the cursor
-   * detects interactive elements.
-   */
   @HostListener('window:pointerover', ['$event'])
   protected onOver(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') return;
@@ -92,7 +74,6 @@ export class MouseGlow {
   @HostListener('window:pointerout', ['$event'])
   protected onOut(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') return;
-    // relatedTarget is where the pointer is heading; null means it left the page.
     this.suppressed.set(isGlowSuppressed(event.relatedTarget));
   }
 }

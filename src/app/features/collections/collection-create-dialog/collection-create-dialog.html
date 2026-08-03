@@ -14,8 +14,6 @@
       <h2 class="cd__title">{{ heading() }}</h2>
 
       @if (pending().length; as count) {
-        <!-- Says what creating will do. Reaching for a new collection mid-add means the films
-             go there, so it should not be a surprise that they did. -->
         <p class="cd__lead">
           {{ i18n.t('collections.createWithFilms', { count: count }) }}
         </p>
@@ -54,10 +52,7 @@
       <label class="cd__field">
         <span class="cd__label">
           {{ i18n.t('collections.fieldDescription') }}
-          <span
-            class="cd__counter"
-            [class.is-over]="descriptionLength() > descriptionMax"
-          >
+          <span class="cd__counter" [class.is-over]="descriptionLength() > descriptionMax">
             {{ descriptionLength() }}/{{ descriptionMax }}
           </span>
         </span>

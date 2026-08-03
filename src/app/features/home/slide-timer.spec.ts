@@ -1,9 +1,4 @@
-import {
-  RING_CIRCUMFERENCE,
-  SLIDE_DURATION_MS,
-  advanceProgress,
-  ringOffset,
-} from './slide-timer';
+import { RING_CIRCUMFERENCE, SLIDE_DURATION_MS, advanceProgress, ringOffset } from './slide-timer';
 
 describe('advanceProgress', () => {
   it('advances by the elapsed fraction of the duration', () => {
@@ -19,7 +14,6 @@ describe('advanceProgress', () => {
     expect(advanceProgress(0.1, -9999, 1000)).toBe(0);
   });
 
-  /** A zero frame delta happens on the first frame after a pause. */
   it('is unchanged by a zero delta', () => {
     expect(advanceProgress(0.42, 0, 1000)).toBeCloseTo(0.42);
   });

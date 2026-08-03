@@ -1,20 +1,10 @@
 @use '../../../styles/mixins' as *;
 
-// Every block here is placed by grid-area from home-layout.ts, so nothing sets
-// its own size — the drums decide. Rules below are purely what goes *inside*.
-
 :host {
   display: block;
   block-size: 100%;
 }
 
-// ---------------------------------------------------------------- headline
-
-/*
- * `isolation` makes this a stacking context so the dots can sit behind the text
- * while the block as a whole still paints above the pad field. Without it a
- * negative z-index would escape and land under the pads, hiding the dots.
- */
 .caption {
   position: relative;
   isolation: isolate;
@@ -26,20 +16,9 @@
   pointer-events: none;
 }
 
-/*
- * A 4x5 matrix to the left of the headline, echoing the drum lattice. Sized by
- * its own content, so only the anchor point is set here — pinning both axes
- * would stretch the pitch.
- */
 .caption__dots {
   position: absolute;
-  /* Raised 1.5 drums above where it used to sit. */
   inset-block-start: calc(4% - var(--nv-grid-cell) * 1.5);
-  /*
-   * Measured from the caption's right edge, so a larger value moves the matrix
-   * left. 1.5 drums puts its right edge that far in from the caption's left —
-   * one drum further right than before.
-   */
   inset-inline-end: calc(100% - var(--nv-grid-cell) * 1.5);
   z-index: 0;
 }
@@ -72,17 +51,10 @@
   line-height: 1.65;
 }
 
-// ------------------------------------------------------------ search slot
-
-/* Block, not flex: the field takes the whole drum rather than being centred
-   inside it, so its edges land on the seams like every other surface. */
 .action {
   display: block;
 }
 
-// ------------------------------------------------------------ camera badge
-
-/* The trail spills well outside this one drum, so nothing may clip it. */
 .badge {
   position: relative;
   display: grid;
@@ -104,17 +76,11 @@
     block-size: 23px;
     fill: none;
     stroke: currentColor;
-    /* Heavier than the other icons — the badge is a focal point, not a hint. */
     stroke-width: 2.4;
     stroke-linejoin: round;
   }
 }
 
-/*
- * Centred on the badge, then pushed out along its arm with `translate`. Using
- * the standalone property rather than `transform` keeps the offset independent
- * of the centring, so neither has to account for the other.
- */
 .badge__trail {
   position: absolute;
   inset-block-start: 50%;
@@ -125,19 +91,10 @@
   pointer-events: none;
 }
 
-// ----------------------------------------------------------------- results
-
-/*
- * Takes the card stack's place. min-inline-size: 0 so the grid inside can be
- * wider than its area — the track scrolls to it rather than the grid being
- * squeezed into the columns the area declares.
- */
 .results {
   min-inline-size: 0;
   min-block-size: 0;
 }
-
-// -------------------------------------------------------------------- hero
 
 .hero {
   min-inline-size: 0;
@@ -152,7 +109,6 @@
   object-fit: cover;
 }
 
-/* Above the trailer, so the title stays readable once video is playing. */
 .hero__scrim {
   position: absolute;
   inset: 0;
@@ -166,11 +122,6 @@
   pointer-events: none;
 }
 
-/*
- * Kept clear of the cards that overlap the hero's right edge. The poster and
- * popularity card cover roughly two drums there, so the text stops short of
- * them and wraps rather than running underneath.
- */
 .hero__text {
   position: absolute;
   inset-block-end: 0;
@@ -188,12 +139,8 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  /* Two lines is the most the card can give a title without crowding the
-     chips below it; anything longer is cut rather than allowed to overflow. */
   @include clamp-lines(2);
 }
-
-// ------------------------------------------------------------------ poster
 
 .poster {
   min-inline-size: 0;
@@ -207,7 +154,6 @@
   color: inherit;
 }
 
-/* Clips the zoom, so the artwork can grow without the card leaving its seams. */
 .poster__art {
   position: relative;
   display: block;
@@ -223,8 +169,6 @@
   transition: scale var(--nv-slow) var(--nv-ease-panel);
 }
 
-/* Held back until the card is engaged, matching the result cards: a rating on
-   permanent display turns the composition into a spec sheet. */
 .poster__score {
   @include score-pill;
 
@@ -256,7 +200,6 @@
   }
 }
 
-/* No hover to reveal it, so the rating is simply present. */
 @media (hover: none), (max-width: 900px) {
   .poster__score {
     opacity: 1;
@@ -310,8 +253,6 @@
   color: var(--nv-text-faint);
 }
 
-// ------------------------------------------------------------------- stats
-
 .stats {
   min-inline-size: 0;
   min-block-size: 0;
@@ -329,8 +270,6 @@
   min-inline-size: 0;
 }
 
-/* The badge carries its own colour and motion per tier. */
-
 .stats__label {
   margin: 0;
   font-size: var(--nv-text-xs);
@@ -346,8 +285,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-// -------------------------------------------------------------------- tags
 
 .tags {
   display: flex;
@@ -378,15 +315,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Quieter than a real genre — it's a count, not a label. */
 .tag--more {
   color: var(--nv-text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-// ---------------------------------------------------------------- carousel
-
-/* Two drums tall, so the strip sits clear of the card above it. */
 .carousel {
   position: relative;
   display: flex;
@@ -394,12 +327,6 @@
   justify-content: center;
 }
 
-/*
- * Pinned to lattice intersections rather than flowed with the avatars: their
- * centres land where four drums meet, which ties them to the grid the same way
- * the cards are. Offsets are from the carousel's own top-left, which is itself
- * on a drum corner.
- */
 .carousel__nav {
   position: absolute;
   translate: -50% 0%;
@@ -409,7 +336,6 @@
   block-size: 40px;
   border: 1px solid var(--nv-border);
   border-radius: 50%;
-  /* Darker than the pads, so the button reads as a hole punched in the grid. */
   background: var(--nv-grid-pad);
   color: var(--nv-text-muted);
   transition:
@@ -426,8 +352,6 @@
     stroke-linejoin: round;
   }
 
-  /* No accent here — the accent is reserved for the countdown ring, so it
-     reads as progress rather than as generic emphasis. */
   &:hover {
     border-color: var(--nv-border-strong);
     color: var(--nv-text);
@@ -489,20 +413,11 @@
   }
 }
 
-/*
- * Countdown ring. Overlaid rather than a border on the avatar, so the stroke
- * can be a partial arc — a border can only ever be a full circle.
- *
- * Two circles at the same radius: a faint full track, and the accent arc drawn
- * over it. The track means the ring still reads as a complete shape at zero
- * progress instead of the avatar losing its outline entirely.
- */
 .carousel__ring {
   position: absolute;
   inline-size: 64px;
   block-size: 64px;
   pointer-events: none;
-  /* SVG draws from 3 o'clock; rotate so the arc starts at the top. */
   transform: rotate(-90deg);
 
   circle {
@@ -521,28 +436,7 @@
   filter: drop-shadow(0 0 6px var(--nv-accent-glow));
 }
 
-// ------------------------------------------------------------------- mobile
-
-/*
- * The drum composition is abandoned below this width — there are not enough
- * columns for cards to overlap meaningfully. Blocks stack in reading order:
- * headline, search, hero, poster + cast, popularity, strip.
- *
- * `grid-area` is set inline on each block, but the parent switches to
- * `display: block` at this width which makes those values inert. The half-drum
- * `translate` nudges are inline too — those *cannot* be undone from here, since
- * an inline style outranks any rule in a media query, so `Home` clears them at
- * the binding instead.
- *
- * Every block is sized by its own content here rather than by drums, so the page
- * is one column of cards with a single shared gutter and rhythm.
- */
 @media (max-width: 900px) {
-  /*
-   * Full width by default. The grid is two columns so the poster and popularity
-   * can pair up below; everything else spans both and reads as one column.
-   * Gutters come from the grid's own padding, so nothing here sets a margin-inline.
-   */
   .caption,
   .action,
   .hero,
@@ -557,13 +451,11 @@
     padding-block-end: var(--nv-space-7);
   }
 
-  /* Decorative companions to the composition; nothing to sit beside now. */
   .badge,
   .caption__dots {
     display: none;
   }
 
-  /* Gutter comes from the grid, so nothing here adds one of its own. */
   .caption {
     gap: var(--nv-space-3);
     padding-block-start: var(--nv-space-6);
@@ -571,7 +463,6 @@
   }
 
   .caption__title {
-    /* Tracks the narrow column instead of the desktop viewport curve. */
     font-size: clamp(2.6rem, 12vw, 3.6rem);
   }
 
@@ -579,28 +470,15 @@
     font-size: var(--nv-text-base);
   }
 
-  /*
-   * Positioned so it paints above the pinned pad layer.
-   *
-   * The cards get this for free — each wraps a positioned DrumCard — but a plain
-   * block does not, and positioned boxes paint after unpositioned ones. That is
-   * what put the search slot and the nav buttons behind the drums.
-   */
   .action,
   .carousel__nav {
     position: relative;
   }
 
-  /*
-   * The error message is taken out of the flow so it can never change the field's
-   * height, which means the space beneath the field has to be reserved here —
-   * otherwise a message lands on top of the first row of results.
-   */
   .action {
     margin-block: var(--nv-space-5) var(--nv-space-6);
   }
 
-  /* Matches the backdrop it crops, rather than a guessed pixel height. */
   .hero {
     aspect-ratio: 16 / 9;
     margin-block-start: var(--nv-space-7);
@@ -614,23 +492,11 @@
     font-size: var(--nv-text-2xl);
   }
 
-  /*
-   * Playback clears the card on touch. The card is small here and the copy is
-   * repeated in the poster and popularity blocks below, so the trailer gets the
-   * whole frame. Faded rather than removed, so the layout does not jump when it
-   * comes back. Kept to this width on purpose: on desktop the hero is large
-   * enough that the title never competes with the video.
-   */
   .hero.is-playing .hero__text {
     opacity: 0;
     transition: opacity var(--nv-normal) var(--nv-ease);
   }
 
-  /*
-   * The pair. Poster takes the left column and keeps its drum proportions —
-   * 3 columns by 5 rows on the lattice, so 3/5 — which is why its height is not
-   * stated. Popularity takes the right column and stretches to match it.
-   */
   .poster {
     grid-column: 1;
     aspect-ratio: 3 / 5;
@@ -638,14 +504,6 @@
     margin-block-start: var(--nv-space-5);
   }
 
-  /*
-   * Half the poster's height, so the pair is deliberately uneven rather than
-   * looking like two cards that failed to match. The poster is 3 wide by 5 tall,
-   * so half of that at the same width is 3 by 2.5 — hence 6/5.
-   *
-   * `align-self` keeps it at the top of the row instead of stretching to fill
-   * the height the poster establishes.
-   */
   .stats {
     grid-column: 2;
     align-self: start;
@@ -655,8 +513,6 @@
     margin-block-start: var(--nv-space-5);
   }
 
-  /* A horizontal row inside one drum on desktop. With real height to spend, the
-     icon leads from above and the copy sits under it, both centred. */
   .stats__body {
     --nv-badge-size: 44px;
 
@@ -669,15 +525,10 @@
   }
 
   .stats__value {
-    /* Room for two lines now that the copy is not competing with the icon. */
     white-space: normal;
     @include clamp-lines(2);
   }
 
-  /*
-   * Nav buttons are pinned to lattice intersections on desktop; with no lattice
-   * to pin to, the strip becomes a plain centred row and they rejoin the flow.
-   */
   .carousel {
     position: static;
     gap: var(--nv-space-4);
@@ -690,24 +541,6 @@
   }
 }
 
-// ---------------------------------------------------------------- entrance
-
-/*
- * The composition assembles itself, in reading order.
- *
- * `is-entering` lands on the grid when the first-load screen begins to clear, and each block carries
- * its own delay in `--enter` from the entrance table. Everything here is CSS: the table decides when,
- * the stylesheet decides how, and neither has to know about the other beyond that one property.
- *
- * Held invisible until the flag arrives, because until then the screen is over the top of it — a
- * block that faded in behind the cover would simply be there when the cover came off.
- *
- * Every fill mode here is `backwards`, never `both`. The two are identical during the delay, but
- * `both` keeps the final keyframe applied forever — and a kept `transform: translateY(0)` is a
- * stacking context, which trapped the search field's corner glow above the pads as four white
- * blobs. Each animation ends at the element's natural state, so dropping the styles changes
- * nothing visible.
- */
 nv-page-grid:not(.is-entering) {
   .caption__dots,
   .caption__line,
@@ -723,41 +556,27 @@ nv-page-grid:not(.is-entering) {
     opacity: 0;
   }
 
-  /* Scale, not opacity: each trail dot carries its own opacity as an inline style, which no rule
-     here can outrank. Scaled to nothing it is just as hidden. */
   .badge__trail {
     scale: 0;
   }
 }
 
 nv-page-grid.is-entering {
-  /* The workhorse: a line of type or a small block, rising as it fades. */
   .caption__line,
   .caption__body,
   .action,
   .hero__text,
   .stats {
-    /* Shorter than the panel swipe it borrows: a dozen blocks arriving in turn cannot each take
-       the better part of a second. */
     animation: nv-swipe-up 520ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
 
-  /* Behind the type, so it fades rather than moves — a matrix that slid would fight the words. */
   .caption__dots {
     animation: nv-fade-in 700ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
 
-  /*
-   * The film, opening from its top-left corner.
-   *
-   * `backwards` rather than `both`: the corner clip must not outlive the animation, or it would keep
-   * cutting off the card's glow. Before the delay is up the first frame holds, which is what keeps
-   * the card hidden until its turn.
-   */
   .hero {
     animation: nv-corner-open 780ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
-
 
   .poster {
     animation: nv-rise 620ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
@@ -767,12 +586,6 @@ nv-page-grid.is-entering {
     animation: nv-pop 420ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
 
-  /*
-   * The trail, traced one dot at a time.
-   *
-   * Scale only, and `backwards`, so each dot keeps the graded opacity it was given — animating that
-   * would end them all at full strength and snap them back.
-   */
   .badge__trail {
     animation: nv-pop-in 300ms var(--nv-ease-panel) var(--enter, 0ms) backwards;
   }
@@ -786,12 +599,6 @@ nv-page-grid.is-entering {
   }
 }
 
-/*
- * Nothing arrives for anyone who asked for that — it is simply already there.
- *
- * Both blocks are reset, including the not-entering one: with no animation to bring them in, an
- * invisible block would stay invisible.
- */
 @media (prefers-reduced-motion: reduce) {
   nv-page-grid:not(.is-entering),
   nv-page-grid.is-entering {
@@ -811,29 +618,12 @@ nv-page-grid.is-entering {
     }
   }
 
-  /* The trail keeps the graded opacity it was given; only its scale had to be put back. */
   nv-page-grid .badge__trail {
     animation: none;
     scale: 1;
   }
 }
 
-// ------------------------------------------------------------------ the swap
-
-/*
- * The next film arrives the way the first one did.
- *
- * Whenever the featured movie changes, the hero replays its corner reveal and the texts and cards
- * hanging off it follow with short rises — a compressed version of the entrance, since a swap is a
- * repetition and a repetition at full length would wear thin by the third film.
- *
- * `swap-a` and `swap-b` are the two keyframe twins; the component alternates them because a CSS
- * animation only restarts when its name changes. Written after (and prefixed to outweigh) the
- * entrance rules, so a swap always wins the `animation` property from them.
- *
- * `backwards`, never `both`: held forwards, the corner clip would outlive the animation and keep
- * cutting off the card's glow.
- */
 nv-page-grid .hero.swap-a {
   animation: nv-corner-open 620ms var(--nv-ease-panel) backwards;
 }
@@ -842,7 +632,6 @@ nv-page-grid .hero.swap-b {
   animation: nv-corner-open-b 620ms var(--nv-ease-panel) backwards;
 }
 
-/* The title and tags follow once the image is most of the way open. */
 .hero.swap-a .hero__text {
   animation: nv-swipe-up 420ms var(--nv-ease-panel) 260ms backwards;
 }
@@ -867,7 +656,6 @@ nv-page-grid .stats.swap-b {
   animation: nv-swipe-up-b 420ms var(--nv-ease-panel) 200ms backwards;
 }
 
-/* The swap is repetition by definition, so under reduced motion the film simply changes. */
 @media (prefers-reduced-motion: reduce) {
   nv-page-grid .hero.swap-a,
   nv-page-grid .hero.swap-b,

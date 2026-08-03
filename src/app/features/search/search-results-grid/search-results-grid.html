@@ -1,14 +1,7 @@
-<section
-  class="rg"
-  [style.--rg-rows]="rows()"
-  [attr.aria-busy]="loadingFirst() || loadingMore()"
->
-  <!-- No visible count any more, but the change still has to be announced. -->
+<section class="rg" [style.--rg-rows]="rows()" [attr.aria-busy]="loadingFirst() || loadingMore()">
   <p class="nv-sr" role="status">{{ announcement() }}</p>
 
-
   @if (loadingFirst()) {
-    <!-- Same footprint as the real grid, so results arriving don't shift the page. -->
     <div class="rg__grid" aria-hidden="true">
       @for (slot of skeletons; track slot) {
         <div class="rg__skeleton"></div>
@@ -40,26 +33,17 @@
         <nv-movie-card [movie]="movie" />
       }
 
-      <!-- Tail placeholders, so the grid visibly continues while the next page
-           loads rather than stopping dead at the last card. -->
       @if (loadingMore()) {
         @for (slot of tail; track slot) {
           <div class="rg__skeleton" aria-hidden="true"></div>
         }
       }
 
-      <!--
-        Only present while a further page exists, so reaching the true end cannot
-        keep asking for more. Sized to a card's width so it sits in the grid flow
-        rather than collapsing between columns.
-      -->
       @if (hasMore() && !loadingMore()) {
         <div class="rg__sentinel" #sentinel aria-hidden="true"></div>
       }
     </div>
 
-    <!-- A failure partway through leaves what loaded on screen and offers the
-         retry inline, rather than discarding results that are perfectly good. -->
     @if (failed()) {
       <p class="rg__tail-error" role="alert">
         {{ i18n.t('search.failed') }}

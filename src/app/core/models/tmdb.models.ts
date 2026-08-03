@@ -66,7 +66,6 @@ export interface CollectionRef {
 
 export interface SpokenLanguage {
   iso_639_1: string;
-  /** Localised name, present only when the request carried a language. */
   name: string;
   english_name?: string;
 }
@@ -97,30 +96,12 @@ export interface CollectionSummary {
   backdrop_path: string | null;
 }
 
-export interface CollectionDetails extends CollectionSummary {
-  parts: MovieSummary[];
-}
-
-export type LoadState = 'idle' | 'loading' | 'success' | 'error';
-
-/**
- * Guest session, which is what lets an anonymous visitor rate a film.
- *
- * `expires_at` is a UTC string without a timezone marker, so it has to be parsed
- * deliberately rather than handed to `new Date()` and hoped for.
- */
 export interface GuestSession {
   success: boolean;
   guest_session_id: string;
   expires_at: string;
 }
 
-/**
- * A film as it appears in a guest session's rated list.
- *
- * `rating` is the guest's own score, which is the whole reason for reading this endpoint —
- * it is the only way to recover what someone rated after a reload.
- */
 export interface RatedMovie extends MovieSummary {
   rating: number;
 }

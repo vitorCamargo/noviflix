@@ -1,11 +1,7 @@
 import { filterByName } from './collection-filter';
 
 describe('filterByName', () => {
-  const items = [
-    { name: 'Saturday nights' },
-    { name: 'Rewatch pile' },
-    { name: 'documentaries' },
-  ];
+  const items = [{ name: 'Saturday nights' }, { name: 'Rewatch pile' }, { name: 'documentaries' }];
 
   it('returns everything for an empty query', () => {
     expect(filterByName(items, '')).toEqual(items);
@@ -14,7 +10,6 @@ describe('filterByName', () => {
     expect(filterByName(items, undefined)).toEqual(items);
   });
 
-  /** Matching anywhere, not only at the start: "nights" should find "Saturday nights". */
   it('matches inside the name', () => {
     expect(filterByName(items, 'nights')).toEqual([{ name: 'Saturday nights' }]);
   });

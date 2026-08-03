@@ -20,7 +20,6 @@
   text-align: start;
 }
 
-/* Two by two, collapsing so one cover fills and three stay balanced. */
 .cc__mosaic {
   position: absolute;
   inset: 0;
@@ -33,8 +32,6 @@
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
-    /* Settles as the mosaic is read, rather than four full-strength posters competing with the
-       name across them. */
     transition: scale var(--nv-normal) var(--nv-ease);
   }
 }
@@ -48,12 +45,10 @@
   grid-row: 1 / -1;
 }
 
-/* The first takes the whole left column, the second the whole right. */
 .cc__mosaic[data-count='2'] img {
   grid-row: 1 / -1;
 }
 
-/* The first spans the top, the other two share the bottom. */
 .cc__mosaic[data-count='3'] img:first-child {
   grid-column: 1 / -1;
 }
@@ -74,16 +69,11 @@
   }
 }
 
-/* Bottom half only: enough to carry the name, not enough to dim the covers. */
 .cc__scrim {
   position: absolute;
   inset-block: 40% 0;
   inset-inline: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    color-mix(in srgb, #000 78%, transparent)
-  );
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, #000 78%, transparent));
 }
 
 .cc__foot {
@@ -125,7 +115,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The accent disc from the reference, filled on hover rather than always lit. */
 .cc__go {
   display: grid;
   place-items: center;

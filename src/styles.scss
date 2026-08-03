@@ -32,12 +32,6 @@ body.nv-modal-open {
   overflow: hidden;
 }
 
-/*
- * While the first-load screen is up.
- *
- * The page behind it is already built, so a wheel or a swipe over the screen would scroll something
- * nobody can see and leave it somewhere unexpected once the screen clears.
- */
 html.nv-booting,
 html.nv-booting body {
   overflow: hidden;
@@ -51,31 +45,10 @@ html.nv-booting body {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Content track
-//
-// Mobile scrolls vertically like any page. From $bp-horizontal up, the track
-// becomes a horizontal rail and HorizontalScroll maps vertical wheel input onto
-// it. These rules are global rather than in app.scss because they must reach
-// routed components, which sit outside App's view encapsulation.
-//
-// The directive detects which mode is active from the resulting overflow, so
-// this media query is the only place the breakpoint is defined.
-// ---------------------------------------------------------------------------
-
 .nv-track {
   inline-size: 100%;
 }
 
-/*
- * Stacked mode scrolls one way only.
- *
- * Measured at a 390px viewport, the document reported a 430px scroll width — so
- * something was sticking out far enough to let the whole page slide sideways,
- * which is what made every card look wrongly inset on one side while devtools
- * showed them at full width. `clip` rather than `hidden` so this stays a
- * non-scrolling clip and does not turn the root into a scroll container.
- */
 @media (max-width: 900px) {
   html {
     overflow-x: clip;
@@ -102,41 +75,18 @@ html.nv-booting body {
     overscroll-behavior-x: contain;
     @include hide-scrollbar;
 
-    /* The directive eases scrollLeft itself; CSS smoothing on top of that
-       fights it and produces a rubbery lag. */
     scroll-behavior: auto;
-
   }
 
-  /*
-   * Dragging the page must not highlight it.
-   *
-   * A press that turns into a drag is a scroll gesture, but the browser has
-   * already read it as the start of a text selection — so by the time the page
-   * moves, every title it passes over is highlighted. The class only lasts for the
-   * gesture, leaving selection available for ordinary clicks and double-clicks.
-   */
   .nv-track.is-dragging,
   .nv-track.is-dragging * {
     user-select: none;
   }
 
-  /*
-   * Focus indicator for the track, relocated to the hint. The hint isn't a
-   * sibling of the track — it sits outside the shell — so this reaches it from
-   * the root rather than with a combinator.
-   */
   body:has(.nv-track:focus-visible) nv-scroll-hint .hint {
     color: var(--nv-text);
   }
 
-  /*
-   * Routed page hosts: full height, at least as wide as the track.
-   *
-   * `100%` of the flex container rather than `100vw` — the two differ whenever
-   * the viewport unit includes space the track doesn't have, and being a hair
-   * too wide is exactly what makes the track scrollable with nothing to reveal.
-   */
   .nv-track > *:not(router-outlet) {
     block-size: 100%;
     flex: 0 0 auto;
@@ -169,13 +119,6 @@ button {
   cursor: pointer;
 }
 
-/*
- * The content track is excluded deliberately. It carries tabindex so keyboard
- * users can scroll it, but it fills the viewport — a focus ring on it draws an
- * accent border around the whole page, which is what kept appearing. Its focus
- * indicator is relocated to the scroll hint instead, which is visible and in a
- * sensible place.
- */
 :where(a, button, input, select, textarea, [tabindex]:not(.nv-track)) {
   @include focus-ring;
 }
@@ -190,12 +133,6 @@ button {
   color: var(--nv-accent-ink);
 }
 
-/*
- * Available to assistive tech, absent from the page.
- *
- * `display: none` would hide it from screen readers too, which defeats the point;
- * this keeps the text in the accessibility tree while giving it no visible box.
- */
 .nv-sr {
   position: absolute;
   inline-size: 1px;
@@ -208,8 +145,6 @@ button {
   white-space: nowrap;
 }
 
-// No scroll chrome anywhere — every surface reads as uninterrupted. Scrolling
-// itself is untouched: wheel, trackpad, touch and keyboard all still work.
 html,
 body,
 * {
@@ -225,14 +160,6 @@ body,
   }
 }
 
-/*
- * Panel reveal: the box unmasks downward from its top edge while drifting into
- * place. Animating clip-path rather than height means the content inside never
- * reflows — it is simply uncovered, so text doesn't reposition mid-animation.
- *
- * Corner radius is passed in so the mask follows the panel's own rounding
- * instead of squaring off its corners as it opens.
- */
 @keyframes nv-mask-open {
   from {
     clip-path: inset(0 0 100% 0 round var(--nv-mask-radius, 20px));
@@ -244,7 +171,6 @@ body,
   }
 }
 
-/* Content rising into place behind the unmasking panel. */
 @keyframes nv-swipe-up {
   from {
     opacity: 0;
@@ -256,10 +182,6 @@ body,
   }
 }
 
-/*
- * Arriving on the lattice: a fade with a little scale, for a block that lands rather than slides.
- * Ends at its own size, so nothing is left transformed once the entrance is over.
- */
 @keyframes nv-pop {
   from {
     opacity: 0;
@@ -271,12 +193,6 @@ body,
   }
 }
 
-/*
- * Scale alone.
- *
- * For anything whose opacity is already meaningful — the badge's trail dots are graded, so animating
- * opacity would end them all at full strength and then snap them back to their own.
- */
 @keyframes nv-pop-in {
   from {
     scale: 0;
@@ -286,13 +202,6 @@ body,
   }
 }
 
-/*
- * A card opening from its own top-left corner, the way the reference reveals its hero.
- *
- * The clip is deliberately not held at the end: the fill mode is `backwards`, so once the animation
- * is over the element goes back to having no clip at all. Held forwards, a 160% circle would stay a
- * clip forever and cut off the card's corner glow, which escapes outside the box.
- */
 @keyframes nv-corner-open {
   from {
     clip-path: circle(0% at 0 0);
@@ -304,12 +213,6 @@ body,
   }
 }
 
-/*
- * Twins of nv-corner-open and nv-swipe-up, identical in every frame.
- *
- * A CSS animation only restarts when its name changes, so anything that replays — the hero swapping
- * to the next film — alternates between a keyframe and its twin. Two names, one motion.
- */
 @keyframes nv-corner-open-b {
   from {
     clip-path: circle(0% at 0 0);

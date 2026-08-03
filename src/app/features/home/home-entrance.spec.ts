@@ -8,7 +8,6 @@ import {
   stepDelay,
 } from './home-entrance';
 
-/** The longest either staggered group can get, so the budget is checked against a real page. */
 const TRAIL_DOTS = 14;
 const AVATARS = 5;
 

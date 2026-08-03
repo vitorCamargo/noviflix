@@ -1,10 +1,3 @@
-@mixin container {
-  width: 100%;
-  max-width: var(--nv-max-width);
-  margin-inline: auto;
-  padding-inline: var(--nv-gutter);
-}
-
 @mixin focus-ring($offset: 3px) {
   &:focus-visible {
     outline: 2px solid var(--nv-accent);
@@ -13,14 +6,6 @@
   }
 }
 
-/*
- * The rating pill that appears over artwork on hover.
- *
- * Shared because two unrelated places show it — the search card and the hero's
- * poster — and a rating that looked slightly different in each would read as two
- * different pieces of information. Position and reveal stay with the caller, since
- * those depend on the card it sits in.
- */
 @mixin score-pill {
   display: inline-flex;
   align-items: center;
@@ -44,16 +29,6 @@
   overflow: hidden;
 }
 
-/*
- * A visible, slim scrollbar — for the few places where hiding it costs more than it
- * gains.
- *
- * Scroll chrome is suppressed globally, which is right for the page: the scroll hint
- * says the page continues and the lattice makes movement obvious. Inside a panel
- * neither is true — content simply stops at an edge with nothing to say there is more
- * below it. This has to out-specify the global rule, which is why it sets `display`
- * back rather than only sizing.
- */
 @mixin slim-scrollbar($size: 6px) {
   scrollbar-width: thin;
   scrollbar-color: var(--nv-accent) transparent;

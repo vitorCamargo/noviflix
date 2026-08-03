@@ -6,11 +6,6 @@
   (closed)="close()"
 >
   <div nvPanelToolbar class="bar">
-    <!--
-      An href for middle-click and open-in-new-tab, but the navigation itself is
-      handled in code — see openFull for why a routerLink cannot express this one
-      from inside the outlet it needs to close.
-    -->
     <a
       class="bar__btn"
       [href]="fullPageUrl()"
@@ -26,8 +21,6 @@
     </a>
 
     @if (film) {
-      <!-- Pressed state carried by aria-pressed as well as the fill, since the
-           colour alone says nothing to a screen reader. -->
       <button
         type="button"
         class="bar__btn"
@@ -53,22 +46,8 @@
     }
   </div>
 
-  <!--
-    Tabs in the panel's own top bar, level with the toolbar. The selected one is marked
-    by a bar at the very top edge of the panel rather than an underline beneath the
-    label — so the indicator reads as the panel itself changing, not as decoration
-    under a word.
-
-    A real tablist: arrow keys move between tabs, and the panel is announced as
-    belonging to whichever opened it.
-  -->
   @if (film) {
-    <div
-      nvPanelFilters
-      class="tabs"
-      role="tablist"
-      [attr.aria-label]="i18n.t('movie.sections')"
-    >
+    <div nvPanelFilters class="tabs" role="tablist" [attr.aria-label]="i18n.t('movie.sections')">
       @for (item of tabs; track item.id) {
         <button
           type="button"
@@ -87,11 +66,6 @@
     </div>
   }
 
-  <!--
-    Left column: the film by default, the rating form once asked for. The two swap
-    rather than stack — the column is a single screen and pushing the film's own
-    details out of view to reveal a form would be a poor trade.
-  -->
   <div nvPanelAside class="film">
     @if (!film) {
       @if (loading()) {
@@ -101,8 +75,6 @@
         <p class="film__state">{{ i18n.t('movie.failedBody') }}</p>
       }
     } @else if (rating()) {
-      <!-- Heading and its hint are one block, so they sit closer to each other than to
-           the control they introduce. -->
       <div class="rate__head">
         <h2 class="rate__title">{{ i18n.t('movie.rateHeading') }}</h2>
         <p class="rate__hint">{{ i18n.t('movie.rateHint', { title: film.title }) }}</p>
@@ -123,8 +95,6 @@
         }
       </div>
 
-      <!-- Title, tagline and genres are one heading block: they describe the same
-           thing, so they sit closer together than to the synopsis below. -->
       <div class="film__head">
         <h1 class="film__title">
           {{ film.title }}
@@ -152,7 +122,6 @@
     }
   </div>
 
-  <!-- Right column: everything about it, one section at a time. -->
   <div
     nvPanelBody
     id="nv-tabpanel"

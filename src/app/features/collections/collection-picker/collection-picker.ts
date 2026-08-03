@@ -13,16 +13,6 @@ import { TmdbService } from '../../../core/tmdb/tmdb.service';
 import { CollectionPickerService } from '../collection-picker.service';
 import { CollectionPickerList } from '../collection-picker-list/collection-picker-list';
 
-/**
- * The frame around the add-to-collection list.
- *
- * Always centred. There was an anchored variant that opened beside a per-card button, but selection
- * is the single way films are gathered now, and a selection has no one place on screen it came from
- * — so a menu attached to a card would be pointing at something that is no longer the subject.
- *
- * Rendered once at the app root: it is opened from the selection bar and from a film's own pop-up,
- * and a copy per call site would let two open at once.
- */
 @Component({
   selector: 'nv-collection-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,7 +32,6 @@ export class CollectionPicker {
 
   protected readonly total = computed(() => this.pending().length);
 
-  /** Posters of the films being added, as a reminder of what this will do. */
   protected readonly posters = computed(() =>
     this.pending()
       .slice(0, 5)
@@ -51,12 +40,6 @@ export class CollectionPicker {
   );
 
   constructor() {
-    /*
-     * Focus goes to the filter on open.
-     *
-     * The list is the point, but typing is how a long one gets used — and landing focus inside the
-     * panel is also what lets Escape and Tab behave as they should.
-     */
     effect(() => {
       const isOpen = this.open();
 
@@ -70,7 +53,6 @@ export class CollectionPicker {
     this.picker.close();
   }
 
-  /** Dismissed because the films landed, so the marks go with it. */
   protected finish(): void {
     this.picker.finish();
   }

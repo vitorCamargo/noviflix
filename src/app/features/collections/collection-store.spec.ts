@@ -48,12 +48,9 @@ describe('nextCollectionName', () => {
     expect(nextCollectionName([], 'Collection')).toBe('Collection 1');
   });
 
-  /** Several called the same thing would be indistinguishable in the picker. */
   it('skips names already taken', () => {
     expect(nextCollectionName(['Collection 1'], 'Collection')).toBe('Collection 2');
-    expect(nextCollectionName(['Collection 1', 'Collection 2'], 'Collection')).toBe(
-      'Collection 3',
-    );
+    expect(nextCollectionName(['Collection 1', 'Collection 2'], 'Collection')).toBe('Collection 3');
   });
 
   it('fills a gap rather than always taking the highest', () => {
@@ -81,7 +78,6 @@ describe('createCollection', () => {
 });
 
 describe('toSavedMovie', () => {
-  /** A snapshot, so a collection renders without a request per film. */
   it('keeps what the tile needs to draw itself', () => {
     const saved = toSavedMovie(movie(1, 'Dune'), NOW);
 
@@ -112,10 +108,6 @@ describe('addMovies', () => {
     expect(after.updatedAt).toBe(new Date(LATER).toISOString());
   });
 
-  /**
-   * The collection is returned untouched, which keeps updatedAt honest — a list reporting a
-   * change every time someone re-adds the same film sorts wrongly and looks busier than it is.
-   */
   it('returns the same object when nothing is new', () => {
     const before = withItems([1, 2]);
     const after = addMovies(before, [movie(1), movie(2)], LATER);
@@ -128,7 +120,6 @@ describe('addMovies', () => {
     expect(after.items.map((item) => item.id)).toEqual([1, 2]);
   });
 
-  /** A loosely built selection can carry the same film twice. */
   it('does not add a duplicate within one call', () => {
     const after = addMovies(withItems([]), [movie(3), movie(3)], LATER);
     expect(after.items).toHaveLength(1);
@@ -175,10 +166,6 @@ describe('readStore / serialiseStore', () => {
     expect(readStore('')).toBeNull();
   });
 
-  /**
-   * A future format read as this one would either crash or silently drop fields, and losing
-   * someone's collections is worse than ignoring a record this build cannot understand.
-   */
   it('refuses a version it does not know', () => {
     expect(readStore(JSON.stringify({ version: 2, collections: [] }))).toBeNull();
   });
@@ -200,7 +187,6 @@ describe('readStore / serialiseStore', () => {
     expect(parsed?.map((collection) => collection.id)).toEqual(['b']);
   });
 
-  /** Records from an earlier build may lack fields added since; repairing beats discarding. */
   it('repairs a record missing its items or timestamps', () => {
     const raw = JSON.stringify({
       version: 1,

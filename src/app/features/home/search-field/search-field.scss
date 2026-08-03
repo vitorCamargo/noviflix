@@ -4,23 +4,12 @@
   block-size: 100%;
 }
 
-/*
- * Positioned so the error can be pinned beneath it, but deliberately not a
- * stacking context: the card's corner glow works by escaping to the page grid to
- * sit *under* the pad layer, and trapping it here would turn it into a halo drawn
- * on top of the field.
- */
 .sf {
   position: relative;
   inline-size: 100%;
   block-size: 100%;
 }
 
-/*
- * Fills the card, which is one drum tall less the lattice seam. The border is
- * inside that height rather than added to it — box-sizing is border-box globally,
- * so the field stays exactly one drum.
- */
 .sf__row {
   display: flex;
   align-items: center;
@@ -32,11 +21,6 @@
   transition: border-color var(--nv-fast) var(--nv-ease);
 }
 
-/*
- * Invalid recolours both the edge and the light behind the card, so the two read
- * as one state. --nv-card-glow is DrumCard's hook; it inherits from here into the
- * glow layer, which is why the flag lives on the wrapper.
- */
 .sf.is-invalid {
   --nv-card-glow: var(--nv-danger);
 }
@@ -64,17 +48,11 @@
   }
 }
 
-/* Accent while focused or working, so the field reads as live. */
 .sf:focus-within .sf__icon,
 .sf__icon.is-busy {
   color: var(--nv-accent);
 }
 
-/*
- * Invalid outranks focus, and must sit after it to do so — the two selectors
- * carry identical specificity, so source order is the only thing deciding which
- * colour the icon takes while a bad term is being typed.
- */
 .sf.is-invalid .sf__icon {
   color: var(--nv-danger);
 }
@@ -85,12 +63,8 @@
   circle {
     fill: none;
     stroke: currentColor;
-    /* Heavier than the magnifier it replaces — a thin arc reads as a smudge at
-       this size. */
     stroke-width: 3.4;
     stroke-linecap: round;
-    /* Roughly a third of the circumference, leaving the rest open so the
-       rotation is legible as progress. */
     stroke-dasharray: 26 75;
   }
 }
@@ -116,24 +90,16 @@
     font-weight: 500;
   }
 
-  /* The card's glow already signals focus, and an outline inside it reads as a
-     second control. */
   &:focus,
   &:focus-visible {
     outline: none;
   }
 
-  /* Safari draws its own clear button on type=search, which sits oddly against
-     the lattice. */
   &::-webkit-search-cancel-button {
     appearance: none;
   }
 }
 
-/*
- * Clear control. Quiet at rest so it doesn't compete with the value beside it —
- * it's an exit, not an action being offered.
- */
 .sf__clear {
   display: grid;
   place-items: center;
@@ -164,7 +130,6 @@
   }
 }
 
-/* Visually hidden, present for assistive tech. */
 .sf__status {
   position: absolute;
   inline-size: 1px;
@@ -177,11 +142,6 @@
   white-space: nowrap;
 }
 
-/*
- * Stacked layouts give this block auto height, so the drum has to be stated
- * outright — otherwise the card collapses to its content and the field ends up
- * shorter here than everywhere else.
- */
 @media (max-width: 900px) {
   :host,
   .sf {
@@ -193,7 +153,6 @@
   position: absolute;
   inset-block-start: 100%;
   inset-inline: 0;
-  /* Positioned, so it paints above the pinned pad layer on mobile. */
   margin: 0;
   padding-block-start: var(--nv-space-2);
   padding-inline: var(--nv-space-2);

@@ -73,12 +73,10 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
       stroke-linejoin: round;
     }
 
-    /* Same plain white treatment as the rest of the header. */
     .lang__trigger {
       display: inline-flex;
       align-items: center;
       gap: var(--nv-space-2);
-      /* Constant padding so opening the menu doesn't nudge the row. */
       padding: var(--nv-space-2) var(--nv-space-3);
       border: 0;
       border-radius: var(--nv-radius-pill);
@@ -87,7 +85,6 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
       font-size: var(--nv-text-sm);
       font-weight: 600;
       white-space: nowrap;
-      /* Same long panel curve as the About trigger, so the header is uniform. */
       transition:
         color var(--nv-dur-swipe) var(--nv-ease-panel),
         background var(--nv-dur-swipe) var(--nv-ease-panel);
@@ -96,7 +93,6 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
         color: var(--nv-text-muted);
       }
 
-      /* Open: tinted accent pill, matching the selected nav item. */
       &[aria-expanded='true'] {
         background: var(--nv-accent-soft);
         color: var(--nv-accent);
@@ -123,17 +119,14 @@ import { I18nService, type Lang } from '../../core/i18n/i18n.service';
       padding: var(--nv-space-1);
       list-style: none;
       background: var(--nv-panel);
-      /* Borderless, like the popover panel — the shadow does the lifting. */
       border-radius: var(--nv-radius);
       box-shadow: var(--nv-shadow-pop);
-      /* Unmasks like the About panel; the radius follows this menu's own. */
       --nv-mask-radius: var(--nv-radius);
       animation: nv-mask-open var(--nv-dur-mask) var(--nv-ease-panel) both;
     }
 
     .lang__menu li {
-      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel)
-        var(--nv-delay-swipe) both;
+      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel) var(--nv-delay-swipe) both;
     }
 
     .lang__option {

@@ -11,12 +11,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { TmdbService } from '../../core/tmdb/tmdb.service';
-import {
-  PageGrid,
-  readCellSize,
-  readViewport,
-  toGridArea,
-} from '../../layout/page-grid/page-grid';
+import { PageGrid, readCellSize, readViewport, toGridArea } from '../../layout/page-grid/page-grid';
 import { HOME_STACK_MAX } from '../home/home-layout';
 import { CAST_LIMIT, CastGrid } from './cast-grid/cast-grid';
 import { MovieFacts } from './movie-facts/movie-facts';
@@ -34,15 +29,6 @@ import {
 
 type Section = 'facts' | 'cast' | 'related';
 
-/**
- * Details as a routed page.
- *
- * Follows the app's two layouts rather than the pop-up's. On desktop the page scrolls
- * sideways, so the sections sit in a row and the track reaches them — no tabs, because
- * hiding content behind a control makes no sense when the layout has room for it. Below
- * the stacking breakpoint the page scrolls downward like any other, and there tabs earn
- * their place: three full sections stacked would bury the last two.
- */
 @Component({
   selector: 'nv-movie-details-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,7 +45,6 @@ export class MovieDetailsPage {
 
   protected readonly id = computed(() => this.params()?.get('id') ?? '');
 
-  /** Guards against a non-numeric id arriving from the address bar. */
   private readonly numericId = computed(() => {
     const raw = Number(this.id());
     return Number.isInteger(raw) && raw > 0 ? raw : null;
@@ -74,33 +59,14 @@ export class MovieDetailsPage {
     () => this.numericId() != null && !this.movie() && !this.failed(),
   );
 
-  // ------------------------------------------------------------------- layout
-
   private readonly viewport = signal(readViewport());
 
-  /**
-   * Whole drum rows the viewport contains, floored.
-   *
-   * The pad field rounds *up* so it covers a viewport that isn't an exact multiple of a
-   * drum — that overhang is clipped and costs nothing. Content cannot use the same
-   * figure: placed to that last partial line it runs past the bottom edge, which is what
-   * clipped the final row of cards. Flooring gives up the fractional row instead.
-   */
   private readonly rows = computed(() =>
     Math.max(1, Math.floor(this.viewport().height / readCellSize())),
   );
 
-  protected readonly stacked = computed(
-    () => this.viewport().width <= HOME_STACK_MAX,
-  );
+  protected readonly stacked = computed(() => this.viewport().width <= HOME_STACK_MAX);
 
-  /**
-   * Sized from what the grids actually render, not from what TMDB returned.
-   *
-   * Both grids cap their lists. Measuring the page against the raw counts made it far
-   * wider than its content — the long empty stretch you had to scroll through to reach
-   * nothing.
-   */
   private readonly layout = computed(() =>
     moviePageLayout(
       this.rows(),
@@ -111,17 +77,8 @@ export class MovieDetailsPage {
 
   protected readonly cardRows = computed(() => this.layout().rows);
 
-  /**
-   * How wide the page must be for every section to be reachable.
-   *
-   * The grid clips horizontal overflow, so a section past this exists but cannot be
-   * scrolled to — the same trap the search results grid had.
-   */
-  protected readonly minColumns = computed(() =>
-    this.stacked() ? 18 : this.layout().totalCols,
-  );
+  protected readonly minColumns = computed(() => (this.stacked() ? 18 : this.layout().totalCols));
 
-  /** Full height below the header, and as wide as the sections need. */
   protected readonly area = computed(() =>
     this.stacked()
       ? null
@@ -144,11 +101,8 @@ export class MovieDetailsPage {
     });
   }
 
-  /** Section widths in drums, handed to CSS so the row lands on the lattice. */
   protected readonly asideCols = ASIDE_COLS;
   protected readonly factsCols = FACTS_COLS;
-
-  // ------------------------------------------------------------------ content
 
   protected readonly poster = computed(() =>
     this.tmdb.imageUrl(this.movie()?.poster_path ?? null, 'w500'),
@@ -164,11 +118,7 @@ export class MovieDetailsPage {
 
   protected readonly cast = computed(() => this.movie()?.credits?.cast ?? []);
 
-  protected readonly related = computed(
-    () => this.movie()?.recommendations?.results ?? [],
-  );
-
-  // --------------------------------------------------------------------- tabs
+  protected readonly related = computed(() => this.movie()?.recommendations?.results ?? []);
 
   protected readonly tab = signal<Section>('facts');
 
@@ -178,13 +128,6 @@ export class MovieDetailsPage {
     { id: 'related' as const, key: 'movie.tab.related' as const },
   ];
 
-  /**
-   * Whether a section renders.
-   *
-   * Everything shows side by side on desktop; stacked, only the selected tab. Driving
-   * both from one predicate keeps the template from needing to know which layout it is
-   * in more than once.
-   */
   protected shows(section: Section): boolean {
     return !this.stacked() || this.tab() === section;
   }
@@ -194,7 +137,6 @@ export class MovieDetailsPage {
   }
 
   constructor() {
-    // A different film starts on the first section.
     effect(() => {
       this.numericId();
       this.tab.set('facts');

@@ -2,25 +2,15 @@
   display: block;
 }
 
-/*
- * Exactly one drum tall. No background: the pads run behind the bar, and
- * anything opaque here would punch a hole in the lattice.
- */
 .hdr {
   block-size: var(--nv-grid-cell);
 }
 
-/*
- * Starts at the second column, so the first drum is left empty. The gap is
- * modest because each item carries its own pill padding.
- */
 .hdr__row {
   display: flex;
   align-items: center;
   gap: var(--nv-space-2);
   block-size: 100%;
-  /* A drum in from each edge, so the mark on the left and the session ring on the right
-     sit the same distance off the lattice boundary. */
   padding-inline: var(--nv-grid-cell);
 }
 
@@ -43,17 +33,12 @@
   align-items: center;
   gap: var(--nv-space-2);
   flex: none;
-  /*
-   * The padding is always present, transparent at rest. Adding it only on the
-   * selected state would shift every neighbour sideways as you navigate.
-   */
   padding: var(--nv-space-2) var(--nv-space-3);
   border-radius: var(--nv-radius-pill);
   color: var(--nv-text);
   font-size: var(--nv-text-sm);
   font-weight: 600;
   white-space: nowrap;
-  /* Matches the popover triggers, so the whole bar moves at one speed. */
   transition:
     color var(--nv-dur-swipe) var(--nv-ease-panel),
     background var(--nv-dur-swipe) var(--nv-ease-panel);
@@ -69,36 +54,25 @@
     stroke-linejoin: round;
   }
 
-  /* Hover dims rather than colours — accent is reserved for the selected item. */
   &:hover {
     color: var(--nv-text-muted);
   }
 
-  /* Selected: tinted pill in accent, no border. */
   &.is-active {
     background: var(--nv-accent-soft);
     color: var(--nv-accent);
   }
 }
 
-/*
- * The popover renders its own trigger, so this only needs to sit in the row.
- * Its internal padding is why the gap looks even against the plain link.
- */
 .hdr__item--popover {
   display: inline-flex;
   align-items: center;
 }
 
-/* One drum of separation from the nav items. */
 .hdr__lang {
   margin-inline-start: var(--nv-grid-cell);
 }
 
-/*
- * Pushed to the far end by an auto margin, which absorbs whatever space the nav leaves.
- * A fixed margin would drift with the width of the items before it.
- */
 .hdr__guest {
   display: inline-flex;
   align-items: center;
@@ -111,8 +85,6 @@
     padding-inline: var(--nv-space-4);
   }
 
-  /* The pair moves to the end together, so the auto margin goes on the first of them and the
-     ring is separated from the selector by the row's own gap. */
   .hdr__lang {
     margin-inline-start: auto;
   }
@@ -122,23 +94,6 @@
   }
 }
 
-/*
- * Icon-only nav on small phones.
- *
- * This row cannot shrink: every item is flex: none and nowrap, so its width is
- * the sum of its parts — measured at 434px with the mobile padding, before the
- * session ring joined it here. Past the viewport width it pushed the document
- * wider, and since the page could then slide sideways, every block on the page
- * looked wrongly inset on one side while actually being full width.
- *
- * The labels are the right thing to give up: both items keep their icon, their
- * accessible name, and their hit area, and the language selector keeps its code
- * visible since that *is* its state.
- *
- * Dropped from 560px rather than 480px because the ring made the labelled row
- * wider, and the threshold has to sit above the width where it stops fitting —
- * not at the width where the last phone did.
- */
 @media (max-width: 560px) {
   .hdr__row {
     gap: var(--nv-space-2);
@@ -149,8 +104,6 @@
     display: none;
   }
 
-  /* Reaches the label inside the popover, which encapsulation puts out of
-     selector range — see the property's definition there. */
   .hdr__item--popover {
     --nv-popover-label-display: none;
   }

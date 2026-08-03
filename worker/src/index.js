@@ -1,31 +1,10 @@
 const TMDB_ORIGIN = 'https://api.themoviedb.org';
 const CACHE_SECONDS = 60 * 30;
 
-/**
- * The only write this proxy will perform, matched exactly.
- *
- * Holding a credential means every method opened here is a method the whole
- * internet can invoke with our token. Ratings are the one write the app needs, so
- * POST is permitted for this path and nothing else — an anchored pattern with a
- * numeric id, not a prefix test, because a prefix would also accept things like
- * `/3/movie/1/rating/../../account`.
- */
 const RATING_PATH = /^\/3\/movie\/\d+\/rating$/;
 
-/** Largest body accepted on a write. A rating is a couple of dozen bytes. */
 const MAX_BODY_BYTES = 512;
 
-/**
- * Requests that must never be cached, however cacheable they look.
- *
- * The edge cache is right for catalogue data — a film's details are the same for everyone
- * and change rarely. It is wrong for anything scoped to one visitor's session: the rated
- * list is a GET, so it was being cached for half an hour, and a rating posted a moment
- * later read back as absent because the empty list from before it was still being served.
- *
- * Matched on the path and the query, since the session id appears in either depending on
- * the endpoint.
- */
 function isSessionScoped(url) {
   return (
     url.pathname.startsWith('/3/guest_session/') ||
@@ -62,7 +41,6 @@ function json(status, body, origin) {
   });
 }
 
-/** True when this exact method and path pair is allowed through. */
 function isPermitted(method, pathname) {
   if (!pathname.startsWith('/3/')) return false;
   if (method === 'GET') return true;
@@ -81,7 +59,6 @@ export default {
         : json(403, { error: 'Origin not allowed' });
     }
 
-    // Origin first, so an unapproved caller learns nothing about what is routable.
     if (!isAllowed) {
       return json(403, { error: 'Origin not allowed' });
     }
@@ -93,17 +70,11 @@ export default {
     const url = new URL(request.url);
 
     if (!isPermitted(request.method, url.pathname)) {
-      return json(
-        405,
-        { error: 'Only GET, and POST to a movie rating, are proxied' },
-        origin,
-      );
+      return json(405, { error: 'Only GET, and POST to a movie rating, are proxied' }, origin);
     }
 
     const upstream = new URL(TMDB_ORIGIN + url.pathname + url.search);
 
-    // Client Authorization headers are never forwarded — the token added below is
-    // the only credential this proxy will present.
     const headers = {
       Authorization: `Bearer ${env.TMDB_ACCESS_TOKEN}`,
       Accept: 'application/json',
@@ -123,7 +94,6 @@ export default {
       });
 
       const response = new Response(upstreamResponse.body, upstreamResponse);
-      // Writes are never cached, and must not be stored by anything downstream.
       response.headers.set('Cache-Control', 'no-store');
       response.headers.delete('Set-Cookie');
 
@@ -133,8 +103,6 @@ export default {
       return response;
     }
 
-    // Session-scoped reads bypass the cache entirely, in both directions: a stale hit is
-    // wrong, and storing one would keep serving it for half an hour.
     if (isSessionScoped(url)) {
       const upstreamResponse = await fetch(upstream.toString(), {
         method: 'GET',

@@ -2,16 +2,6 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { CollectionPickerService } from '../collection-picker.service';
 
-/**
- * The "N selected" bar, rendered once at the app root.
- *
- * Selection is global — a film can be marked on the search results, in a details pop-up's related
- * strip, or on a details page — so the bar that acts on it cannot belong to any one of those. It
- * started inside the search grid, which meant selecting anywhere else appeared to do nothing.
- *
- * Fixed to the bottom rather than placed in a grid: the desktop grids scroll sideways, and a bar
- * inside one would slide out of reach exactly as more films were being chosen.
- */
 @Component({
   selector: 'nv-selection-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,11 +27,6 @@ import { CollectionPickerService } from '../collection-picker.service';
       display: contents;
     }
 
-    /*
-     * Above the details overlay, so a film selected in its related strip can still be acted on,
-     * but below the picker it opens — otherwise the bar would draw over the menu on a short
-     * viewport where the two meet.
-     */
     .sb {
       position: fixed;
       inset-block-end: var(--nv-space-6);
@@ -91,7 +76,6 @@ import { CollectionPickerService } from '../collection-picker.service';
       }
     }
 
-    /* Out of the corner the scroll hint occupies, which shares this edge. */
     @media (max-width: 640px) {
       .sb {
         inset-inline: var(--nv-space-4);

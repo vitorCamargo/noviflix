@@ -55,7 +55,6 @@
       outline: none;
     }
 
-    /* Safari draws its own clear button, which sits oddly against the icon. */
     &::-webkit-search-cancel-button {
       appearance: none;
     }

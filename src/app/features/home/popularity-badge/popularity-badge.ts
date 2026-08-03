@@ -1,21 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import type { PopularityTier } from '../popularity';
 
-/**
- * Icon for a popularity status, each with motion that reads as its own idea rather than a generic
- * pulse: a flame gutters, a rocket climbs on its exhaust, a heart beats twice, a gem catches the
- * light, a star's sparkle glints, scales rock, an eye looks about and blinks. The movement is what
- * identifies the tier before the label is read.
- *
- * Two rules learned from the first draft of these. Amplitude has to be a visible fraction of the
- * glyph — two pixels of travel on a 24px icon is motion nobody sees, and "animated" that cannot be
- * told from static is worse than static. And the most legible motion belongs to a *part*, not the
- * whole: an exhaust that flickers under a steady rocket reads instantly, where the same flicker on
- * the whole rocket reads as jitter.
- *
- * Behind each icon sits an aura in the tier's own colour, breathing slowly. It is what makes the
- * badge read as alive from across the composition, before the icon's own movement can be resolved.
- */
 @Component({
   selector: 'nv-popularity-badge',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,7 +53,6 @@ import type { PopularityTier } from '../popularity';
           <svg class="icon icon--gem" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3.2 18.8 8 12 20.8 5.2 8 12 3.2Z" />
             <path class="gem__facet" d="M5.2 8h13.6M12 3.2 9 8l3 12.8M12 3.2 15 8l-3 12.8" />
-            <!-- The glint: a four-point spark crossing the stone's shoulder. -->
             <path
               class="gem__spark"
               d="M17.6 2.6l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5.5-1.3Z"
@@ -117,16 +101,27 @@ import type { PopularityTier } from '../popularity';
     :host {
       display: inline-flex;
       flex: none;
-      /* Falls back to lowkey, which is also the default icon branch. */
       color: var(--nv-tier-lowkey);
     }
 
-    :host([data-tier='blazing']) { color: var(--nv-tier-blazing); }
-    :host([data-tier='trending']) { color: var(--nv-tier-trending); }
-    :host([data-tier='acclaimed']) { color: var(--nv-tier-acclaimed); }
-    :host([data-tier='hiddenGem']) { color: var(--nv-tier-gem); }
-    :host([data-tier='wellKnown']) { color: var(--nv-tier-known); }
-    :host([data-tier='divisive']) { color: var(--nv-tier-divisive); }
+    :host([data-tier='blazing']) {
+      color: var(--nv-tier-blazing);
+    }
+    :host([data-tier='trending']) {
+      color: var(--nv-tier-trending);
+    }
+    :host([data-tier='acclaimed']) {
+      color: var(--nv-tier-acclaimed);
+    }
+    :host([data-tier='hiddenGem']) {
+      color: var(--nv-tier-gem);
+    }
+    :host([data-tier='wellKnown']) {
+      color: var(--nv-tier-known);
+    }
+    :host([data-tier='divisive']) {
+      color: var(--nv-tier-divisive);
+    }
 
     .orb {
       position: relative;
@@ -134,12 +129,6 @@ import type { PopularityTier } from '../popularity';
       place-items: center;
     }
 
-    /*
-     * The tier's colour, breathing behind the glyph.
-     *
-     * This is the part that reads from a distance: the icons' own motion resolves only up close,
-     * and a badge whose life depended on it looked static — which is what prompted this rewrite.
-     */
     .aura {
       position: absolute;
       inset: -38%;
@@ -150,8 +139,6 @@ import type { PopularityTier } from '../popularity';
       pointer-events: none;
     }
 
-    /* Sized by the caller, since the same badge sits in a one-drum row on desktop and in a much
-       taller card when the layout stacks. */
     .icon {
       position: relative;
       inline-size: var(--nv-badge-size, 24px);
@@ -162,23 +149,16 @@ import type { PopularityTier } from '../popularity';
       transform-origin: 50% 70%;
     }
 
-    // ------------------------------------------------------------------ flame
-
-    /* The body gutters — asymmetric squash and lean, never a clean scale, so it reads as fire. */
     .icon--flame {
       animation: nv-tier-flicker 1.6s var(--nv-ease) infinite;
     }
 
-    /* The hot core dances against the body, twice as fast and out of phase. */
     .flame__core {
       fill: hsla(0, 0%, 100%, 0.8);
       transform-origin: 50% 85%;
       animation: nv-tier-core 0.8s ease-in-out infinite alternate;
     }
 
-    // ----------------------------------------------------------------- rocket
-
-    /* The ship climbs and settles; the work shows in the exhaust, not the hull. */
     .rocket {
       animation: nv-tier-climb 2.2s var(--nv-ease-panel) infinite;
     }
@@ -195,25 +175,17 @@ import type { PopularityTier } from '../popularity';
       stroke-linejoin: round;
     }
 
-    /* Burning: fast, uneven stretches from the nozzle, sharing the climb so the plume stays
-       attached to the ship. */
     .rocket__exhaust {
       opacity: 0.9;
       transform-origin: 50% 68%;
       animation: nv-tier-burn 0.5s ease-in-out infinite alternate;
     }
 
-    // ------------------------------------------------------------------ heart
-
-    /* Lub-dub, then rest — a pulse, not a metronome. */
     .icon--beat {
       transform-origin: 50% 55%;
       animation: nv-tier-beat 1.6s ease-in-out infinite;
     }
 
-    // -------------------------------------------------------------------- gem
-
-    /* The stone shimmers by narrowing, as a cut face does turning through light. */
     .icon--gem {
       transform-origin: 50% 50%;
       animation: nv-tier-shimmer 2.8s var(--nv-ease) infinite;
@@ -232,23 +204,17 @@ import type { PopularityTier } from '../popularity';
       animation: nv-tier-spark 2.8s var(--nv-ease) infinite;
     }
 
-    // ------------------------------------------------------------------- star
-
     .star {
       transform-origin: 50% 55%;
       animation: nv-tier-twinkle 2.8s var(--nv-ease) infinite;
     }
 
-    /* Its own beat, offset from the star's, so the two never move as one piece. */
     .star__spark {
       fill: hsla(0, 0%, 100%, 0.95);
       transform-origin: 82% 17%;
       animation: nv-tier-spark 2.8s var(--nv-ease) 1.1s infinite;
     }
 
-    // ----------------------------------------------------------------- scales
-
-    /* Rocking about the pivot, which is why the origin sits at the fulcrum. */
     .icon--teeter {
       transform-origin: 50% 80%;
       animation: nv-tier-teeter 2.6s ease-in-out infinite;
@@ -269,8 +235,6 @@ import type { PopularityTier } from '../popularity';
       stroke-linejoin: round;
     }
 
-    // -------------------------------------------------------------------- eye
-
     .eye__outline {
       fill: none;
       stroke: currentColor;
@@ -279,7 +243,6 @@ import type { PopularityTier } from '../popularity';
       stroke-linejoin: round;
     }
 
-    /* Looks left, looks right, then blinks — watching, which is what lowkey means here. */
     .eye__pupil {
       animation: nv-tier-gaze 4s var(--nv-ease) infinite;
     }
@@ -289,82 +252,175 @@ import type { PopularityTier } from '../popularity';
       animation: nv-tier-blink 4s var(--nv-ease) infinite;
     }
 
-    // -------------------------------------------------------------- keyframes
-
     @keyframes nv-tier-aura {
-      0%, 100% { opacity: 0.14; transform: scale(0.85); }
-      50% { opacity: 0.42; transform: scale(1.18); }
+      0%,
+      100% {
+        opacity: 0.14;
+        transform: scale(0.85);
+      }
+      50% {
+        opacity: 0.42;
+        transform: scale(1.18);
+      }
     }
 
     @keyframes nv-tier-flicker {
-      0%, 100% { transform: scale(1, 1) skewX(0deg); }
-      22% { transform: scale(0.9, 1.12) skewX(-3.5deg); }
-      48% { transform: scale(1.08, 0.93) skewX(3deg); }
-      74% { transform: scale(0.95, 1.06) skewX(-2deg); }
+      0%,
+      100% {
+        transform: scale(1, 1) skewX(0deg);
+      }
+      22% {
+        transform: scale(0.9, 1.12) skewX(-3.5deg);
+      }
+      48% {
+        transform: scale(1.08, 0.93) skewX(3deg);
+      }
+      74% {
+        transform: scale(0.95, 1.06) skewX(-2deg);
+      }
     }
 
     @keyframes nv-tier-core {
-      from { transform: scale(0.85, 0.8) translateY(6%); opacity: 0.7; }
-      to { transform: scale(1.1, 1.15) translateY(-4%); opacity: 1; }
+      from {
+        transform: scale(0.85, 0.8) translateY(6%);
+        opacity: 0.7;
+      }
+      to {
+        transform: scale(1.1, 1.15) translateY(-4%);
+        opacity: 1;
+      }
     }
 
     @keyframes nv-tier-climb {
-      0%, 100% { transform: translateY(6%) rotate(0deg); }
-      35% { transform: translateY(-8%) rotate(-2.5deg); }
-      60% { transform: translateY(-5%) rotate(2deg); }
+      0%,
+      100% {
+        transform: translateY(6%) rotate(0deg);
+      }
+      35% {
+        transform: translateY(-8%) rotate(-2.5deg);
+      }
+      60% {
+        transform: translateY(-5%) rotate(2deg);
+      }
     }
 
     @keyframes nv-tier-burn {
-      from { transform: translateY(6%) scale(0.7, 0.55); opacity: 0.55; }
-      to { transform: translateY(-5%) scale(1.15, 1.3); opacity: 1; }
+      from {
+        transform: translateY(6%) scale(0.7, 0.55);
+        opacity: 0.55;
+      }
+      to {
+        transform: translateY(-5%) scale(1.15, 1.3);
+        opacity: 1;
+      }
     }
 
     @keyframes nv-tier-beat {
-      0%, 100% { transform: scale(1); }
-      12% { transform: scale(1.22); }
-      24% { transform: scale(1.02); }
-      36% { transform: scale(1.16); }
-      52% { transform: scale(1); }
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      12% {
+        transform: scale(1.22);
+      }
+      24% {
+        transform: scale(1.02);
+      }
+      36% {
+        transform: scale(1.16);
+      }
+      52% {
+        transform: scale(1);
+      }
     }
 
     @keyframes nv-tier-shimmer {
-      0%, 100% { transform: scaleX(1); opacity: 1; }
-      45% { transform: scaleX(0.82); opacity: 0.75; }
-      60% { transform: scaleX(1.05); opacity: 1; }
+      0%,
+      100% {
+        transform: scaleX(1);
+        opacity: 1;
+      }
+      45% {
+        transform: scaleX(0.82);
+        opacity: 0.75;
+      }
+      60% {
+        transform: scaleX(1.05);
+        opacity: 1;
+      }
     }
 
     @keyframes nv-tier-spark {
-      0%, 55%, 100% { transform: scale(0); opacity: 0; }
-      65% { transform: scale(1.4) rotate(20deg); opacity: 1; }
-      80% { transform: scale(0.9) rotate(45deg); opacity: 0.8; }
-      92% { transform: scale(0); opacity: 0; }
+      0%,
+      55%,
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      65% {
+        transform: scale(1.4) rotate(20deg);
+        opacity: 1;
+      }
+      80% {
+        transform: scale(0.9) rotate(45deg);
+        opacity: 0.8;
+      }
+      92% {
+        transform: scale(0);
+        opacity: 0;
+      }
     }
 
     @keyframes nv-tier-twinkle {
-      0%, 100% { transform: rotate(0deg) scale(1); }
-      40% { transform: rotate(14deg) scale(1.12); }
-      68% { transform: rotate(-7deg) scale(0.95); }
+      0%,
+      100% {
+        transform: rotate(0deg) scale(1);
+      }
+      40% {
+        transform: rotate(14deg) scale(1.12);
+      }
+      68% {
+        transform: rotate(-7deg) scale(0.95);
+      }
     }
 
     @keyframes nv-tier-teeter {
-      0%, 100% { transform: rotate(-9deg); }
-      50% { transform: rotate(9deg); }
+      0%,
+      100% {
+        transform: rotate(-9deg);
+      }
+      50% {
+        transform: rotate(9deg);
+      }
     }
 
     @keyframes nv-tier-blink {
-      0%, 86%, 100% { transform: scaleY(1); }
-      92% { transform: scaleY(0.1); }
+      0%,
+      86%,
+      100% {
+        transform: scaleY(1);
+      }
+      92% {
+        transform: scaleY(0.1);
+      }
     }
 
     @keyframes nv-tier-gaze {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-1.8px); }
-      55% { transform: translateX(1.8px); }
-      80% { transform: translateX(0); }
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-1.8px);
+      }
+      55% {
+        transform: translateX(1.8px);
+      }
+      80% {
+        transform: translateX(0);
+      }
     }
 
-    /* Still, for anyone who asked for that. The aura keeps a faint constant tint, so the tier's
-       colour survives even with every movement gone. */
     @media (prefers-reduced-motion: reduce) {
       .aura,
       .icon,
@@ -383,8 +439,6 @@ import type { PopularityTier } from '../popularity';
         opacity: 0.22;
       }
 
-      /* Hidden while still: the sparks only exist mid-animation, and their resting frame is
-         invisible only because the animation said so. */
       .gem__spark,
       .star__spark {
         display: none;

@@ -1,10 +1,6 @@
 @let list = collection();
 
 <nv-drum-card [flat]="true" [interactive]="true">
-  <!--
-    A button, not a link. The films open in a pop-up over this page rather than at an address of
-    their own, so there is nowhere for a link to point.
-  -->
   <button
     type="button"
     class="cc"
@@ -13,7 +9,6 @@
     (click)="open.emit()"
   >
     @if (covers().length) {
-      <!-- A mosaic, so the square fills whether there is one cover or four. -->
       <span class="cc__mosaic" [attr.data-count]="covers().length" aria-hidden="true">
         @for (cover of covers(); track cover) {
           <img [src]="cover" [alt]="" loading="lazy" />
@@ -28,7 +23,6 @@
       </span>
     }
 
-    <!-- Reads over the covers, so the mosaic keeps the whole square. -->
     <span class="cc__scrim" aria-hidden="true"></span>
 
     <span class="cc__foot">

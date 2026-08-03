@@ -6,7 +6,6 @@
   block-size: 100%;
 }
 
-/* A button now, so the element defaults have to be undone before it looks like a card again. */
 .mc {
   display: flex;
   flex-direction: column;
@@ -21,10 +20,6 @@
   cursor: pointer;
 }
 
-/*
- * The artwork's frame. It clips the zoom, so the image can grow without the card
- * growing with it — the card's edges have to stay on the lattice seams.
- */
 .mc__art {
   position: relative;
   display: block;
@@ -37,11 +32,6 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
-  /*
-   * Scaled from the centre on hover. `scale` rather than `transform` so it does
-   * not fight anything else that might want to translate the image, and a slow
-   * curve because a brisk zoom on a wall of posters is agitating.
-   */
   transition: scale var(--nv-slow) var(--nv-ease-panel);
 }
 
@@ -61,13 +51,6 @@
   }
 }
 
-/*
- * Vote average, hidden until the card is engaged.
- *
- * Held back rather than always shown because a score on every card at rest turns
- * a grid of posters into a table of numbers; on hover it answers a question that
- * has just been asked.
- */
 .mc__score {
   @include score-pill;
 
@@ -92,7 +75,6 @@
   fill: var(--nv-accent);
 }
 
-/* The meta strip. One drum tall, matching the poster card it borrows from. */
 .mc__meta {
   display: flex;
   align-items: center;
@@ -100,17 +82,7 @@
   block-size: var(--nv-grid-cell);
   flex: none;
   padding-inline: var(--nv-space-4);
-  /* The worst case — a two-line title over a year — fills the strip almost exactly, so centring
-     alone leaves the title touching the artwork above. A little top padding buys the air, and the
-     spare pixels sit at the bottom where nothing borders them. */
   padding-block-start: var(--nv-space-2);
-  /*
-   * Room for one control, because only one sits here now.
-   *
-   * Reserving for two left barely a hundred pixels of a three-drum card for the title, and every
-   * name clamped mid-word. The add button moved up onto the artwork, where there is space, and the
-   * title got that width back.
-   */
   padding-inline-end: calc(var(--nv-space-3) + 30px);
 }
 
@@ -134,13 +106,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/*
- * Opens the details pop-up, at the right edge of the meta strip.
- *
- * Always visible, unlike everything else on the card. It is now the only way to open a film — the
- * card body toggles selection instead — so hiding it until hover would leave no visible route to
- * the details at all, and none whatsoever on touch.
- */
 .mc__full {
   position: absolute;
   inset-block-end: calc((var(--nv-grid-cell) - 26px) / 2);
@@ -173,11 +138,6 @@
   }
 }
 
-/*
- * Engaged state, driven from the host so hovering the artwork, the title or the
- * button all count as the same gesture. Focus is included so keyboard users get
- * the score and the button too.
- */
 :host(:hover),
 :host(:focus-within) {
   .mc__img {
@@ -191,11 +151,6 @@
   }
 }
 
-/*
- * Selection control. Quiet and empty until used, filled once chosen.
- *
- * Top-left, opposite the score, so the two never collide however long a rating is.
- */
 .mc__pick {
   position: absolute;
   inset-block-start: var(--nv-space-3);
@@ -210,8 +165,6 @@
   backdrop-filter: blur(6px);
   color: transparent;
   opacity: 0;
-  /* A mark, not a target: the card behind it is the control, and intercepting the press here
-     would make the top-left corner of every card mysteriously inert. */
   pointer-events: none;
   transition:
     opacity var(--nv-normal) var(--nv-ease),
@@ -229,8 +182,6 @@
   }
 }
 
-/* Held on once chosen: a mark that disappeared when the pointer left would make a built-up
-   selection impossible to review. */
 .mc__pick.is-on {
   opacity: 1;
   border-color: var(--nv-accent);
@@ -238,13 +189,6 @@
   color: var(--nv-accent-ink);
 }
 
-/*
- * A ring around the artwork while selected.
- *
- * The tick alone is a 24px mark in one corner. Now that the whole card is the control, the whole
- * card should show the state — scanning a grid for what is chosen should not mean hunting corners.
- * Inset, so it reads as part of the card rather than a border added around it.
- */
 .mc.is-selected .mc__art::after {
   content: '';
   position: absolute;
@@ -254,14 +198,6 @@
   pointer-events: none;
 }
 
-/*
- * Where there is no hover, nothing can be revealed by it.
- *
- * Both the score and the link button are shown outright on touch. The score is the
- * obvious one, but the button matters more: hidden until hover, it would be
- * completely unreachable on a phone — the full-page route would exist with no way
- * in.
- */
 @media (hover: none), (max-width: 900px) {
   .mc__score,
   .mc__pick {
@@ -270,8 +206,6 @@
   }
 }
 
-/* The zoom is the one effect here that reads as motion, so it goes. The score
-   and button still appear — they are information, not decoration. */
 @media (prefers-reduced-motion: reduce) {
   .mc__img {
     transition: none;

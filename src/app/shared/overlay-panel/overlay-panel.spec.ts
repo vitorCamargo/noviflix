@@ -5,11 +5,7 @@ import { OverlayPanel } from './overlay-panel';
 @Component({
   imports: [OverlayPanel],
   template: `
-    <nv-overlay-panel
-      ariaLabel="Top movies"
-      closeLabel="Close"
-      (closed)="closes.set(closes() + 1)"
-    >
+    <nv-overlay-panel ariaLabel="Top movies" closeLabel="Close" (closed)="closes.set(closes() + 1)">
       <div nvPanelToolbar class="toolbar">Toolbar</div>
       <div nvPanelFilters class="filters">Filters</div>
       <div nvPanelAside class="aside">Aside</div>

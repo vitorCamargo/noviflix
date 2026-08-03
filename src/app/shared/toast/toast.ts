@@ -1,25 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ToastService, type Toast } from './toast.service';
 
-/**
- * The toast stack, rendered once at the app root.
- *
- * Bottom centre, above the scroll hint's corner and the selection bar, because it reports the
- * result of an action rather than offering one — it should not sit where a control was just
- * pressed.
- */
 @Component({
   selector: 'nv-toast',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (toasts().length) {
-      <!-- A live region, so the outcome is announced rather than only shown. Nothing here takes
-           focus: the visitor is mid-task and a message is not worth interrupting it. -->
       <div class="ts" role="status" aria-live="polite">
         @for (toast of toasts(); track toast.id) {
           @if (toast.action; as action) {
-            <!-- A plain box here, not a dismissible button: the offer is the point, and a
-                 button inside a button is neither valid nor operable. -->
             <div class="ts__item">
               <svg class="ts__icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12.5l5 5 9-11" />
@@ -59,10 +48,6 @@ import { ToastService, type Toast } from './toast.service';
       pointer-events: none;
     }
 
-    /*
-     * A button, because it is dismissible — clicking a message that will not go away is a small
-     * frustration, and a div would give no affordance for it.
-     */
     .ts__item {
       display: flex;
       align-items: center;
@@ -81,8 +66,6 @@ import { ToastService, type Toast } from './toast.service';
       animation: nv-rise var(--nv-fast) var(--nv-ease);
     }
 
-    /* Set apart from the message by a rule rather than a gap, so it reads as a control and
-       not as the tail of the sentence. */
     .ts__action {
       margin-inline-start: var(--nv-space-2);
       padding-inline-start: var(--nv-space-3);

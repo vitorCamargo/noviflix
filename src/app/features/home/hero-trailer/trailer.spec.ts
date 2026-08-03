@@ -13,7 +13,6 @@ const video = (over: Partial<Video>): Video =>
   }) as Video;
 
 describe('trailerScore', () => {
-  /** Anything we cannot embed is unplayable regardless of how apt it is. */
   it('rejects sites we have no embed for', () => {
     expect(trailerScore(video({ site: 'Vimeo' }))).toBe(-1);
   });
@@ -33,7 +32,6 @@ describe('trailerScore', () => {
     );
   });
 
-  /** An official teaser should not beat an unofficial full trailer. */
   it('weighs type above officialness', () => {
     expect(trailerScore(video({ type: 'Trailer', official: false }))).toBeGreaterThan(
       trailerScore(video({ type: 'Teaser', official: true })),
@@ -51,7 +49,6 @@ describe('pickTrailer', () => {
     expect(best?.key).toBe('official');
   });
 
-  /** TMDB's own order is a better tiebreak than anything we could invent. */
   it('keeps the earlier of equally good clips', () => {
     const best = pickTrailer([
       video({ key: 'first', type: 'Trailer', official: true }),
@@ -73,10 +70,6 @@ describe('embedUrl', () => {
     expect(url).toContain('youtube-nocookie.com/embed/KEY123');
   });
 
-  /**
-   * Muted is a hard requirement, not a preference: browsers refuse to autoplay
-   * audible video, so an unmuted embed would never start at all.
-   */
   it('autoplays muted', () => {
     expect(url).toContain('autoplay=1');
     expect(url).toContain('mute=1');
@@ -88,7 +81,6 @@ describe('embedUrl', () => {
     expect(url).toContain('rel=0');
   });
 
-  /** Looping avoids ending on YouTube's related-video screen. */
   it('loops back to the same clip', () => {
     expect(url).toContain('loop=1');
     expect(url).toContain('playlist=KEY123');
@@ -96,10 +88,6 @@ describe('embedUrl', () => {
 });
 
 describe('HOVER_INTENT_MS', () => {
-  /**
-   * The delay exists so crossing the card on the way elsewhere doesn't fire a
-   * request. Too short defeats that; too long feels broken.
-   */
   it('is long enough to read as intent and short enough to feel responsive', () => {
     expect(HOVER_INTENT_MS).toBeGreaterThanOrEqual(250);
     expect(HOVER_INTENT_MS).toBeLessThanOrEqual(700);

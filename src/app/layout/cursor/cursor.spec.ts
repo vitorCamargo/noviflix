@@ -15,7 +15,6 @@ describe('isInteractiveTarget', () => {
     expect(isInteractiveTarget(root.querySelector('#b'))).toBe(true);
   });
 
-  /** The pointer usually lands on an icon inside the control, not the control. */
   it('matches a child of a button', () => {
     root.innerHTML = '<button><span id="icon">x</span></button>';
     expect(isInteractiveTarget(root.querySelector('#icon'))).toBe(true);
@@ -43,7 +42,6 @@ describe('isInteractiveTarget', () => {
     expect(isInteractiveTarget(root.querySelector('#p'))).toBe(false);
   });
 
-  /** pointerout fires with a null relatedTarget when leaving the window. */
   it('is false for null and non-elements', () => {
     expect(isInteractiveTarget(null)).toBe(false);
     expect(isInteractiveTarget(document)).toBe(false);

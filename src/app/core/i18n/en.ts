@@ -1,19 +1,13 @@
 export const en = {
   'app.name': 'Noviflix',
   'boot.loading': 'Starting Noviflix',
-  'app.tagline': 'Discover how you watch.',
 
   'nav.home': 'Home',
   'nav.collections': 'Collections',
   'nav.language': 'Language',
 
   'page.home.title': 'Home',
-  'page.home.body': 'Search and featured movies land here.',
-  'page.home.demoModal': 'Open the details pop-up',
 
-  // Headline is split so the accent word can be styled separately, and so
-  // translators can reorder it — the emphasis doesn't fall last in every
-  // language.
   'home.headlineLead': 'Discover how',
   'home.headlineTailBefore': 'you',
   'home.headlineAccent': 'watch.',
@@ -22,7 +16,6 @@ export const en = {
   'search.label': 'Search for a movie',
   'search.searching': 'Searching',
   'search.clear': 'Clear search',
-  // Says what is wrong and what to do, rather than restating the rule.
   'search.error.tooShort': 'Type at least {min} characters to search.',
   'search.error.charset': 'Use letters and numbers only.',
 
@@ -41,7 +34,6 @@ export const en = {
 
   'movie.overview': 'Overview',
   'movie.noOverview': 'No synopsis has been written in this language yet.',
-  'movie.facts': 'Details',
   'movie.budget': 'Budget',
   'movie.revenue': 'Revenue',
   'movie.runtime': 'Runtime',
@@ -50,7 +42,6 @@ export const en = {
   'movie.voteCountLabel': 'Vote count',
   'movie.voteCount': 'from {count} votes',
 
-  // Rating
   'movie.rate': 'Rate',
   'movie.addToCollection': 'Add to collection',
   'movie.rateHeading': 'Rate this film',
@@ -79,44 +70,27 @@ export const en = {
   'trailer.loading': 'Loading trailer',
 
   'home.popularity': 'Popularity',
-  // Newest release in the set — recency, not volume.
   'home.tier.blazing': 'Blazing hot',
-  // Commands most of the batch's attention.
   'home.tier.trending': 'Trending',
-  // Strong score with enough votes to trust it.
   'home.tier.acclaimed': 'Acclaimed',
-  // Well liked but hasn't broken through.
   'home.tier.hiddenGem': 'Hidden gem',
   'home.tier.wellKnown': 'Well known',
-  // Plenty of votes, low score — people disagree.
   'home.tier.divisive': 'Divisive',
   'home.tier.lowkey': 'Lowkey',
 
-  'page.search.title': 'Search results',
-  'page.search.body': 'Results for the current query land here.',
-
-  'page.movie.title': 'Movie details',
-  'page.movie.body': 'Full details for one movie land here.',
-
   'page.movieModal.title': 'Movie details (pop-up)',
-  'page.movieModal.body': 'Same details, overlaid on the page behind.',
 
-
-  // Collections
-  // Split so the accent word can be styled on its own, and so translators can reorder it.
   'collections.headlineLead': 'All your collections,',
   'collections.headlineAccent': 'saved.',
   'collections.headlineBody':
     'Kept in this browser rather than on a server, so they are yours alone. Group the films you mean to watch, or the ones you already love.',
   'collections.none': 'Nothing saved yet',
   'collections.count': '{count} films',
-  // The page counts collections; a collection counts films. Two units, so two strings.
   'collections.total': '{count} collections',
   'collections.open': 'Open {name}',
   'collections.new': 'New collection',
   'collections.createTitle': 'New collection',
-  'collections.createLead':
-    'Give it a name and say what belongs in it. Both are required.',
+  'collections.createLead': 'Give it a name and say what belongs in it. Both are required.',
   'collections.fieldTitle': 'Title',
   'collections.fieldTitlePlaceholder': 'Saturday nights',
   'collections.fieldDescription': 'Description',
@@ -126,18 +100,14 @@ export const en = {
   'collections.errorRequired': 'This is required.',
   'collections.errorTooLong': 'Keep this under {max} characters.',
   'collections.emptyTitle': 'This collection is empty',
-  'collections.emptyDetail':
-    'Nothing here yet. Search for films and add them from the results.',
+  'collections.emptyDetail': 'Nothing here yet. Search for films and add them from the results.',
   'collections.noDescription': 'No description was written for this one.',
   'collections.tabMovies': 'Movies',
   'collections.createdAt': 'Created',
   'collections.updatedAt': 'Last changed',
   'collections.removeMovie': 'Remove {title} from this collection',
 
-  // Editing and deleting one, from the heading above its films
   'collections.edit': 'Edit',
-  // The visible label is one word, because it sits beside the collection it acts on. Screen
-  // readers get the name, having arrived at the button without that context.
   'collections.editOne': 'Edit {name}',
   'collections.editTitle': 'Edit collection',
   'collections.editLead': 'Change the name or what it is for. Both are still required.',
@@ -146,7 +116,6 @@ export const en = {
   'collections.removeOne': 'Delete {name}',
   'collections.deleted': 'Deleted {name}.',
 
-  // Adding to a collection
   'collections.select': 'Select {title}',
   'collections.selected': '{count} selected',
   'collections.addSelected': 'Add to collection',
@@ -155,23 +124,17 @@ export const en = {
   'collections.pickerLead': 'Choose where these {count} films should go.',
   'collections.pickerEmpty': 'No collections yet. Make one and they will land there.',
   'collections.find': 'Find a collection',
-  // The short one is for the add panel's list, where the row it replaces is a single line.
   'collections.noMatch': 'No collection matches that.',
   'collections.noMatchTitle': 'Nothing called “{query}”',
   'collections.noMatchBody':
     'Check the spelling, or try part of a name — the filter matches anywhere in it, not just the start.',
   'collections.showAll': 'Show all {count}',
-  'collections.createWithFilms':
-    'Name it, and the {count} films you picked will go straight in.',
-  // Quick-create has no form to ask for these, so it invents them. Numbered past what exists, so
-  // several are still tellable apart in the list.
+  'collections.createWithFilms': 'Name it, and the {count} films you picked will go straight in.',
   'collections.generatedName': 'Collection',
   'collections.generatedDescription': 'Started from a film you liked.',
   'collections.createdWith': 'Created {name} with {count} films.',
   'collections.alreadyIn': '{count} already in',
   'collections.addedCount': 'Added {count} to {name}.',
-  // Every chosen film was already there, so nothing changed — said plainly rather than
-  // reporting a success that did nothing.
   'collections.addedNone': 'Already in {name}.',
 
   'about.trigger': 'About',
@@ -197,8 +160,6 @@ export const en = {
   'guest.extending': 'Extending…',
 
   'scroll.hint': 'Swipe or scroll to navigate',
-  // Two labels because two axes: the desktop page travels sideways, the stacked
-  // one downward, and "top" would be wrong on the first.
   'scroll.toStart': 'Back to start',
   'scroll.toTop': 'Back to top',
 
@@ -207,7 +168,6 @@ export const en = {
   'common.openFull': 'Open full page',
   'common.back': 'Back',
   'common.forward': 'Forward',
-  'common.share': 'Share this',
 
   'error.kicker': 'Error 404',
   'error.titleLead': 'Nothing at',
@@ -215,7 +175,6 @@ export const en = {
   'error.body':
     'The link may be old, or the address mistyped. Every film is still here — start from the top, or open one of your collections.',
   'error.path': 'You asked for',
-  'error.notFound': 'We could not find that page.',
   'error.goHome': 'Back to home',
   'error.toCollections': 'My collections',
 } as const;

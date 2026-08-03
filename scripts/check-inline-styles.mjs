@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-/**
- * Guards against backticks inside a component's inline styles template literal.
- *
- * A backtick in a CSS comment there silently terminates the string, and the
- * TypeScript errors that follow point everywhere except the real cause. Cheap
- * to check, genuinely hard to diagnose by hand.
- */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -32,7 +25,6 @@ function check(path) {
       if (/\bstyles:\s*`/.test(line)) inside = true;
       continue;
     }
-    // Closing line of the literal, e.g. a lone backtick and comma.
     if (/^\s*`,?\s*$/.test(line)) {
       inside = false;
       continue;

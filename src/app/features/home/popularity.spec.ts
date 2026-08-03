@@ -28,37 +28,28 @@ describe('resolveTier', () => {
     expect(resolveTier(signals({ voteAverage: 7.8, voteCount: 400 }))).toBe('acclaimed');
   });
 
-  /** A great score off twelve votes says nothing, so volume gates it. */
   it('does not call a thinly-voted film acclaimed', () => {
-    expect(resolveTier(signals({ voteAverage: 9.2, voteCount: 12 }))).not.toBe(
-      'acclaimed',
-    );
+    expect(resolveTier(signals({ voteAverage: 9.2, voteCount: 12 }))).not.toBe('acclaimed');
   });
 
   it('names a poorly-scored film with many votes divisive', () => {
     expect(resolveTier(signals({ voteAverage: 5.1, voteCount: 900 }))).toBe('divisive');
   });
 
-  /**
-   * An unrated film reports 0.0, which would otherwise look like unanimous
-   * dislike rather than absent data.
-   */
   it('does not read an unrated film as divisive', () => {
-    expect(resolveTier(signals({ voteAverage: 0, voteCount: 900 }))).not.toBe(
-      'divisive',
-    );
+    expect(resolveTier(signals({ voteAverage: 0, voteCount: 900 }))).not.toBe('divisive');
   });
 
   it('names a liked but quiet film a hidden gem', () => {
-    expect(
-      resolveTier(signals({ attention: 0.2, voteAverage: 7.1, voteCount: 120 })),
-    ).toBe('hiddenGem');
+    expect(resolveTier(signals({ attention: 0.2, voteAverage: 7.1, voteCount: 120 }))).toBe(
+      'hiddenGem',
+    );
   });
 
   it('does not call a quiet, poorly-liked film a gem', () => {
-    expect(
-      resolveTier(signals({ attention: 0.2, voteAverage: 5.5, voteCount: 120 })),
-    ).toBe('lowkey');
+    expect(resolveTier(signals({ attention: 0.2, voteAverage: 5.5, voteCount: 120 }))).toBe(
+      'lowkey',
+    );
   });
 
   it('grades the remainder by attention', () => {
@@ -82,10 +73,6 @@ describe('attentionRanks', () => {
     expect(ranks.get(2)).toBe(1);
   });
 
-  /**
-   * The reason this is relative at all: a batch of current releases all score
-   * high on TMDB's absolute scale, so fixed cutoffs give every film one label.
-   */
   it('still spreads when every value is high and close together', () => {
     const ranks = attentionRanks([
       { id: 1, popularity: 980 },
@@ -122,7 +109,6 @@ describe('newestReleaseId', () => {
     expect(id).toBe(2);
   });
 
-  /** Stability matters — a flickering badge would be worse than none. */
   it('keeps the first of equal dates', () => {
     const id = newestReleaseId([
       { id: 7, release_date: '2026-03-20' },
@@ -170,7 +156,6 @@ describe('assignTiers', () => {
     expect(tiers.size).toBe(2);
   });
 
-  /** The whole point of the rework: a realistic batch yields varied labels. */
   it('produces more than one status for a plausible batch', () => {
     const tiers = assignTiers([
       movie({ id: 1, popularity: 1200, release_date: '2026-07-20' }),

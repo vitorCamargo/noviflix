@@ -19,10 +19,6 @@ import {
 import { DotField } from '../home/dot-field/dot-field';
 import { HOME_STACK_MAX } from '../home/home-layout';
 
-/**
- * The page's entrance, in reading order. Even an error page arrives like the rest of the app —
- * especially an error page, since it is where the visitor is most inclined to think it broke.
- */
 const ENTRANCE = {
   kicker: 0,
   title: 80,
@@ -33,32 +29,12 @@ const ENTRANCE = {
   actions: 460,
 } as const;
 
-/** First column, clearing the left gutter the rest of the app uses. */
 const START_COL = 3;
 
-/** The text block. The same nine drums the home page gives its caption. */
 const TEXT_COLS = 9;
 
-/**
- * Rows the text block occupies.
- *
- * A fixed span rather than the whole column, so the dot matrix — placed as a percentage of this
- * block — lands beside the type rather than at the top of the viewport. Room to spare inside it,
- * since the type is centred there and the copy wraps differently at every width.
- */
 const TEXT_ROWS = 7;
 
-/**
- * The page for an address that is not a page.
- *
- * Built like every other screen here rather than as a bare message: the lattice, a dot matrix, a
- * headline block on the drums. A 404 is where a visitor is most likely to conclude the site is
- * broken, so it is the last place to drop the design and hand them a stack of centred text.
- *
- * Type and two ways out, and nothing else. There was an empty poster card beside this, on the idea
- * that what is missing would have been a film — but it illustrated the error rather than helping with
- * it, and a decoration that says nothing is worse on this page than on any other.
- */
 @Component({
   selector: 'nv-not-found',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,10 +63,6 @@ const TEXT_ROWS = 7;
           {{ i18n.t('error.body') }}
         </p>
 
-        <!--
-          What was actually asked for. Cheap to show, and the one fact on this page the visitor
-          cannot get from anywhere else on it.
-        -->
         <p class="nf__path" [style.--enter]="delay('path')">
           <span class="nf__path-label">{{ i18n.t('error.path') }}</span>
           <code class="nf__path-value">{{ path }}</code>
@@ -115,11 +87,6 @@ const TEXT_ROWS = 7;
       block-size: 100%;
     }
 
-    /*
-     * isolation: isolate makes this a stacking context so the dots can sit behind the text while the block
-     * as a whole still paints above the pad field. Without it a negative z-index would escape and
-     * land under the pads, hiding the dots.
-     */
     .nf {
       position: relative;
       isolation: isolate;
@@ -131,7 +98,6 @@ const TEXT_ROWS = 7;
       min-inline-size: 0;
     }
 
-    /* A 4x5 matrix bleeding off the left of the text, as on the home page. */
     .nf__dots {
       position: absolute;
       inset-block-start: calc(4% - var(--nv-grid-cell) * 1.5);
@@ -193,7 +159,6 @@ const TEXT_ROWS = 7;
       color: var(--nv-text-faint);
     }
 
-    /* Monospaced, because it is a string that was typed or handed over in a link — not prose. */
     .nf__path-value {
       max-inline-size: 100%;
       padding: 2px var(--nv-space-2);
@@ -242,9 +207,6 @@ const TEXT_ROWS = 7;
       }
     }
 
-    // ----------------------------------------------------------------- entrance
-
-    /* The same machinery as every other page: hidden until the app may animate, then in order. */
     nv-page-grid:not(.is-entering) {
       .nf__kicker,
       .nf__line,
@@ -285,11 +247,7 @@ const TEXT_ROWS = 7;
       }
     }
 
-    // ------------------------------------------------------------------ stacked
-
     @media (max-width: 900px) {
-      /* Spans the two columns PageGrid pairs at this width; otherwise it renders at half the
-         viewport. The same air under the nav as every other page's first block. */
       .nf {
         grid-column: 1 / -1;
         gap: var(--nv-space-3);
@@ -308,35 +266,23 @@ export class NotFound {
   private readonly appReady = inject(AppReadyService);
   private readonly router = inject(Router);
 
-  /** True on arrival by navigation; on a deep-linked refresh, once the first-load screen clears. */
   protected readonly entering = this.appReady.revealed;
 
   protected delay(beat: keyof typeof ENTRANCE): string {
     return `${ENTRANCE[beat]}ms`;
   }
 
-  /**
-   * The address that missed.
-   *
-   * Read once, from the router rather than from `location`: this is the app's own view of where it
-   * was asked to go, and it cannot change while this page is the one being shown.
-   */
   protected readonly path = this.router.url;
 
   private readonly viewport = signal(readViewport());
 
-  /** Floored: content placed to a partial bottom row is placed past the viewport edge. */
   private readonly rows = computed(() =>
     Math.max(1, Math.floor(this.viewport().height / readCellSize())),
   );
 
-  protected readonly stacked = computed(
-    () => this.viewport().width <= HOME_STACK_MAX,
-  );
+  protected readonly stacked = computed(() => this.viewport().width <= HOME_STACK_MAX);
 
-  protected readonly minColumns = computed(() =>
-    this.stacked() ? 18 : START_COL + TEXT_COLS,
-  );
+  protected readonly minColumns = computed(() => (this.stacked() ? 18 : START_COL + TEXT_COLS));
 
   protected readonly textArea = computed(() => {
     if (this.stacked()) return null;
@@ -351,7 +297,6 @@ export class NotFound {
     });
   });
 
-  /** One row goes to the header, which floats over the first drum. */
   private readonly available = computed(() => Math.max(1, this.rows() - 1));
 
   private resizeFrame: number | null = null;

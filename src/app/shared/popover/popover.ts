@@ -50,16 +50,10 @@ import {
       position: relative;
     }
 
-    /*
-     * Plain white text, matching the other nav items — no pill or border. The
-     * trigger only needs to read as a peer of its neighbours; the panel arriving
-     * is what signals it was pressed.
-     */
     .pv__trigger {
       display: inline-flex;
       align-items: center;
       gap: var(--nv-space-2);
-      /* Padding is always present so opening the panel doesn't shift the row. */
       padding: var(--nv-space-2) var(--nv-space-3);
       border: 0;
       border-radius: var(--nv-radius-pill);
@@ -68,10 +62,6 @@ import {
       font-size: var(--nv-text-sm);
       font-weight: 600;
       white-space: nowrap;
-      /*
-       * Long and heavily decelerated, matching the panel's curve, so the pill
-       * and the panel feel like one gesture rather than two separate effects.
-       */
       transition:
         color var(--nv-dur-swipe) var(--nv-ease-panel),
         background var(--nv-dur-swipe) var(--nv-ease-panel);
@@ -81,18 +71,10 @@ import {
       }
     }
 
-    /*
-     * Hideable from outside the component.
-     *
-     * A custom property crosses the encapsulation boundary where a descendant
-     * selector cannot, so a caller can drop the label to an icon-only trigger
-     * without this component knowing anything about the context.
-     */
     .pv__label {
       display: var(--nv-popover-label-display, inline);
     }
 
-    /* Open: tinted accent pill, matching the selected nav item. */
     .is-open .pv__trigger {
       background: var(--nv-accent-soft);
       color: var(--nv-accent);
@@ -101,8 +83,6 @@ import {
     .pv__icon {
       display: inline-flex;
 
-      /* Sized by the caller. Most triggers want a small glyph beside a label, but one
-         projects a countdown ring, which has to be legible on its own. */
       ::ng-deep svg {
         inline-size: var(--nv-popover-icon-size, 18px);
         block-size: var(--nv-popover-icon-size, 18px);
@@ -116,12 +96,6 @@ import {
 
     .pv__panel {
       --pv-width: 560px;
-      /*
-       * Reset, not a default. The trigger usually sits in a nav row where items
-       * must not wrap, and white-space is inherited — so the panel picked up
-       * nowrap from its surroundings and every paragraph ran off the side as a
-       * single line. Prose here wraps wherever the trigger happens to live.
-       */
       white-space: normal;
       position: absolute;
       inset-block-start: calc(100% + var(--nv-space-3));
@@ -134,24 +108,13 @@ import {
       padding: var(--nv-space-6);
       background: var(--nv-panel);
       border-radius: var(--nv-radius-lg);
-      /* Borderless — the shadow alone lifts it off the grid. An outline here
-         competes with the lattice showing through behind it. */
       box-shadow: var(--nv-shadow-pop);
       --nv-mask-radius: var(--nv-radius-lg);
       animation: nv-mask-open var(--nv-dur-mask) var(--nv-ease-panel) both;
     }
 
-    /*
-     * Every block of panel content rises as the mask opens. Applied here rather
-     * than by each caller, via ::ng-deep, so any popover's content animates
-     * without the caller knowing about it.
-     *
-     * The delay lets the mask get underway first — content arriving at the same
-     * instant as the box reads as one flat fade instead of two layers.
-     */
     ::ng-deep .pv__panel > * {
-      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel)
-        var(--nv-delay-swipe) both;
+      animation: nv-swipe-up var(--nv-dur-swipe) var(--nv-ease-panel) var(--nv-delay-swipe) both;
     }
 
     .pv__panel--end {
@@ -193,7 +156,6 @@ export class Popover {
   readonly align = input<'start' | 'end'>('start');
   readonly width = input('560px');
   readonly notch = input(true);
-
 
   readonly opened = output<void>();
   readonly closed = output<void>();

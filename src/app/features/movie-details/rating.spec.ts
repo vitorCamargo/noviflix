@@ -16,11 +16,6 @@ describe('RATING_VALUES', () => {
     expect(RATING_VALUES).toHaveLength(20);
   });
 
-  /**
-   * Repeated addition of 0.5 drifts in binary floating point. Left unrounded the
-   * range holds values like 7.000000000000001, which TMDB rejects outright and which
-   * compares unequal to the 7 the visitor thought they picked.
-   */
   it('holds exact values, free of floating point drift', () => {
     for (const value of RATING_VALUES) {
       expect(Number.isInteger(value * 2)).toBe(true);
@@ -42,11 +37,6 @@ describe('snapRating', () => {
     expect(snapRating(99)).toBe(RATING_MAX);
   });
 
-  /**
-   * Any non-finite input is treated as no value at all, infinities included. They
-   * cannot arrive from the control — the slider and the stars are both bounded — so
-   * the simplest safe answer beats arguing about which end infinity belongs at.
-   */
   it('falls back to the minimum for values that are not real numbers', () => {
     expect(snapRating(Number.NaN)).toBe(RATING_MIN);
     expect(snapRating(Number.POSITIVE_INFINITY)).toBe(RATING_MIN);
@@ -74,7 +64,6 @@ describe('isValidRating', () => {
 });
 
 describe('starFill', () => {
-  /** Star 4 covers ratings 7 and 8: half at 7, full at 8. */
   it('fills, half-fills or empties a star for a rating', () => {
     expect(starFill(4, 8)).toBe(1);
     expect(starFill(4, 7)).toBe(0.5);

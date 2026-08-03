@@ -11,11 +11,6 @@ describe('isHorizontalTrack', () => {
     expect(isHorizontalTrack('scroll')).toBe(true);
   });
 
-  /**
-   * The stacked-mode bug: content can overflow a `visible` box, so measuring
-   * scrollWidth alone had the directive claiming a track it could not move,
-   * swallowing the wheel and leaving the page stuck.
-   */
   it('rejects a box that merely has content sticking out of it', () => {
     expect(isHorizontalTrack('visible')).toBe(false);
     expect(isHorizontalTrack('clip')).toBe(false);
@@ -75,7 +70,6 @@ describe('findNestedVerticalScroller', () => {
   let inner: HTMLElement;
   let leaf: HTMLElement;
 
-  /** jsdom reports zero for layout, so scroll metrics are defined explicitly. */
   function setMetrics(
     el: HTMLElement,
     metrics: { scrollHeight: number; clientHeight: number; scrollTop: number },

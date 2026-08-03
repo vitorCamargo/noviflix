@@ -40,9 +40,7 @@ export class I18nService {
 
   readonly languages = LANGUAGES;
 
-  readonly current = computed(
-    () => LANGUAGES.find((l) => l.code === this.lang()) ?? LANGUAGES[0],
-  );
+  readonly current = computed(() => LANGUAGES.find((l) => l.code === this.lang()) ?? LANGUAGES[0]);
 
   readonly tmdbLang = computed(() => this.current().tmdb);
 
@@ -61,10 +59,7 @@ export class I18nService {
     }
   }
 
-  readonly t = (
-    key: TranslationKey,
-    params?: Record<string, string | number>,
-  ): string => {
+  readonly t = (key: TranslationKey, params?: Record<string, string | number>): string => {
     const dict = this.dictionaries[this.lang()];
     let value = dict[key] ?? en[key] ?? key;
 

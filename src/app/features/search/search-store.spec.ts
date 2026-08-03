@@ -11,10 +11,6 @@ describe('mergeUnique', () => {
     expect(merged.map((m) => m.id)).toEqual([1, 2, 3, 4]);
   });
 
-  /**
-   * TMDB can repeat a record across pages, and a repeat is not cosmetic: the grid
-   * tracks by id, and Angular throws on a duplicate tracking key.
-   */
   it('drops films already present', () => {
     const merged = mergeUnique([movie(1), movie(2)], [movie(2), movie(3)]);
     expect(merged.map((m) => m.id)).toEqual([1, 2, 3]);
